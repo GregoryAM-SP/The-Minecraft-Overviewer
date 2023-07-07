@@ -150,7 +150,13 @@ const mc_block_t block_class_stair[] = {
     block_cobbled_deepslate_stairs,
     block_polished_deepslate_stairs,
     block_deepslate_brick_stairs,
-    block_deepslate_tile_stairs};
+    block_deepslate_tile_stairs,
+    
+    block_mangrove_stairs,
+    block_cherry_stairs,
+    block_bamboo_stairs,
+    block_bamboo_mosaic_stairs,
+    block_mud_brick_stairs};
 const size_t block_class_stair_len = COUNT_OF(block_class_stair);
 
 const mc_block_t block_class_door[] = {
@@ -252,7 +258,14 @@ const mc_block_t block_class_ancil[] = {
     block_cobbled_deepslate_wall,
     block_polished_deepslate_wall,
     block_deepslate_brick_wall,
-    block_deepslate_tile_wall};
+    block_deepslate_tile_wall,
+    
+    block_mangrove_stairs,
+    block_cherry_stairs,
+    block_bamboo_stairs,
+    block_bamboo_mosaic_stairs,
+    block_mud_brick_stairs,
+    block_mud_brick_wall};
 const size_t block_class_ancil_len = COUNT_OF(block_class_ancil);
 
 const mc_block_t block_class_alt_height[] = {
@@ -342,7 +355,13 @@ const mc_block_t block_class_alt_height[] = {
     block_polished_deepslate_slab,
     block_deepslate_brick_slab,
     block_deepslate_tile_slab,
-    block_mud_brick_slab};
+    block_mud_brick_slab,
+    
+    block_mangrove_stairs,
+    block_cherry_stairs,
+    block_bamboo_stairs,
+    block_bamboo_mosaic_stairs,
+    block_mud_brick_stairs};
 const size_t block_class_alt_height_len = COUNT_OF(block_class_alt_height);
 
 const mc_block_t block_class_nether_roof[] = {
