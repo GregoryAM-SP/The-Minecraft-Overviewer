@@ -1071,6 +1071,9 @@ class RegionSet(object):
             # Sculk
             'minecraft:sculk': (1222, 0),
             'minecraft:sculk_vein': (1223, 0),
+            'minecraft:sculk_sensor': (1245, 0),
+            'minecraft:sculk_shrieker': (1246, 0),
+            'minecraft:calibrated_sculk_sensor': (1247, 0),
             # Flowers, Leaves & Saplings
             'minecraft:torchflower_crop': (1240, 0),
             'minecraft:torchflower': (1241, 0),
@@ -1260,19 +1263,13 @@ class RegionSet(object):
         elif (key in 'minecraft:chiseled_bookshelf'):
             facing = palette_entry['Properties']['facing']
             data = {'south': 0, 'west': 1, 'north': 2, 'east': 3}[facing]
-            if palette_entry['Properties']['slot_0_occupied'] == 'true':
-                data |= 4
-            elif palette_entry['Properties']['slot_1_occupied'] == 'true':
-                data |= 5
-            elif palette_entry['Properties']['slot_2_occupied'] == 'true':
-                data |= 6
-            elif palette_entry['Properties']['slot_3_occupied'] == 'true':
-                data |= 7
-            elif palette_entry['Properties']['slot_4_occupied'] == 'true':
-                data |= 8
-            elif palette_entry['Properties']['slot_5_occupied'] == 'true':
-                data |= 9
-            # print(f"Data: {data}, Facing: {facing}")
+            p = palette_entry['Properties']
+            for i in range(6):
+                if p[f'slot_{i}_occupied'] == 'true':
+                    data |= 4
+        elif (key in 'minecraft:calibrated_sculk_sensor'):
+            facing = palette_entry['Properties']['facing']
+            data = {'south': 0, 'west': 1, 'north': 2, 'east': 3}[facing]
         elif key in wood_slabs + stone_slabs + prismarine_slabs + copper_slabs:
         # handle double slabs 
             if palette_entry['Properties']['type'] == 'top':

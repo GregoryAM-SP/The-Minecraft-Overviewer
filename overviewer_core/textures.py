@@ -2862,6 +2862,134 @@ def stonecutter(self, blockid, data):
 
     return img
 
+@material(blockid=1245, data=list(range(5)), transparent=True, solid=True)
+def sculk_sensor(self, blockid, data):
+    top_t = self.load_image_texture(BLOCKTEXTURE + "sculk_sensor_top.png").copy()
+    side_t = self.load_image_texture(BLOCKTEXTURE + "sculk_sensor_side.png")
+
+    tendril = self.load_image_texture(BLOCKTEXTURE + "sculk_sensor_tendril_inactive.png").copy()
+    tendrilAlpha = tendril.split()[3]
+    tendril = ImageEnhance.Brightness(tendril).enhance(0.8)
+    tendril.putalpha(tendrilAlpha)
+
+    img = self.build_full_block((top_t, 8), None, None, side_t, side_t, None)
+
+    tendril_swap = self.transform_image_side(tendril)
+    tendril_swap = tendril_swap.transpose(Image.FLIP_LEFT_RIGHT)
+
+
+
+    alpha_over(img, tendril, (4, 1), tendril)
+    alpha_over(img, tendril, (4, -5), tendril)
+    alpha_over(img, tendril_swap, (-1, -2), tendril_swap)
+    alpha_over(img, tendril_swap, (13, -2), tendril_swap)
+
+    return img
+
+@material(blockid=1246, data=list(range(5)), transparent=True, solid=True)
+def sculk_shrieker(self, blockid, data):
+    top_portion = self.load_image_texture(BLOCKTEXTURE + "sculk_shrieker_top.png").copy()
+    side_t = self.load_image_texture(BLOCKTEXTURE + "sculk_shrieker_side.png")
+    top_inside = self.load_image_texture(BLOCKTEXTURE + "sculk_shrieker_inner_top.png").copy()
+
+    img = self.build_full_block((top_portion, 0), side_t, side_t, side_t, side_t, top_inside)
+
+    return img
+
+
+@material (blockid=1247, data=list(range(128)), transparent=True, solid=True)
+def calibrated_sculk_sensor(self, blockid, data):
+    sensor_amethyst = self.load_image_texture(BLOCKTEXTURE + "calibrated_sculk_sensor_amethyst.png")
+    front = self.load_image_texture(BLOCKTEXTURE + "calibrated_sculk_sensor_input_side.png")
+    t_top = self.load_image_texture(BLOCKTEXTURE + "calibrated_sculk_sensor_top.png")
+    tendril = self.load_image_texture(BLOCKTEXTURE + "sculk_sensor_tendril_inactive.png")
+    t_side = self.load_image_texture(BLOCKTEXTURE + "sculk_sensor_side.png")
+
+    tendrilAlpha = tendril.split()[3]
+    tendril = ImageEnhance.Brightness(tendril).enhance(0.8)
+    tendril.putalpha(tendrilAlpha)
+
+    # img = self.build_full_block((top_t, 8), None, None, side_t, side_t, None)
+
+    tendril_swap = self.transform_image_side(tendril)
+    tendril_swap = tendril_swap.transpose(Image.FLIP_LEFT_RIGHT)
+    
+    
+
+
+
+    # alpha_over(img, tendril, (4, 1), tendril)
+    # alpha_over(img, tendril, (4, -5), tendril)
+    # alpha_over(img, tendril_swap, (-1, -2), tendril_swap)
+    # alpha_over(img, tendril_swap, (13, -2), tendril_swap)
+
+    # if self.rotation == 0: # rendering north upper-left
+    if data == 0 or data == 4: # south
+        img = self.build_full_block((t_top.rotate(180), 8), t_side, front, t_side, t_side)
+        alpha_over(img, tendril, (4, 1), tendril)
+        alpha_over(img, tendril, (4, -5), tendril)
+        alpha_over(img, tendril_swap, (-1, -2), tendril_swap)
+        alpha_over(img, tendril_swap, (13, -2), tendril_swap)
+        alpha_over(img, sensor_amethyst, (5, -4), sensor_amethyst)
+        return img
+    elif data == 1 or data == 5: # west
+        img = self.build_full_block((t_top.rotate(90), 8), front, t_side, t_side, t_side)
+        alpha_over(img, tendril, (4, 1), tendril)
+        alpha_over(img, tendril, (4, -5), tendril)
+        alpha_over(img, tendril_swap, (-1, -2), tendril_swap)
+        alpha_over(img, tendril_swap, (13, -2), tendril_swap)
+        alpha_over(img, sensor_amethyst, (5, -4), sensor_amethyst)
+        return img
+    elif data == 2 or data == 6: # north
+        img = self.build_full_block((t_top, 8), t_side, t_side, t_side, front)
+        alpha_over(img, tendril, (4, 1), tendril)
+        alpha_over(img, tendril, (4, -5), tendril)
+        alpha_over(img, tendril_swap, (-1, -2), tendril_swap)
+        alpha_over(img, tendril_swap, (13, -2), tendril_swap)
+        alpha_over(img, sensor_amethyst, (5, -4), sensor_amethyst)
+        return img
+    elif data == 3 or data == 7: # east
+        img = self.build_full_block((t_top.rotate(270), 8), t_side, t_side, front, t_side)
+        alpha_over(img, tendril, (4, 1), tendril)
+        alpha_over(img, tendril, (4, -5), tendril)
+        alpha_over(img, tendril_swap, (-1, -2), tendril_swap)
+        alpha_over(img, tendril_swap, (13, -2), tendril_swap)
+        alpha_over(img, sensor_amethyst, (5, -4), sensor_amethyst)
+        return img
+    
+
+    # elif self.rotation == 1: # north upper-right
+    #     if data == 0 or data == 4: # south
+    #         return self.build_full_block((t_top, 8), t_side, t_side, front, t_side)
+    #     elif data == 1 or data == 5: # west
+    #         return self.build_full_block((t_top, 8), t_side, front, t_side, t_side)
+    #     elif data == 2 or data == 6: # north
+    #         return self.build_full_block((t_top, 8), front, t_side, t_side, t_side)
+    #     elif data == 3 or data == 7: # east
+    #         return self.build_full_block((t_top, 8), t_side, t_side, t_side, front)            
+
+    # elif self.rotation == 2: # north lower-right
+    #     if data == 0 or data == 4: # south
+    #         return self.build_full_block((t_top, 8), t_side, front, t_side, t_side)
+    #     elif data == 1 or data == 5: # west
+    #         return self.build_full_block((t_top, 8), front, t_side, t_side, t_side)
+    #     elif data == 2 or data == 6: # north
+    #         return self.build_full_block((t_top, 8), t_side, t_side, t_side, front)
+    #     elif data == 3 or data == 7: # east
+    #         return self.build_full_block((t_top, 8), t_side, t_side, front, t_side)
+            
+    # elif self.rotation == 3: # north lower-left
+    #     if data == 0 or data == 4: # south
+    #         return self.build_full_block((t_top, 8), front, t_side, t_side, t_side)
+    #     elif data == 1 or data == 5: # west
+    #         return self.build_full_block((t_top, 8), t_side, t_side, t_side, front)
+    #     elif data == 2 or data == 6: # north
+    #         return self.build_full_block((t_top, 8), t_side, t_side, front, t_side)
+    #     elif data == 3 or data == 7: # east
+    #         return self.build_full_block((t_top, 8), t_side, front, t_side, t_side)
+
+
+
 
 @material(blockid=11369, data=list(range(12)), transparent=True, solid=True, nospawn=True)
 def grindstone(self, blockid, data):
@@ -5096,9 +5224,11 @@ def beacon(self, blockid, data):
     # generate the three pieces of the block
     t = self.load_image_texture(BLOCKTEXTURE + "glass.png")
     glass = self.build_block(t,t)
+
     t = self.load_image_texture(BLOCKTEXTURE + "obsidian.png")
     obsidian = self.build_full_block((t,12),None, None, t, t)
     obsidian = obsidian.resize((20,20), Image.ANTIALIAS)
+
     t = self.load_image_texture(BLOCKTEXTURE + "beacon.png")
     crystal = self.build_block(t,t)
     crystal = crystal.resize((16,16),Image.ANTIALIAS)
@@ -6153,7 +6283,7 @@ def sandstone(self, blockid, data):
 block(blockid=11414, top_image=BLOCKTEXTURE + "scaffolding_top.png", side_image=BLOCKTEXTURE + "scaffolding_side.png", solid=False, transparent=True)
 
 # Chiseled Bookshelf
-@material(blockid=1227, data=list(range(16)), transparent=False, solid=True)
+@material(blockid=1227, data=list(range(128)), transparent=False, solid=True)
 def chiseledBookshelf(self, blockid, data):
     t_top = self.load_image_texture(BLOCKTEXTURE + "chiseled_bookshelf_top.png")
     t_side = self.load_image_texture(BLOCKTEXTURE + "chiseled_bookshelf_side.png")
