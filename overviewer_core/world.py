@@ -1797,7 +1797,7 @@ class RegionSet(object):
         # Empty is self-explanatory, and liquid_carved and carved seem to correspond
         # to SkyLight not being calculated, which results in mostly-black chunks,
         # so we'll just pretend they aren't there.
-        if chunk_data.get("Status", "") not in ("minecraft:full", "postprocessed", "fullchunk", "mobs_spawned", "spawn", ""):
+        if chunk_data.get("Status", "") not in ("minecraft:full", "postprocessed", "fullchunk", "mobs_spawned", "spawn", "full", ""):
             raise ChunkDoesntExist("Chunk %s,%s doesn't exist" % (x,z))
 
         # Turn the Biomes array into a 16x16 numpy array
