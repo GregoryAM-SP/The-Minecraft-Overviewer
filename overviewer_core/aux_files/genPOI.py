@@ -159,9 +159,17 @@ def signWrangler(poi):
     """
     Just does the JSON things for signs
     """
-    for field in ["Text1", "Text2", "Text3", "Text4"]:
-        poi[field] = jsonText(poi[field])
+    if "Text1" in poi:
+        for field in ["Text1", "Text2", "Text3", "Text4"]:
+            poi[field] = jsonText(poi[field])
+    else:
+        for field in ["front_text", "back_text"]:
+            if field in poi:
+                messages = poi[field].get("messages", [])
+                for i in range(len(messages)):
+                    messages[i] = jsonText(messages[i])
     return poi
+
 
 
 def handleEntities(rset, config, config_path, filters, markers):
