@@ -39,4 +39,5 @@ You can upload these files on a web server and let others view your map.
 The Minecraft Overviewer **only** supports the world format from the Java Edition of Minecraft.\
 Minecraft Bedrock worlds are not supported.
 
-Using a tool such as [Amulet](https://www.amuletmc.com/) to convert your Bedrock Worlds into Java Edition Worlds has been reported to work. But, the results may vary.
+Using a tool such as [Amulet](https://www.amuletmc.com/) to convert your Bedrock Worlds into Java Edition Worlds has been reported to work.\
+But, the results may vary.
