@@ -4,7 +4,7 @@
 The Minecraft Overviewer is a command-line tool for rendering high-resolution maps of Minecraft Worlds.\
 It generates a set of static HTML Image files and uses LeafletJS to display an interactive map.
 
-While The Minecraft Overviewer was in active development for several years by the original developers, they have stopped development; leading to the community to take over the project and work to continue development.
+While The Minecraft Overviewer was in active development for nearly a decade by the original developers, they have stopped development; leading to the community to take over the project and work to continue development.
 
 ## The Minecraft Overviewer includes:
 - Day / Night Lighting
