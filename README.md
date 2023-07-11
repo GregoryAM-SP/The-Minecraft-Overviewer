@@ -46,7 +46,7 @@ While Overviewer can be run directly from the command line, it's generally easie
 **Step 5:** Edit *ConfigOverviewer.txt*
 
  - Replace C:/Users/YourPathHere with the path to your world file.
- - Replace "D:/YourPathHere" with the path to where you want the map's files to be.
+ - Replace D:/YourPathHere with the path to where you want the map's files to be.
  - Add, remove, or edit any renders you'd like to change. The sample comes with four smooth-lighting renders from the overworld, one for each isometric perspective. For more info on the config file, visit [the docs](http://docs.overviewer.org/en/latest/config/). Overviewer supports the Nether, the End, and a cave view, though these are not included in the sample config.
  - Save the file.
 
