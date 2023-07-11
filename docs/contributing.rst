@@ -292,6 +292,8 @@ talk with other developers that are on the IRC channel in real-time.
 
 .. _an IRC channel on Libera.Chat: https://overviewer.org/irc/
 
+Additionally, there is a `Discord <https://discord.gg/32Bz2yW>`__, where those
+currently continuing the project can be most easily reached.
 Since most developers have jobs or are in college or university, it may
 sometimes take a few moments to get a reply. So it's useful to stick around and
 wait for someone who can help you to be around.
