@@ -1032,8 +1032,8 @@ sprite(blockid=11413, imagename=BLOCKTEXTURE + "bamboo_stage0.png")
 sprite(blockid=1233, imagename=BLOCKTEXTURE + "mangrove_propagule.png")
 sprite(blockid=1234, imagename=BLOCKTEXTURE + "cherry_sapling.png")
 # Eventually, Replace these with full blocks
-sprite(blockid=1235, imagename=BLOCKTEXTURE + "potted_azalea_bush_plant.png")
-sprite(blockid=1236, imagename=BLOCKTEXTURE + "potted_flowering_azalea_bush_plant.png")
+# sprite(blockid=1235, imagename=BLOCKTEXTURE + "potted_azalea_bush_plant.png")
+# sprite(blockid=1236, imagename=BLOCKTEXTURE + "potted_flowering_azalea_bush_plant.png")
 # ------------------------------------------
 # sprite(blockid=1233, imagename=BLOCKTEXTURE + "dead_tube_coral.png")
 # sprite(blockid=1234, imagename=BLOCKTEXTURE + "dead_brain_coral.png")
@@ -5000,6 +5000,17 @@ def torchflower(self, blockid, data):
             return self.build_sprite(self.load_image_texture(BLOCKTEXTURE + "torchflower_crop_stage1.png"))
     if blockid == 1241:
         return self.build_sprite(self.load_image_texture(BLOCKTEXTURE + "torchflower.png"))
+
+@material(blockid=[1235, 1236], data=list(range(2)), transparent=True)
+def azalea(self,blockid,data):
+    if blockid == 1235:
+        top = self.load_image_texture(BLOCKTEXTURE + "azalea_top.png")
+        side = self.load_image_texture(BLOCKTEXTURE + "azalea_side.png")
+        return self.build_full_block(top, None, None, side, side)
+    if blockid == 1236:
+        top = self.load_image_texture(BLOCKTEXTURE + "flowering_azalea_top.png")
+        side = self.load_image_texture(BLOCKTEXTURE + "flowering_azalea_side.png")
+        return self.build_full_block(top, None, None, side, side)
 
 # enchantment table
 # TODO there's no book at the moment
