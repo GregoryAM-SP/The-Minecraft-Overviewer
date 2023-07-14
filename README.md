@@ -1,4 +1,11 @@
 # The Minecraft Overviewer
+![forthebadge](https://forthebadge.com/images/badges/built-by-developers.svg)
+![forthebadge](https://forthebadge.com/images/badges/open-source.svg)
+![forthebadge](https://forthebadge.com/images/badges/made-with-crayons.svg)
+![forthebadge](https://forthebadge.com/images/badges/made-with-python.svg)
+![forthebadge](https://forthebadge.com/images/badges/made-with-c.svg)
+![forthebadge](https://forthebadge.com/images/badges/does-not-contain-treenuts.svg)
+![forthebadge](https://forthebadge.com/images/badges/powered-by-black-magic.svg)
 
 ### What is The Minecraft Overviewer?
 The Minecraft Overviewer is a command-line tool for rendering high-resolution maps of Minecraft Worlds.\
