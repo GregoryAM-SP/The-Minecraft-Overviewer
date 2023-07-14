@@ -7,6 +7,8 @@
 ![forthebadge](https://forthebadge.com/images/badges/does-not-contain-treenuts.svg)
 ![forthebadge](https://forthebadge.com/images/badges/powered-by-black-magic.svg)
 
+### [Python 3.6](https://www.python.org/downloads/release/python-360/) Required
+
 ### What is The Minecraft Overviewer?
 The Minecraft Overviewer is a command-line tool for rendering high-resolution maps of Minecraft Worlds.\
 It generates a set of static HTML Image files and uses LeafletJS to display an interactive map.
