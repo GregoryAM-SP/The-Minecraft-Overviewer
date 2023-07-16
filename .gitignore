@@ -43,3 +43,5 @@ overviewer_core/src/primitives.h
 /.vs
 .vscode
 ImagingUtils.h
+
+*_CONFIG.PY

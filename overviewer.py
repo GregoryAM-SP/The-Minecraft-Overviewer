@@ -368,7 +368,7 @@ def main():
 
     ############################################################
     # Final validation steps and creation of the destination directory
-    logging.info("Welcome to Minecraft Overviewer version %s (%s)!" % (util.findGitVersion(), util.findGitHash()[:7]))
+    logging.info("Welcome to Minecraft Overviewer version %s (%s)!" % (util.findGitTag(), util.findGitHash()[:7]))
     logging.debug("Current log level: {0}.".format(logging.getLogger().level))
 
     def set_renderchecks(checkname, num):

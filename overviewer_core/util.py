@@ -81,6 +81,21 @@ def findGitVersion():
             return overviewer_version.VERSION
         except Exception:
             return "unknown"
+        
+def findGitTag():
+    try:
+        p = Popen('git describe --tags --abbrev=0', stdout=PIPE, stderr=PIPE, shell=True)
+        p.stderr.close()
+        line = p.stdout.readlines()[0].decode('utf-8').strip()
+        return line
+    except Exception:
+        try:
+            from . import overviewer_version
+            return overviewer_version.VERSION
+        except Exception:
+            pass
+    return "unknown"
+
 
 
 def is_bare_console():
