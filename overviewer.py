@@ -176,7 +176,7 @@ def main():
     # This section of main() runs in response to any one-time options we have,
     # such as -V for version reporting
     if args.version:
-        print("Minecraft Overviewer %s" % util.findGitVersion() +
+        print("Minecraft Overviewer %s" % util.findGitTag() +
               " (%s)" % util.findGitHash()[:7])
         try:
             import overviewer_core.overviewer_version as overviewer_version
@@ -193,7 +193,7 @@ def main():
         if not args.checkversion:
             return 0
     if args.checkversion:
-        print("Currently running Minecraft Overviewer %s" % util.findGitVersion() +
+        print("Currently running Minecraft Overviewer %s" % util.findGitTag() +
               " (%s)" % util.findGitHash()[:7])
         try:
             from urllib import request

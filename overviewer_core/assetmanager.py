@@ -216,7 +216,7 @@ top-level directory.
         index = codecs.open(indexpath, 'r', encoding='UTF-8').read()
         index = index.replace("{title}", "Minecraft Overviewer")
         index = index.replace("{time}", time.strftime("%a, %d %b %Y %H:%M:%S %Z", time.localtime()))
-        versionstr = "%s (%s)" % (util.findGitVersion(),
+        versionstr = "%s (%s)" % (util.findGitTag(),
                                   util.findGitHash()[:7])
         index = index.replace("{version}", versionstr)
 

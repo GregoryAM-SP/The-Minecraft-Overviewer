@@ -63,7 +63,7 @@ def read(fname):
     return open(fname).read()
 
 setup_kwargs['name'] = 'Minecraft-Overviewer'
-setup_kwargs['version'] = util.findGitVersion()
+setup_kwargs['version'] = util.findGitTag()
 setup_kwargs['description'] = 'Generates large resolution images of a Minecraft map.'
 setup_kwargs['url'] = 'http://overviewer.org/'
 setup_kwargs['author'] = 'Andrew Brown'
@@ -121,7 +121,7 @@ def find_system_module_path():
 if py2exe is not None:
     setup_kwargs['comments'] = "http://overviewer.org"
     # py2exe likes a very particular type of version number:
-    setup_kwargs['version'] = util.findGitVersion().replace("-",".")
+    setup_kwargs['version'] = util.findGitTag().replace("-",".")
 
     setup_kwargs['console'] = ['overviewer.py', 'contribManager.py']
     setup_kwargs['data_files'] = [('', doc_files)]
@@ -257,7 +257,7 @@ class CustomClean(clean):
 def generate_version_py():
     try:
         outstr = ""
-        outstr += "VERSION=%r\n" % util.findGitVersion()
+        outstr += "VERSION=%r\n" % util.findGitTag()
         outstr += "HASH=%r\n" % util.findGitHash()
         outstr += "BUILD_DATE=%r\n" % time.asctime()
         outstr += "BUILD_PLATFORM=%r\n" % platform.processor()
