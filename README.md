@@ -6,6 +6,8 @@
 ![forthebadge](https://forthebadge.com/images/badges/made-with-c.svg)
 ![forthebadge](https://forthebadge.com/images/badges/does-not-contain-treenuts.svg)
 ![forthebadge](https://forthebadge.com/images/badges/powered-by-black-magic.svg)
+### Currently built for Windows
+<sub>Honestly, I'm just not sure how to build for other Operating Systems, yet! ~ GregoryAM</sub>
 
 ### [Python 3.6](https://www.python.org/downloads/release/python-360/) Required
 
