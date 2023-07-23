@@ -113,6 +113,8 @@ base_draw(void* data, RenderState* state, PyObject* src, PyObject* mask, PyObjec
         (((state->block == block_pumpkin_stem) || (state->block == block_melon_stem)) && (state->block_data != 7)) ||
         /* doublePlant grass & ferns */
         (state->block == block_double_plant && (state->block_data == 2 || state->block_data == 3)) ||
+        /* sugarcane/reeds (according to minecraft-fandom) */
+        (state->block == block_reeds) ||
         /* doublePlant grass & ferns tops */
         (state->block == block_double_plant && below_block == block_double_plant && (below_data == 2 || below_data == 3))) {
         /* do the biome stuff! */
@@ -120,6 +122,7 @@ base_draw(void* data, RenderState* state, PyObject* src, PyObject* mask, PyObjec
         uint8_t r = 255, g = 255, b = 255;
         PyObject* color_table = NULL;
         bool flip_xy = false;
+        bool is_water = false;
 
         if (state->block == block_grass) {
             /* grass needs a special facemask */
@@ -129,6 +132,8 @@ base_draw(void* data, RenderState* state, PyObject* src, PyObject* mask, PyObjec
             color_table = self->grasscolor;
         } else if (block_class_is_subset(state->block, (mc_block_t[]){block_flowing_water, block_water}, 2)) {
             color_table = self->watercolor;
+            //we dont use color_table for water but i am too lazy for refactoring :(
+            is_water = true;
         } else if (block_class_is_subset(state->block, (mc_block_t[]){block_leaves, block_leaves2}, 2)) {
             color_table = self->foliagecolor;
             /* birch foliage color is flipped XY-ways */
@@ -158,9 +163,16 @@ base_draw(void* data, RenderState* state, PyObject* src, PyObject* mask, PyObjec
 
                         temp += biome_table[biome].temperature;
                         rain += biome_table[biome].rainfall;
-                        multr += biome_table[biome].r;
-                        multg += biome_table[biome].g;
-                        multb += biome_table[biome].b;
+                        if (is_water) {
+                            multr += biome_table[biome].water_r;
+                            multg += biome_table[biome].water_g;
+                            multb += biome_table[biome].water_b;
+                            //printf("%s, (%d, %d, %d) ->\n", biome_table[biome].name, biome_table[biome].water_r, biome_table[biome].water_g, biome_table[biome].water_b);
+                        } else {
+                            multr += biome_table[biome].r;
+                            multg += biome_table[biome].g;
+                            multb += biome_table[biome].b;
+                        }
                     }
                 }
 
@@ -173,9 +185,16 @@ base_draw(void* data, RenderState* state, PyObject* src, PyObject* mask, PyObjec
                 /* don't use biomes, just use the default */
                 temp = biome_table[DEFAULT_BIOME].temperature;
                 rain = biome_table[DEFAULT_BIOME].rainfall;
-                multr = biome_table[DEFAULT_BIOME].r;
-                multg = biome_table[DEFAULT_BIOME].g;
-                multb = biome_table[DEFAULT_BIOME].b;
+
+                if (is_water) {
+                    multr = biome_table[DEFAULT_BIOME].water_r;
+                    multg = biome_table[DEFAULT_BIOME].water_g;
+                    multb = biome_table[DEFAULT_BIOME].water_b;
+                } else {
+                    multr = biome_table[DEFAULT_BIOME].r;
+                    multg = biome_table[DEFAULT_BIOME].g;
+                    multb = biome_table[DEFAULT_BIOME].b;
+                }
             }
 
             /* second coordinate is actually scaled to fit inside the triangle
@@ -195,17 +214,25 @@ base_draw(void* data, RenderState* state, PyObject* src, PyObject* mask, PyObjec
                 tabley = tmp;
             }
 
-            /* look up color! */
-            color = PySequence_GetItem(color_table, tabley * 256 + tablex);
-            r = PyLong_AsLong(PyTuple_GET_ITEM(color, 0));
-            g = PyLong_AsLong(PyTuple_GET_ITEM(color, 1));
-            b = PyLong_AsLong(PyTuple_GET_ITEM(color, 2));
-            Py_DECREF(color);
+            if(is_water) {
+                //dont use colortable, use averaged biome-watercolor
+                r = multr;
+                g = multg;
+                b = multb;
+                multb = 0, multg = 0; multb = 0;
+            } else {
+                /* look up color! */
+                color = PySequence_GetItem(color_table, tabley * 256 + tablex);
+                r = PyLong_AsLong(PyTuple_GET_ITEM(color, 0));
+                g = PyLong_AsLong(PyTuple_GET_ITEM(color, 1));
+                b = PyLong_AsLong(PyTuple_GET_ITEM(color, 2));
+                Py_DECREF(color);
 
-            /* do the after-coloration */
-            r = OV_MULDIV255(r, multr, tmp);
-            g = OV_MULDIV255(g, multg, tmp);
-            b = OV_MULDIV255(b, multb, tmp);
+                /* do the after-coloration */
+                r = OV_MULDIV255(r, multr, tmp);
+                g = OV_MULDIV255(g, multg, tmp);
+                b = OV_MULDIV255(b, multb, tmp);
+            }
         }
 
         /* final coloration */
