@@ -1,4 +1,5 @@
 # -*- mode: python -*-
+# spec file for pyinstaller
 
 block_cipher = None
 
@@ -10,10 +11,13 @@ def get_overviewer_pkgname():
     return "overviewer-" + overviewer_version.VERSION
 
 a = Analysis(['overviewer.py'],
-             pathex=['Z:\\devel\\Minecraft-Overviewer'],
              binaries=None,
              datas=[("overviewer_core/data", "overviewer_core/data")],
-             hiddenimports=['overviewer_core.aux_files.genPOI'],
+             hiddenimports=[
+                 'overviewer_core.aux_files.genPOI',
+                 # https://github.com/pypa/setuptools/issues/1963
+                 'pkg_resources.py2_warn',
+             ],
              hookspath=[],
              runtime_hooks=[],
              excludes=['FixTk', 'tcl', 'tk', '_tkinter', 'tkinter', 'Tkinter'],
