@@ -611,8 +611,8 @@ class TileSet(object):
         if d['maxZoom'] < 0:
             d['maxZoom'] = self.treedepth + self.options.get('maxzoom')
         d['world'] = self.options.get('worldname_orig')
-        if self.options.get('dimension')[1] != 0:
-            d['world'] += " - " + self.options.get('dimension')[0]
+        # if self.options.get('dimension')[1] != 0:
+        #     d['world'] += " - " + self.options.get('dimension')[0]
         d['maxZoom'] = min(self.treedepth, d['maxZoom'])
         d['minZoom'] = min(max(0, self.options.get("minzoom", 0)), d['maxZoom'])
         d['defaultZoom'] = max(d['minZoom'], min(d['defaultZoom'], d['maxZoom']))

@@ -31,7 +31,7 @@
 
 // increment this value if you've made a change to the c extension
 // and want to force users to rebuild
-#define OVERVIEWER_EXTENSION_VERSION 117
+#define OVERVIEWER_EXTENSION_VERSION 118
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -82,14 +82,10 @@ typedef struct _RenderMode RenderMode;
 typedef struct {
     /* whether this chunk is loaded: use load_chunk to load */
     int32_t loaded;
-    /* chunk biome array */
-    PyArrayObject* biomes;
-    /* whether this is a 3d biome array */
-    bool new_biomes;
     /* all the sections in a given chunk */
     struct {
         /* all there is to know about each section */
-        PyArrayObject *blocks, *data, *skylight, *blocklight;
+        PyArrayObject *blocks, *data, *skylight, *blocklight, *biomes;
     } sections[SECTIONS_PER_CHUNK];
 } ChunkData;
 typedef struct {
@@ -212,7 +208,7 @@ static inline uint32_t get_data(RenderState* state, DataType type, int32_t x, in
         data_array = state->chunks[chunkx][chunkz].sections[chunky].skylight;
         break;
     case BIOMES:
-        data_array = state->chunks[chunkx][chunkz].biomes;
+        data_array = state->chunks[chunkx][chunkz].sections[chunky].biomes;
     };
 
     if (data_array == NULL)
@@ -221,11 +217,7 @@ static inline uint32_t get_data(RenderState* state, DataType type, int32_t x, in
     if (type == BLOCKS)
         return getArrayShort3D(data_array, x, y, z);
     if (type == BIOMES) {
-        if (state->chunks[chunkx][chunkz].new_biomes) {
-            return getArrayByte3D(data_array, x / 4, y / 4, z / 4);
-        } else {
-            return getArrayByte2D(data_array, x, z);
-        }
+        return getArrayByte3D(data_array, x / 4, y / 4, z / 4);
     }
     return getArrayByte3D(data_array, x, y, z);
 }
