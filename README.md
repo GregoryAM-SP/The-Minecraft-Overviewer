@@ -67,6 +67,28 @@ While Overviewer can be run directly from the command line, it's generally easie
 
 **In the future:** To update your map, just double-click the RunOverviewer.bat file again. Overviewer will automatically check your world to find out where things have changed, and only update those parts of the map.
 
+## Building the Overviewer from Source
+Installation for Ubuntu 22.04.1 LTS, for other Linux operating systems there will be a similar installation
+
+**Step 1.** clone the repository. For cloning via ssh you need to add ssh key to github or use https
+```bash
+git clone https://github.com/GregoryAM-SP/The-Minecraft-Overviewer.git
+```
+**Step 2.** go to repo directory
+```bash
+cd The-Minecraft-Overviewer/
+```
+**Step 3.** install dependencies
+```bash
+apt install python3-numpy python3-pil python3-dev build-essential
+```
+**Step 4.** building
+```bash
+python3 setup.py build
+```
+
+At this point, you can run ./overviewer.py from the current directory, so to run it you’ll have to be in this directory and run ./overviewer.py or provide the the full path to overviewer.py
+
 ## Getting Help
 A great place to start is the old [docs](http://docs.overviewer.org/en/latest/). They aren't being updated anymore, but since this repo's Wiki is still a work in progress, they're a great tool and nearly all the information in them is still accurate.
 
