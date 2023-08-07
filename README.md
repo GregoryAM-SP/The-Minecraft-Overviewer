@@ -1,11 +1,5 @@
 ![Overviewer](https://gregoryam.com/assets/img/github/overviewer-img.webp?h=0347c3bd38ae284637ade776034fd281)
-![forthebadge](https://forthebadge.com/images/badges/built-by-developers.svg)
-![forthebadge](https://forthebadge.com/images/badges/open-source.svg)
-![forthebadge](https://forthebadge.com/images/badges/made-with-crayons.svg)
-![forthebadge](https://forthebadge.com/images/badges/made-with-python.svg)
-![forthebadge](https://forthebadge.com/images/badges/made-with-c.svg)
-![forthebadge](https://forthebadge.com/images/badges/does-not-contain-treenuts.svg)
-![forthebadge](https://forthebadge.com/images/badges/powered-by-black-magic.svg)
+
 ### Currently built for Windows
 <sub>Honestly, I'm just not sure how to build for other Operating Systems, yet! ~ GregoryAM</sub>
 
