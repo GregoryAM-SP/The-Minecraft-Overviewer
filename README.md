@@ -1,9 +1,10 @@
 ![Overviewer](https://gregoryam.com/assets/img/github/overviewer-img.webp?h=0347c3bd38ae284637ade776034fd281)
 
-### Currently built for Windows
-<sub>Honestly, I'm just not sure how to build for other Operating Systems, yet! ~ GregoryAM</sub>
+<hr>
 
 ### [Python 3.8.10](https://www.python.org/downloads/release/python-3810/) Required
+
+<hr>
 
 ### What is The Minecraft Overviewer?
 The Minecraft Overviewer is a command-line tool for rendering high-resolution maps of Minecraft Worlds.\
