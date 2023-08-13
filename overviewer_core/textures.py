@@ -146,14 +146,14 @@ class Textures(object):
         
         if self.texture_size != 24:
             # rescale biome grass
-            self.biome_grass_texture = self.biome_grass_texture.resize(self.texture_dimensions, Image.ANTIALIAS)
+            self.biome_grass_texture = self.biome_grass_texture.resize(self.texture_dimensions, Image.LANCZOS)
             
             # rescale the rest
             for i, tex in enumerate(blockmap):
                 if tex is None:
                     continue
                 block = tex[0]
-                scaled_block = block.resize(self.texture_dimensions, Image.ANTIALIAS)
+                scaled_block = block.resize(self.texture_dimensions, Image.LANCZOS)
                 blockmap[i] = self.generate_texture_tuple(scaled_block)
         
         self.generated = True
@@ -345,7 +345,7 @@ class Textures(object):
         if w != h:
             img = img.crop((0,0,w,w))
         if w != 16:
-            img = img.resize((16, 16), Image.ANTIALIAS)
+            img = img.resize((16, 16), Image.LANCZOS)
 
         self.texture_cache[filename] = img
         return img
@@ -473,7 +473,7 @@ class Textures(object):
 
         # Resize to 17x17, since the diagonal is approximately 24 pixels, a nice
         # even number that can be split in half twice
-        img = img.resize((17, 17), Image.ANTIALIAS)
+        img = img.resize((17, 17), Image.LANCZOS)
 
         # Build the Affine transformation matrix for this perspective
         transform = numpy.matrix(numpy.identity(3))
@@ -499,7 +499,7 @@ class Textures(object):
         the right side)"""
 
         # Size of the cube side before shear
-        img = img.resize((12,12), Image.ANTIALIAS)
+        img = img.resize((12,12), Image.LANCZOS)
 
         # Apply shear
         transform = numpy.matrix(numpy.identity(3))
@@ -516,7 +516,7 @@ class Textures(object):
         in the -y direction (reflect for +x direction). Used for minetracks"""
 
         # Take the same size as trasform_image_side
-        img = img.resize((12,12), Image.ANTIALIAS)
+        img = img.resize((12,12), Image.LANCZOS)
 
         # Apply shear
         transform = numpy.matrix(numpy.identity(3))
@@ -541,7 +541,7 @@ class Textures(object):
         """
 
         # Take the same size as trasform_image_side
-        img = img.resize((12,12), Image.ANTIALIAS)
+        img = img.resize((12,12), Image.LANCZOS)
 
         # some values
         cos_angle = math.cos(angle)
@@ -807,7 +807,7 @@ class Textures(object):
         """
         img = Image.new("RGBA", (24,24), self.bgcolor)
 
-        front = tex.resize((14, 12), Image.ANTIALIAS)
+        front = tex.resize((14, 12), Image.LANCZOS)
         alpha_over(img, front, (5,9))
         return img
 
@@ -2379,7 +2379,7 @@ def chests(self, blockid, data):
 
         # the textures is no longer in terrain.png, get it from
         # item/chest.png and get by cropping all the needed stuff
-        if t.size != (64, 64): t = t.resize((64, 64), Image.ANTIALIAS)
+        if t.size != (64, 64): t = t.resize((64, 64), Image.LANCZOS)
         # top
         top = t.crop((28, 50, 42, 64))
         top.load() # every crop need a load, crop is a lazy operation
@@ -3229,7 +3229,7 @@ def signpost(self, blockid, data):
 
     # Minecraft uses wood texture for the signpost stick
     texture_stick = self.load_image_texture(texture_stick_path)
-    texture_stick = texture_stick.resize((12,12), Image.ANTIALIAS)
+    texture_stick = texture_stick.resize((12,12), Image.LANCZOS)
     ImageDraw.Draw(texture_stick).rectangle((2,0,12,12),outline=(0,0,0,0),fill=(0,0,0,0))
 
     img = Image.new("RGBA", (24,24), self.bgcolor)
@@ -5302,11 +5302,11 @@ def beacon(self, blockid, data):
 
     t = self.load_image_texture(BLOCKTEXTURE + "obsidian.png")
     obsidian = self.build_full_block((t,12),None, None, t, t)
-    obsidian = obsidian.resize((20,20), Image.ANTIALIAS)
+    obsidian = obsidian.resize((20,20), Image.LANCZOS)
 
     t = self.load_image_texture(BLOCKTEXTURE + "beacon.png")
     crystal = self.build_block(t,t)
-    crystal = crystal.resize((16,16),Image.ANTIALIAS)
+    crystal = crystal.resize((16,16),Image.LANCZOS)
     
     # compose the block
     img = Image.new("RGBA", (24,24), self.bgcolor)
@@ -5625,8 +5625,8 @@ def hopper(self, blockid, data):
     hop_mid = self.build_full_block((top,5), side, side, side, side, side)
     hop_bot = self.build_block(side,side)
 
-    hop_mid = hop_mid.resize((17,17),Image.ANTIALIAS)
-    hop_bot = hop_bot.resize((10,10),Image.ANTIALIAS)
+    hop_mid = hop_mid.resize((17,17),Image.LANCZOS)
+    hop_bot = hop_bot.resize((10,10),Image.LANCZOS)
     
     #compose the final block
     img = Image.new("RGBA", (24,24), self.bgcolor)
@@ -5743,7 +5743,7 @@ def flower(self, blockid, data):
     #sunflower top
     if data == 8:
         bloom_tex = self.load_image_texture(BLOCKTEXTURE + "sunflower_front.png")
-        alpha_over(img, bloom_tex.resize((14, 11), Image.ANTIALIAS), (5,5))
+        alpha_over(img, bloom_tex.resize((14, 11), Image.LANCZOS), (5,5))
 
     return img
 
