@@ -2209,7 +2209,9 @@ class RotatedRegionSet(RegionSetWrapper):
             yield x,z,mtime
 
 class CroppedRegionSet(RegionSetWrapper):
+    
     Margin = 5
+
     def __init__(self, rsetobj, xmin, zmin, xmax, zmax):
         super(CroppedRegionSet, self).__init__(rsetobj)
         self.xmin = (xmin // 16) + self.MARGIN
