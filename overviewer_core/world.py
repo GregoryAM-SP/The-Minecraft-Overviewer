@@ -2209,12 +2209,13 @@ class RotatedRegionSet(RegionSetWrapper):
             yield x,z,mtime
 
 class CroppedRegionSet(RegionSetWrapper):
+    Margin = 5
     def __init__(self, rsetobj, xmin, zmin, xmax, zmax):
         super(CroppedRegionSet, self).__init__(rsetobj)
-        self.xmin = xmin//16
-        self.xmax = xmax//16
-        self.zmin = zmin//16
-        self.zmax = zmax//16
+        self.xmin = (xmin // 16) + self.MARGIN
+        self.xmax = (xmax // 16) - self.MARGIN
+        self.zmin = (zmin // 16) + self.MARGIN
+        self.zmax = (zmax // 16) - self.MARGIN
 
     def get_chunk(self,x,z):
         if (
