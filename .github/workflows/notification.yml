@@ -1,0 +1,52 @@
+name: Discord Release Notification
+
+on:
+  release:
+    types:
+      - created
+
+jobs:
+  send_discord_notification:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Send Discord Message
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          RELEASE_NAME: ${{ github.event.release.name }}
+          RELEASE_DESC: ${{ github.event.release.body }}
+          RELEASE_URL: ${{ github.event.release.html_url }}
+          RELEASE_CREATED_AT: ${{ github.event.release.created_at }}
+        run: |
+          PAYLOAD=$(cat <<-EOF
+          {
+            "content": null,
+            "embeds": [
+              {
+                "title": "${RELEASE_NAME}",
+                "url": "${RELEASE_URL}",
+                "color": 8435015,
+                "fields": [
+                  {
+                    "name": "Release Note:",
+                    "value": "${RELEASE_DESC}"
+                  }
+                ],
+                "footer": {
+                  "text": "Released"
+                },
+                "timestamp": "${RELEASE_CREATED_AT}",
+                "image": {
+                  "url": "https://camo.githubusercontent.com/b9e2ae9ada73e9453411cbe056249bd2a79ef94e302b1e714c7ed2f99a95a0f0/68747470733a2f2f677265676f7279616d2e636f6d2f6173736574732f696d672f6769746875622f6f7665727669657765722d696d672e776562703f683d3033343763336264333861653238343633376164653737363033346664323831"
+                }
+              }
+            ],
+            "attachments": []
+          }
+          EOF
+          )
+          
+          curl -X POST -H "Content-Type: application/json" -d "$PAYLOAD" $DISCORD_WEBHOOK_URL
