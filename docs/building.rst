@@ -18,10 +18,10 @@ Get The Source
 First step: download the platform-independent source! Either clone with Git
 (recommended if you know Git) or download the most recent snapshot:
 
-* Git URL to clone: ``git://github.com/overviewer/Minecraft-Overviewer.git``
-* `Download most recent tar archive <https://github.com/overviewer/Minecraft-Overviewer/tarball/master>`_
+* Git URL to clone: ``git://github.com/GregoryAM-SP/The-Minecraft-Overviewer.git``
+* `Download most recent tar archive <https://github.com/GregoryAM-SP/tarball/master>`_
 
-* `Download most recent zip archive <https://github.com/overviewer/Minecraft-Overviewer/zipball/master>`_
+* `Download most recent zip archive <https://github.com/GregoryAM-SP/The-Minecraft-Overviewer/releases>`_
 
 Once you have the source, see below for instructions on building for your
 system.
@@ -82,7 +82,7 @@ Building with mingw-w64 and msys2
 
 This is the recommended way to build on Windows without MSVC.
 
-1. Install msys2 by following **all** the instructions on 
+1. Install msys2 by following **all** the instructions on
    `the msys2 installation page <https://msys2.github.io/>`_.
 
 2. Install the dependencies::
@@ -116,10 +116,10 @@ Building with mingw
 4. Build::
 
     python3 setup.py build --compiler=mingw32
-    
+
 If the build fails with complaints about ``-mno-cygwin``, open the file ``Lib/distutils/cygwincompiler.py``
 in an editor of your choice, and remove all mentions of ``-mno-cygwin``. This is a bug in distutils,
-filed as `Issue 12641 <http://bugs.python.org/issue12641>`_. 
+filed as `Issue 12641 <http://bugs.python.org/issue12641>`_.
 
 
 Linux
@@ -145,8 +145,76 @@ You will need the following packages on Debian-derived distributions (e.g. Ubunt
 Then to build::
 
     python3 setup.py build
-    
+
 At this point, you can run ``./overviewer.py`` from the current directory, so to run it you'll have to be in this directory and run ``./overviewer.py`` or provide the the full path to ``overviewer.py``.  Another option would be to add this directory to your ``$PATH``.   Note that there is a ``python3 setup.py install`` step that you can run which will install things into ``/usr/local/bin``, but this is strongly not recommended as it might conflict with other installs of Overviewer.
+
+Alternate Linux Installation Method
+___________________________________
+This method uses a virtual environment to build and run Minecraft Overviewer
+
+You will need the gcc compiler and a working build environment. On Ubuntu and
+Debian, this can be done by installing the ``build-essential`` package.
+
+You will need the following:
+
+- `Python 3.x <https://www.python.org/downloads/windows/>`_
+- A copy of the `Pillow sources <https://github.com/python-pillow/Pillow>`_.
+- The Pillow Extension for Python.
+- The Numpy Extension for Python.
+- The extensions can be installed now if you already have pipenv. This should be done from within your Minecraft Overviewer directory. This will ensure you virtual environment is focused on that project::
+
+    pipenv install numpy
+    pipenv install pillow
+
+#. Install python3-dev (python3-devel on RedHat based Distro)
+
+    apt-get install python3-dev
+    yum install python3-devel
+    dnf install python3-devel
+
+#. Copy the missing files into your Minecraft Overviewer directory::
+
+    cp <Pillow_source_location>/src/libImaging/{Imaging.h,ImagingUtils.h,ImPlatform.h} /path/to/minecraft_overviewer/directory/
+
+#. Install pipenv::
+
+    pip install pipenv
+
+#. Enter the directory were you cloned the repository::
+
+    cd <path/to/minecraft_overviewer/directory/>
+
+#. Create a virtual environment for this project and install numpy::
+
+    pipenv install numpy
+
+#. Install pillow to the project virtual environment::
+
+    pipenv install pillow
+
+#. Enter the projects virtual environment shell::
+
+    pipenv shell
+
+#. Add enviromental variable for ``PIL_INCLUDE_DIR`` to point to the Pillow header files copied earlier::
+
+    export PIL_INCLUDE_DIR=.
+
+#. Build Minecraft Overviewer
+
+    python3 setup.py build
+
+You can now run ``./overviewer.py`` from the projects virtual environment.
+You can run Minecraft Overviewer in one of 2 ways
+#. Enter the projects virtual environment shell and run ``./overviewer.py``
+
+    pipenv shell
+    ./overviewer.py --config=/path/to/your/config
+
+#. You can also run it directly from pipenv
+
+    pipenv run ./overviewer.py --config=/path/to/your/config
+
 
 macOS
 -----
