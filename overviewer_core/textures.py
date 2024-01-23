@@ -3472,7 +3472,7 @@ def ladder(self, blockid, data):
 
 
 # wall signs
-@material(blockid=[68,11407,11408,11409,11410,11411,11412,12507,12508], data=[2, 3, 4, 5], transparent=True)
+@material(blockid=[68,11407,11408,11409,11410,11411,11412,12507,12508,12509,12510,12511], data=[2, 3, 4, 5], transparent=True)
 def wall_sign(self, blockid, data): # wall sign
 
     # first rotations
@@ -3502,6 +3502,9 @@ def wall_sign(self, blockid, data): # wall sign
         11412: "dark_oak_planks.png",
         12507: "crimson_planks.png",
         12508: "warped_planks.png",
+        12509: "mangrove_planks.png",
+        12510: "cherry_planks.png",
+        12511: "bamboo_planks.png",
     }
     texture_path = BLOCKTEXTURE + "" + sign_texture[blockid]
     texture = self.load_image_texture(texture_path).copy()
