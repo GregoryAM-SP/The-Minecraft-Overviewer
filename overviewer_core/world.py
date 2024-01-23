@@ -1295,6 +1295,13 @@ class RegionSet(object):
             'minecraft:dark_prismarine_slab': 'minecraft:dark_prismarine',
             'minecraft:prismarine_brick_slab': 'minecraft:prismarine_bricks',
             'minecraft:stone_brick_slab': 'minecraft:stone_bricks',
+
+            # Additional wooden double slabs not handled by the wooden slab function
+            'minecraft:mangrove_slab': 'minecraft:mangrove_planks',
+            'minecraft:petrified_oak_slab': 'minecraft:oak_planks',
+            'minecraft:cherry_slab': 'minecraft:cherry_planks',
+            'minecraft:bamboo_slab': 'minecraft:bamboo_planks',
+            'minecraft:bamboo_mosaic_slab': 'minecraft:bamboo_mosaic',
         }
 
         colors = ['white', 'orange', 'magenta', 'light_blue', 'yellow', 'lime', 'pink', 'gray', 'light_gray', 'cyan',
@@ -1353,12 +1360,17 @@ class RegionSet(object):
             facing = palette_entry['Properties']['facing']
             data = {'south': 0, 'west': 1, 'north': 2, 'east': 3}[facing]
         elif key in wood_slabs + stone_slabs + prismarine_slabs + copper_slabs:
-        # handle double slabs 
+            # handle double slabs
             if palette_entry['Properties']['type'] == 'top':
                 data |= 0x08
             elif palette_entry['Properties']['type'] == 'double':
-                if key in wood_slabs:
-                    block = 125         # block_double_wooden_slab
+                # Not all wooden slabs are listed here. Block ID 125 has a 4 bit data field, one bit of which is used
+                # for top/bottom indication allowing only 8 distinct slab types. These are listed here. Everything else
+                # goes through the usual slab process.
+                if key in ['minecraft:oak_slab', 'minecraft:spruce_slab', 'minecraft:birch_slab',
+                           'minecraft:jungle_slab', 'minecraft:acacia_slab', 'minecraft:dark_oak_slab',
+                           'minecraft:crimson_slab', 'minecraft:warped_slab']:
+                    block = 125  # block_double_wooden_slab
                 else:
                     (block, data) = self._blockmap[slab_to_double[key]]
 
@@ -1731,7 +1743,7 @@ class RegionSet(object):
             result[1::2] = ( b[2::3]         << 4) | ((b[1::3] & 0xf0) >> 4)
 
         return result
-    
+
     def _packed_longarray_to_shorts_v116(self, long_array, n, num_palette):
         bits_per_value = max(4, (len(long_array) * 64) // n)
 
@@ -1743,7 +1755,7 @@ class RegionSet(object):
         for i in range(shorts_per_long):
             j = (n + shorts_per_long - 1 - i) // shorts_per_long
             result[i::shorts_per_long] = (b[:j] >> (bits_per_value * i)) & mask
-        
+
         return result
 
     def _get_blockdata_v118(self, section, unrecognized_block_types, longarray_unpacker):
@@ -1966,7 +1978,7 @@ class RegionSet(object):
                 blocklight_expanded[:,:,1::2] = (blocklight & 0xF0) >> 4
                 del blocklight
                 section['BlockLight'] = blocklight_expanded
-                
+
                 #apparently this can be missing, at least it was with 1.18-papermc generated map
                 if 'biomes' in section:
                     section['Biomes'] = self._get_biomedata_v118(section)
@@ -2212,7 +2224,7 @@ class RotatedRegionSet(RegionSetWrapper):
             yield x,z,mtime
 
 class CroppedRegionSet(RegionSetWrapper):
-    
+
     MARGIN = 5
 
     def __init__(self, rsetobj, xmin, zmin, xmax, zmax):
