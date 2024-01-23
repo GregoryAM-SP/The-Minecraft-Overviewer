@@ -3455,6 +3455,113 @@ def wall_sign(self, blockid, data): # wall sign
 
     return img
 
+
+@material(blockid=list(range(12600,12611)), data=[2, 3, 4, 5], transparent=True)
+def hanging_wall_sign(self, blockid, data):
+
+    # first rotations
+    if self.rotation == 1:
+        if data == 2: data = 5
+        elif data == 3: data = 4
+        elif data == 4: data = 2
+        elif data == 5: data = 3
+    elif self.rotation == 2:
+        if data == 2: data = 3
+        elif data == 3: data = 2
+        elif data == 4: data = 5
+        elif data == 5: data = 4
+    elif self.rotation == 3:
+        if data == 2: data = 4
+        elif data == 3: data = 5
+        elif data == 4: data = 3
+        elif data == 5: data = 2
+
+    sign_texture = {
+        12600: "oak.png",
+        12601: "spruce.png",
+        12602: "birch.png",
+        12603: "jungle.png",
+        12604: "acacia.png",
+        12605: "dark_oak.png",
+        12606: "crimson.png",
+        12607: "warped.png",
+        12608: "mangrove.png",
+        12609: "cherry.png",
+        12610: "bamboo.png",
+    }
+
+    texture_path = "assets/minecraft/textures/entity/signs/hanging/" + sign_texture[blockid]
+    texture = self.load_image(texture_path).copy()
+
+    # texture is the full multi-face sign texture. It's not a 16x16 face texture, so
+    # we need to load the underlying image with load_image() rather than load_image_texture()
+    # We also need to crop it into bits for the relevant parts
+    # top == the top face, side == the main side face, end == the small side face
+
+    bar_top_tex = texture.crop((4, 0, 20, 4))
+    bar_side_tex = texture.crop((4, 4, 20, 6))
+    bar_end_tex = texture.crop((0, 4, 4, 6))
+
+    sign_top_tex = texture.crop((2, 12, 16, 14))
+    sign_side_tex = texture.crop((2, 14, 16, 24))
+    sign_end_tex = texture.crop((0, 14, 2, 24))
+
+    # For each part, we need to put the texture in the correct place in a 16x16 image
+    # before transforming it. The transform rescales to 16x16, then squashes it into
+    # the isometric view.
+
+    # New image to handle the correct location of the top of the bar
+    bar_top = Image.new("RGBA", (16,16), self.bgcolor)
+    # Render the bar top into the new image with an offset.
+    alpha_over(bar_top, bar_top_tex, (0, 7))
+    # Transform the bar top into isometric view
+    bar_top = self.transform_image_top(bar_top)
+
+    # As above...
+    bar_side = Image.new("RGBA", (16,16), self.bgcolor)
+    alpha_over(bar_side, bar_side_tex)
+    bar_side = self.transform_image_side(bar_side)
+    # transform_side targets the left side by default. Cheat and flip to get the right side.
+    bar_side = bar_side.transpose(Image.FLIP_LEFT_RIGHT)
+    # Darken it down a bit for 3D effects.
+    bar_side = ImageEnhance.Brightness(bar_side).enhance(0.8)
+
+    bar_end = Image.new("RGBA", (16,16), self.bgcolor)
+    alpha_over(bar_end, bar_end_tex)
+    bar_end = self.transform_image_side(bar_end)
+    bar_end = ImageEnhance.Brightness(bar_end).enhance(0.9)
+
+    sign_top = Image.new("RGBA", (16,16), self.bgcolor)
+    alpha_over(sign_top, sign_top_tex, (1, 8))
+    sign_top = self.transform_image_top(sign_top)
+
+    sign_side = Image.new("RGBA", (16,16), self.bgcolor)
+    alpha_over(sign_side, sign_side_tex, (1, 6))
+    sign_side = self.transform_image_side(sign_side)
+    sign_side = sign_side.transpose(Image.FLIP_LEFT_RIGHT)
+    sign_side = ImageEnhance.Brightness(sign_side).enhance(0.8)
+
+    sign_end = Image.new("RGBA", (16,16), self.bgcolor)
+    alpha_over(sign_end, sign_end_tex, (8, 6))
+    sign_end = self.transform_image_side(sign_end)
+    sign_end = ImageEnhance.Brightness(sign_end).enhance(0.9)
+
+    img = Image.new("RGBA", (24,24), self.bgcolor)
+
+    alpha_over(img, sign_side, (7, 3))
+    alpha_over(img, sign_end, (1, 5))
+    alpha_over(img, sign_top, (1, 4))
+
+    alpha_over(img, bar_side, (8, 4))
+    alpha_over(img, bar_end, (6, 9))
+    alpha_over(img, bar_top)
+
+    # if sign is oriented east/west, flip it.
+    if data in [4, 5]:
+        img = img.transpose(Image.FLIP_LEFT_RIGHT)
+
+    return img
+
 # levers
 @material(blockid=69, data=list(range(16)), transparent=True)
 def levers(self, blockid, data):

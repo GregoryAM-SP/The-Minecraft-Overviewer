@@ -775,6 +775,18 @@ enum mc_item_id {
     item_record_ward = 2265,
     item_record_11 = 2266,
     item_record_wait = 2267,
+
+    oak_wall_hanging_sign = 12600,
+    spruce_wall_hanging_sign = 12601,
+    birch_wall_hanging_sign = 12602,
+    jungle_wall_hanging_sign = 12603,
+    acacia_wall_hanging_sign = 12604,
+    dark_oak_wall_hanging_sign = 12605,
+    crimson_wall_hanging_sign = 12606,
+    warped_wall_hanging_sign = 12607,
+    mangrove_wall_hanging_sign = 12608,
+    cherry_wall_hanging_sign = 12609,
+    bamboo_wall_hanging_sign = 12610,
 };
 
 typedef uint16_t mc_item_t;

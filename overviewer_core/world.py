@@ -1193,6 +1193,19 @@ class RegionSet(object):
             # Amethyst Cluster
             'minecraft:amethyst_cluster': (1232, 0), 
             'minecraft:sculk_catalyst': (1244, 0),
+
+            # Hanging wall signs
+            'minecraft:oak_wall_hanging_sign': (12600, 0),
+            'minecraft:spruce_wall_hanging_sign': (12601, 0),
+            'minecraft:birch_wall_hanging_sign': (12602, 0),
+            'minecraft:jungle_wall_hanging_sign': (12603, 0),
+            'minecraft:acacia_wall_hanging_sign': (12604, 0),
+            'minecraft:dark_oak_wall_hanging_sign': (12605, 0),
+            'minecraft:crimson_wall_hanging_sign': (12606, 0),
+            'minecraft:warped_wall_hanging_sign': (12607, 0),
+            'minecraft:mangrove_wall_hanging_sign': (12608, 0),
+            'minecraft:cherry_wall_hanging_sign': (12609, 0),
+            'minecraft:bamboo_wall_hanging_sign': (12610, 0),
         }
 
         colors = [   'white', 'orange', 'magenta', 'light_blue',
@@ -1479,7 +1492,7 @@ class RegionSet(object):
             if facing == 'north': data += 2
             if facing == 'east':  data += 3
         elif key.endswith('sign'):
-            if key.endswith('wall_sign'):
+            if key.endswith('wall_sign') or key.endswith('_wall_hanging_sign'):
                 facing = palette_entry['Properties']['facing']
                 if   facing == 'north': data = 2
                 elif facing == 'west':  data = 4
@@ -1488,6 +1501,10 @@ class RegionSet(object):
             else:
                 p = palette_entry['Properties']
                 data = p['rotation']
+
+                if key.endswith('_hanging_sign') and p['attached']:
+                    data |= 0x1F
+
         elif key.endswith('_fence'):
             p = palette_entry['Properties']
             if p['north'] == 'true':
