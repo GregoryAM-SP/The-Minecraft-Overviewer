@@ -1728,7 +1728,11 @@ def tall_grass(self, blockid, data):
     if data == 0: # dead shrub
         texture = self.load_image_texture(BLOCKTEXTURE + "dead_bush.png")
     elif data == 1: # tall grass
-        texture = self.load_image_texture(BLOCKTEXTURE + "grass.png")
+        try:
+            texture = self.load_image_texture(BLOCKTEXTURE + "short_grass.png")
+        except (TextureException, IOError):
+            # Attempt loading from the old name of this texture pre-1.20.3
+            texture = self.load_image_texture(BLOCKTEXTURE + "grass.png")
     elif data == 2: # fern
         texture = self.load_image_texture(BLOCKTEXTURE + "fern.png")
     elif data == 3: # Nether Sprouts

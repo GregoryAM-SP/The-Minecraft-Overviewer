@@ -440,7 +440,8 @@ class RegionSet(object):
             'minecraft:sticky_piston': (29, 0),
             'minecraft:cobweb': (30, 0),
             'minecraft:dead_bush': (31, 0),
-            'minecraft:grass': (31, 1),
+            'minecraft:short_grass': (31, 1),
+            'minecraft:grass': (31, 1),  # Renamed to minecraft:short_grass in 1.20.3
             'minecraft:fern': (31, 2),
             'minecraft:piston': (33, 0),
             'minecraft:piston_head': (34, 0),
