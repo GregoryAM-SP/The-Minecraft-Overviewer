@@ -1217,8 +1217,10 @@ class RegionSet(object):
         return "<RegionSet regiondir=%r>" % self.regiondir
 
     def _get_block(self, palette_entry):
-        wood_slabs = ('minecraft:oak_slab','minecraft:spruce_slab','minecraft:birch_slab','minecraft:jungle_slab',
-                        'minecraft:acacia_slab','minecraft:dark_oak_slab','minecraft:petrified_oak_slab', 'minecraft:crimson_slab', 'minecraft:warped_slab', 'minecraft:mangrove_slab', 'minecraft:cherry_slab')
+        wood_slabs = ('minecraft:oak_slab', 'minecraft:spruce_slab', 'minecraft:birch_slab', 'minecraft:jungle_slab',
+                      'minecraft:acacia_slab', 'minecraft:dark_oak_slab', 'minecraft:petrified_oak_slab',
+                      'minecraft:crimson_slab', 'minecraft:warped_slab', 'minecraft:mangrove_slab',
+                      'minecraft:cherry_slab', 'minecraft:bamboo_slab', 'minecraft:bamboo_mosaic_slab')
         stone_slabs = ('minecraft:stone_slab', 'minecraft:sandstone_slab','minecraft:red_sandstone_slab',
                         'minecraft:cobblestone_slab', 'minecraft:brick_slab','minecraft:purpur_slab',
                         'minecraft:stone_brick_slab', 'minecraft:nether_brick_slab',
@@ -1266,7 +1268,7 @@ class RegionSet(object):
             'minecraft:red_nether_brick_slab': 'minecraft:red_nether_bricks',
             'minecraft:smooth_sandstone_slab': 'minecraft:smooth_sandstone',
             'minecraft:cut_sandstone_slab': 'minecraft:cut_sandstone',
-            'minecraft:smooth_red_standstone_slab': 'minecraft:smooth_red_sandstone',
+            'minecraft:smooth_red_sandstone_slab': 'minecraft:smooth_red_sandstone',
             'minecraft:cut_red_sandstone_slab': 'minecraft:cut_red_sandstone',
             'minecraft:end_stone_brick_slab': 'minecraft:end_stone_bricks',
             'minecraft:mossy_cobblestone_slab': 'minecraft:mossy_cobblestone',
@@ -1292,6 +1294,7 @@ class RegionSet(object):
             'minecraft:prismarine_slab': 'minecraft:prismarine',
             'minecraft:dark_prismarine_slab': 'minecraft:dark_prismarine',
             'minecraft:prismarine_brick_slab': 'minecraft:prismarine_bricks',
+            'minecraft:stone_brick_slab': 'minecraft:stone_bricks',
         }
 
         colors = ['white', 'orange', 'magenta', 'light_blue', 'yellow', 'lime', 'pink', 'gray', 'light_gray', 'cyan',
