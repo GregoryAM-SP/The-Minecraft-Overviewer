@@ -3189,7 +3189,7 @@ def farmland(self, blockid, data):
 
 
 # signposts
-@material(blockid=[63,11401,11402,11403,11404,11405,11406,12505,12506], data=list(range(16)), transparent=True)
+@material(blockid=[63,11401,11402,11403,11404,11405,11406,12505,12506,12512,12513,12514], data=list(range(16)), transparent=True)
 def signpost(self, blockid, data):
 
     # first rotations
@@ -3211,6 +3211,9 @@ def signpost(self, blockid, data):
         11406: ("dark_oak_planks.png", "dark_oak_log.png"),
         12505: ("crimson_planks.png", "crimson_stem.png"),
         12506: ("warped_planks.png", "warped_stem.png"),
+        12512: ("mangrove_planks.png", "mangrove_log.png"),
+        12513: ("cherry_planks.png", "cherry_log.png"),
+        12514: ("bamboo_planks.png", "bamboo_planks.png"),
     }
     texture_path, texture_stick_path = [BLOCKTEXTURE + "" + x for x in sign_texture[blockid]]
     
