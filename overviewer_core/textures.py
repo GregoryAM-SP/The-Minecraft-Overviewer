@@ -1125,8 +1125,7 @@ block(blockid=2048, top_image=BLOCKTEXTURE + "reinforced_deepslate_top.png", sid
 
 @material(blockid=[17, 162, 11306, 11307, 11308,
                     11309, 11310, 11311, 1008, 1009, 
-                    1126, 1192, 1201, 1210,
-                    1222, 1228, 1229, 1244],
+                    1126, 1192, 1201, 1210],
           data=list(range(12)), solid=True)
 def wood(self, blockid, data):
     # extract orientation and wood type frorm data bits
@@ -1213,19 +1212,6 @@ def wood(self, blockid, data):
             1: ("stripped_bamboo_block_top.png", "stripped_bamboo_block.png"),
             2: ("bamboo_mosaic.png", None)
         },
-        1222: {
-            0: ("sculk_sensor_bottom.png", None)
-        }, 
-        1228: {
-            0: ("suspicious_sand_0.png", None), 
-            1: ("suspicious_gravel_0.png", None)
-        },
-        1229: {
-            0: ("target_top.png", "target_side.png")
-        },
-        1244: {
-            0: ("sculk_catalyst_top.png", "sculk_catalyst_side.png")
-        }
     }
 
     top_f, side_f = wood_tex[blockid].get(wood_type, wood_tex[blockid][0])
@@ -1276,6 +1262,11 @@ block(blockid=22, top_image=BLOCKTEXTURE + "lapis_block.png")
 block(blockid=1242,top_image=BLOCKTEXTURE + "cherry_leaves.png")
 block(blockid=1226, top_image=BLOCKTEXTURE + "tinted_glass.png", transparent=True)
 
+block(blockid=1222, top_image=BLOCKTEXTURE + "sculk.png")
+block(blockid=1228, top_image=BLOCKTEXTURE + "suspicious_sand_0.png")
+block(blockid=1248, top_image=BLOCKTEXTURE + "suspicious_gravel_0.png")
+block(blockid=1229, top_image=BLOCKTEXTURE + "target_top.png", side_image=BLOCKTEXTURE + "target_side.png")
+block(blockid=1244, top_image=BLOCKTEXTURE + "sculk_catalyst_top.png", side_image=BLOCKTEXTURE + "sculk_catalyst_side.png")
 
 # dispenser, dropper, furnace, blast furnace, and smoker
 @material(blockid=[23, 61, 158, 11362, 11364], data=list(range(14)), solid=True)

@@ -1179,7 +1179,7 @@ class RegionSet(object):
             'minecraft:chiseled_bookshelf': (1227, 0),
             # Suspicious Blocks
             'minecraft:suspicious_sand': (1228, 0),
-            'minecraft:suspicious_gravel': (1228, 1),
+            'minecraft:suspicious_gravel': (1248, 0),
             # Target Block
             'minecraft:target': (1229, 0),
             # Nether Sprout
