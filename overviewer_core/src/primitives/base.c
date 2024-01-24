@@ -104,8 +104,8 @@ base_draw(void* data, RenderState* state, PyObject* src, PyObject* mask, PyObjec
      */
     if (/* grass, but not snowgrass */
         (state->block == block_grass && get_data(state, BLOCKS, state->x, state->y + 1, state->z) != 78) ||
-        block_class_is_subset(state->block, (mc_block_t[]){block_vine, block_waterlily, block_flowing_water, block_water, block_leaves, block_leaves2},
-                              6) ||
+        block_class_is_subset(state->block, (mc_block_t[]){block_vine, block_waterlily, block_flowing_water, block_water, block_leaves},
+                              5) ||
         /* tallgrass, but not dead shrubs */
         (state->block == block_tallgrass && state->block_data != 0) ||
         /* pumpkin/melon stem, not fully grown. Fully grown stems
@@ -134,7 +134,7 @@ base_draw(void* data, RenderState* state, PyObject* src, PyObject* mask, PyObjec
             color_table = self->watercolor;
             //we dont use color_table for water but i am too lazy for refactoring :(
             is_water = true;
-        } else if (block_class_is_subset(state->block, (mc_block_t[]){block_leaves, block_leaves2}, 2)) {
+        } else if (block_class_is_subset(state->block, (mc_block_t[]){block_leaves}, 1)) {
             color_table = self->foliagecolor;
             /* birch foliage color is flipped XY-ways */
             flip_xy = state->block_data == 2;
@@ -232,6 +232,23 @@ base_draw(void* data, RenderState* state, PyObject* src, PyObject* mask, PyObjec
                 r = OV_MULDIV255(r, multr, tmp);
                 g = OV_MULDIV255(g, multg, tmp);
                 b = OV_MULDIV255(b, multb, tmp);
+            }
+        }
+
+        if (block_class_is_subset(state->block, (mc_block_t[]){block_leaves}, 1)) {
+            if (state->block_data == 1) {
+                // spruce leaves
+                // #619961
+                r = 97;
+                g = 153;
+                b = 97;
+            }
+            if (state->block_data == 2) {
+                // birch leaves
+                // #80A755
+                r = 128;
+                g = 167;
+                b = 85;
             }
         }
 

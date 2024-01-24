@@ -416,15 +416,18 @@ class RegionSet(object):
             'minecraft:spruce_log': (17, 1),
             'minecraft:birch_log': (17, 2),
             'minecraft:jungle_log': (17, 3),
+            # leaves. Block ID 18 will have biome colouring applied, ID 161 will not.
             'minecraft:oak_leaves': (18, 0),
-            'minecraft:spruce_leaves': (18, 1),
-            'minecraft:birch_leaves': (18, 2),
+            'minecraft:spruce_leaves': (18, 1), # biome overlay needed, though locked to specific value
+            'minecraft:birch_leaves': (18, 2), # biome overlay needed, though locked to specific value
             'minecraft:jungle_leaves': (18, 3),
             'minecraft:acacia_leaves': (18, 4),
             'minecraft:dark_oak_leaves': (18, 5),
-            'minecraft:flowering_azalea_leaves': (18, 6),
-            'minecraft:azalea_leaves': (18, 7),
+            'minecraft:flowering_azalea_leaves': (161, 6),
+            'minecraft:azalea_leaves': (161, 7),
             'minecraft:mangrove_leaves': (18, 8),
+            'minecraft:cherry_leaves': (161, 9),
+            # end of leaves
             'minecraft:sponge': (19, 0),
             'minecraft:wet_sponge': (19, 1),
             'minecraft:glass': (20, 0),
@@ -1163,7 +1166,6 @@ class RegionSet(object):
             # Flowers, Leaves & Saplings
             'minecraft:torchflower_crop': (1240, 0),
             'minecraft:torchflower': (1241, 0),
-            'minecraft:cherry_leaves': (1242, 0),
             'minecraft:mangrove_propagule': (1233, 0),
             'minecraft:cherry_sapling': (1234, 0),
             'minecraft:azalea': (1235, 0),

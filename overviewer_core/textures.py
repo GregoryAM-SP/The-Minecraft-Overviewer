@@ -1228,28 +1228,28 @@ def wood(self, blockid, data):
     elif wood_orientation == 8: # north-south orientation
         return self.build_full_block(side, None, None, side.rotate(270), top)
 
-@material(blockid=18, data=list(range(16)), transparent=True, solid=True)
+@material(blockid=[18, 161], data=list(range(16)), transparent=True, solid=True)
 def leaves(self, blockid, data):
-    # mask out the bits 4 and 8
-    # they are used for player placed and check-for-decay blocks
-    data = data & 0x7
     t = self.load_image_texture(BLOCKTEXTURE + "oak_leaves.png")
-    if (blockid, data) == (18, 1): # pine!
+    if data == 1:
         t = self.load_image_texture(BLOCKTEXTURE + "spruce_leaves.png")
-    elif (blockid, data) == (18, 2): # birth tree
+    elif data == 2:
         t = self.load_image_texture(BLOCKTEXTURE + "birch_leaves.png")
-    elif (blockid, data) == (18, 3): # jungle tree
+    elif data == 3:
         t = self.load_image_texture(BLOCKTEXTURE + "jungle_leaves.png")
-    elif (blockid, data) == (18, 4): # acacia tree
+    elif data == 4:
         t = self.load_image_texture(BLOCKTEXTURE + "acacia_leaves.png")
-    elif (blockid, data) == (18, 5): 
+    elif data == 5:
         t = self.load_image_texture(BLOCKTEXTURE + "dark_oak_leaves.png")
-    elif (blockid, data) == (18, 6):
+    elif data == 6:
         t = self.load_image_texture(BLOCKTEXTURE + "flowering_azalea_leaves.png")
-    elif (blockid, data) == (18, 7):
+    elif data == 7:
         t = self.load_image_texture(BLOCKTEXTURE + "azalea_leaves.png")
-    elif (blockid, data) == (18, 8):
+    elif data == 8:
         t = self.load_image_texture(BLOCKTEXTURE + "mangrove_leaves.png")
+    elif data == 9:
+        t = self.load_image_texture(BLOCKTEXTURE + "cherry_leaves.png")
+
     return self.build_block(t, t)
 
 # sponge
