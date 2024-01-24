@@ -2918,150 +2918,55 @@ def calibrated_sculk_sensor(self, blockid, data):
     tendril = ImageEnhance.Brightness(tendril).enhance(0.8)
     tendril.putalpha(tendrilAlpha)
 
-    # img = self.build_full_block((top_t, 8), None, None, side_t, side_t, None)
-
     tendril_swap = self.transform_image_side(tendril)
     tendril_swap = tendril_swap.transpose(Image.FLIP_LEFT_RIGHT)
-    
-    # alpha_over(img, tendril, (4, 1), tendril)
-    # alpha_over(img, tendril, (4, -5), tendril)
-    # alpha_over(img, tendril_swap, (-1, -2), tendril_swap)
-    # alpha_over(img, tendril_swap, (13, -2), tendril_swap)
+
+    # default something (probably wrong) in case we fall through this if
+    img = self.build_full_block((t_top, 8), t_side, front, t_side, t_side)
 
     if self.rotation == 0: # rendering north upper-left
         if data == 0 or data == 4: # south
             img = self.build_full_block((t_top.rotate(180), 8), t_side, front, t_side, t_side)
-            alpha_over(img, tendril, (4, 1), tendril)
-            alpha_over(img, tendril, (4, -5), tendril)
-            alpha_over(img, tendril_swap, (-1, -2), tendril_swap)
-            alpha_over(img, tendril_swap, (13, -2), tendril_swap)
-            alpha_over(img, sensor_amethyst, (5, -4), sensor_amethyst)
-            return img
         elif data == 1 or data == 5: # west
             img = self.build_full_block((t_top.rotate(90), 8), front, t_side, t_side, t_side)
-            alpha_over(img, tendril, (4, 1), tendril)
-            alpha_over(img, tendril, (4, -5), tendril)
-            alpha_over(img, tendril_swap, (-1, -2), tendril_swap)
-            alpha_over(img, tendril_swap, (13, -2), tendril_swap)
-            alpha_over(img, sensor_amethyst, (5, -4), sensor_amethyst)
-            return img
         elif data == 2 or data == 6: # north
             img = self.build_full_block((t_top.rotate(0), 8), t_side, t_side, t_side, front)
-            alpha_over(img, tendril, (4, 1), tendril)
-            alpha_over(img, tendril, (4, -5), tendril)
-            alpha_over(img, tendril_swap, (-1, -2), tendril_swap)
-            alpha_over(img, tendril_swap, (13, -2), tendril_swap)
-            alpha_over(img, sensor_amethyst, (5, -4), sensor_amethyst)
-            return img
         elif data == 3 or data == 7: # east
             img = self.build_full_block((t_top.rotate(270), 8), t_side, t_side, front, t_side)
-            alpha_over(img, tendril, (4, 1), tendril)
-            alpha_over(img, tendril, (4, -5), tendril)
-            alpha_over(img, tendril_swap, (-1, -2), tendril_swap)
-            alpha_over(img, tendril_swap, (13, -2), tendril_swap)
-            alpha_over(img, sensor_amethyst, (5, -4), sensor_amethyst)
-            return img
     if self.rotation == 1: # north upper-right
         if data == 0 or data == 4: # south
             img = self.build_full_block((t_top.rotate(90), 8), front, t_side, t_side, t_side)
-            alpha_over(img, tendril, (4, 1), tendril)
-            alpha_over(img, tendril, (4, -5), tendril)
-            alpha_over(img, tendril_swap, (-1, -2), tendril_swap)
-            alpha_over(img, tendril_swap, (13, -2), tendril_swap)
-            alpha_over(img, sensor_amethyst, (5, -4), sensor_amethyst)
-            return img
         elif data == 1 or data == 5: # west
             img = self.build_full_block((t_top.rotate(0), 8), t_side, t_side, t_side, front)
-            alpha_over(img, tendril, (4, 1), tendril)
-            alpha_over(img, tendril, (4, -5), tendril)
-            alpha_over(img, tendril_swap, (-1, -2), tendril_swap)
-            alpha_over(img, tendril_swap, (13, -2), tendril_swap)
-            alpha_over(img, sensor_amethyst, (5, -4), sensor_amethyst)
-            return img
         elif data == 2 or data == 6: # north
             img = self.build_full_block((t_top.rotate(270), 8), t_side, t_side, front, t_side)
-            alpha_over(img, tendril, (4, 1), tendril)
-            alpha_over(img, tendril, (4, -5), tendril)
-            alpha_over(img, tendril_swap, (-1, -2), tendril_swap)
-            alpha_over(img, tendril_swap, (13, -2), tendril_swap)
-            alpha_over(img, sensor_amethyst, (5, -4), sensor_amethyst)
-            return img
         elif data == 3 or data == 7: # east
             img = self.build_full_block((t_top.rotate(180), 8), t_side, front, t_side, t_side)
-            alpha_over(img, tendril, (4, 1), tendril)
-            alpha_over(img, tendril, (4, -5), tendril)
-            alpha_over(img, tendril_swap, (-1, -2), tendril_swap)
-            alpha_over(img, tendril_swap, (13, -2), tendril_swap)
-            alpha_over(img, sensor_amethyst, (5, -4), sensor_amethyst)
-            return img           
     if self.rotation == 2: # north lower-right
         if data == 0 or data == 4: # south
             img = self.build_full_block((t_top.rotate(0), 8), t_side, t_side, t_side, front)
-            alpha_over(img, tendril, (4, 1), tendril)
-            alpha_over(img, tendril, (4, -5), tendril)
-            alpha_over(img, tendril_swap, (-1, -2), tendril_swap)
-            alpha_over(img, tendril_swap, (13, -2), tendril_swap)
-            alpha_over(img, sensor_amethyst, (5, -4), sensor_amethyst)
-            return img
         elif data == 1 or data == 5: # west
             img = self.build_full_block((t_top.rotate(270), 8), t_side, t_side, front, t_side)
-            alpha_over(img, tendril, (4, 1), tendril)
-            alpha_over(img, tendril, (4, -5), tendril)
-            alpha_over(img, tendril_swap, (-1, -2), tendril_swap)
-            alpha_over(img, tendril_swap, (13, -2), tendril_swap)
-            alpha_over(img, sensor_amethyst, (5, -4), sensor_amethyst)
-            return img
         elif data == 2 or data == 6: # north
             img = self.build_full_block((t_top.rotate(180), 8), t_side, front, t_side, t_side)
-            alpha_over(img, tendril, (4, 1), tendril)
-            alpha_over(img, tendril, (4, -5), tendril)
-            alpha_over(img, tendril_swap, (-1, -2), tendril_swap)
-            alpha_over(img, tendril_swap, (13, -2), tendril_swap)
-            alpha_over(img, sensor_amethyst, (5, -4), sensor_amethyst)
-            return img
         elif data == 3 or data == 7: # east
             img = self.build_full_block((t_top.rotate(90), 8), front, t_side, t_side, t_side)
-            alpha_over(img, tendril, (4, 1), tendril)
-            alpha_over(img, tendril, (4, -5), tendril)
-            alpha_over(img, tendril_swap, (-1, -2), tendril_swap)
-            alpha_over(img, tendril_swap, (13, -2), tendril_swap)
-            alpha_over(img, sensor_amethyst, (5, -4), sensor_amethyst)
-            return img       
     if self.rotation == 3: # north lower-left
         if data == 0 or data == 4: # south
             img = self.build_full_block((t_top.rotate(270), 8), t_side, t_side, front, t_side)
-            alpha_over(img, tendril, (4, 1), tendril)
-            alpha_over(img, tendril, (4, -5), tendril)
-            alpha_over(img, tendril_swap, (-1, -2), tendril_swap)
-            alpha_over(img, tendril_swap, (13, -2), tendril_swap)
-            alpha_over(img, sensor_amethyst, (5, -4), sensor_amethyst)
-            return img
         elif data == 1 or data == 5: # west
             img = self.build_full_block((t_top.rotate(180), 8), t_side, front, t_side, t_side)
-            alpha_over(img, tendril, (4, 1), tendril)
-            alpha_over(img, tendril, (4, -5), tendril)
-            alpha_over(img, tendril_swap, (-1, -2), tendril_swap)
-            alpha_over(img, tendril_swap, (13, -2), tendril_swap)
-            alpha_over(img, sensor_amethyst, (5, -4), sensor_amethyst)
-            return img
         elif data == 2 or data == 6: # north
             img = self.build_full_block((t_top.rotate(90), 8), front, t_side, t_side, t_side)
-            alpha_over(img, tendril, (4, 1), tendril)
-            alpha_over(img, tendril, (4, -5), tendril)
-            alpha_over(img, tendril_swap, (-1, -2), tendril_swap)
-            alpha_over(img, tendril_swap, (13, -2), tendril_swap)
-            alpha_over(img, sensor_amethyst, (5, -4), sensor_amethyst)
-            return img
         elif data == 3 or data == 7: # east
             img = self.build_full_block((t_top.rotate(0), 8), t_side, t_side, t_side, front)
-            alpha_over(img, tendril, (4, 1), tendril)
-            alpha_over(img, tendril, (4, -5), tendril)
-            alpha_over(img, tendril_swap, (-1, -2), tendril_swap)
-            alpha_over(img, tendril_swap, (13, -2), tendril_swap)
-            alpha_over(img, sensor_amethyst, (5, -4), sensor_amethyst)
-            return img 
 
-
+    alpha_over(img, tendril, (4, 1), tendril)
+    alpha_over(img, tendril, (4, -5), tendril)
+    alpha_over(img, tendril_swap, (-1, -2), tendril_swap)
+    alpha_over(img, tendril_swap, (13, -2), tendril_swap)
+    alpha_over(img, sensor_amethyst, (5, -4), sensor_amethyst)
+    return img
 
 
 @material(blockid=11369, data=list(range(12)), transparent=True, solid=True, nospawn=True)
