@@ -1149,11 +1149,11 @@ class RegionSet(object):
             'minecraft:bamboo_pressure_plate': (1219, 0),
             'minecraft:bamboo_button': (1220, 0),
             # Reinforced Deepslate
-            'minecraft:reinforced_deepslate': (1221, 0),
+            'minecraft:reinforced_deepslate': (2048, 0),
             # Froglight
-            'minecraft:ochre_froglight': (1221, 1),
-            'minecraft:verdant_froglight': (1221, 2),
-            'minecraft:pearlescent_froglight': (1221, 3),
+            'minecraft:ochre_froglight': (2049, 1),
+            'minecraft:verdant_froglight': (2050, 2),
+            'minecraft:pearlescent_froglight': (2051, 3),
             # Sculk
             'minecraft:sculk': (1222, 0),
             'minecraft:sculk_vein': (1223, 0),
@@ -1438,7 +1438,7 @@ class RegionSet(object):
             if axis == 'z':
                 data = 4
         elif key in ['minecraft:basalt', 'minecraft:polished_basalt', 'minecraft:chain', 'minecraft:purpur_pillar',
-                     'minecraft:deepslate']:
+                     'minecraft:deepslate'] or key.endswith('_froglight'):
             axis = palette_entry['Properties']['axis']
             data = {'y': 0, 'x': 1, 'z': 2}[axis]
         elif key in ['minecraft:redstone_torch','minecraft:redstone_wall_torch','minecraft:wall_torch',

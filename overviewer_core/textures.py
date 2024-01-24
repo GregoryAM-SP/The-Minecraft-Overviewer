@@ -1120,10 +1120,12 @@ block(blockid=14, top_image=BLOCKTEXTURE + "gold_ore.png")
 block(blockid=15, top_image=BLOCKTEXTURE + "iron_ore.png")
 # coal ore
 block(blockid=16, top_image=BLOCKTEXTURE + "coal_ore.png")
+# reinforced deepslate
+block(blockid=2048, top_image=BLOCKTEXTURE + "reinforced_deepslate_top.png", side_image=BLOCKTEXTURE + "reinforced_deepslate_side.png")
 
 @material(blockid=[17, 162, 11306, 11307, 11308,
                     11309, 11310, 11311, 1008, 1009, 
-                    1126, 1192, 1201, 1210, 1221, 
+                    1126, 1192, 1201, 1210,
                     1222, 1228, 1229, 1244],
           data=list(range(12)), solid=True)
 def wood(self, blockid, data):
@@ -1210,12 +1212,6 @@ def wood(self, blockid, data):
             0: ("bamboo_block_top.png", "bamboo_block.png"),
             1: ("stripped_bamboo_block_top.png", "stripped_bamboo_block.png"),
             2: ("bamboo_mosaic.png", None)
-        },
-        1221: {
-            0: ("reinforced_deepslate_top.png", "reinforced_deepslate_side.png"),
-            1: ("ochre_froglight_top.png", "ochre_froglight_side.png"),
-            2: ("verdant_froglight_top.png", "verdant_froglight_side.png"),
-            3: ("pearlescent_froglight_top.png", "pearlescent_froglight_side.png"),
         },
         1222: {
             0: ("sculk_sensor_bottom.png", None)
@@ -6729,6 +6725,19 @@ def basalt(self, blockid, data):
     side = self.load_image_texture(BLOCKTEXTURE + "" + block_name + "_side.png")
     return self.build_axis_block(top, side, data)
 
+# Froglights
+@material(blockid=[2049, 2050, 2051], data=list(range(3)), solid=True)
+def froglight(self, blockid, data):
+
+    froglights = {
+        2049: 'ochre',
+        2050: 'verdant',
+        2051: 'pearlescent',
+    }
+
+    top = self.load_image_texture(BLOCKTEXTURE + "" + froglights[blockid] + "_froglight_top.png")
+    side = self.load_image_texture(BLOCKTEXTURE + "" + froglights[blockid] + "_froglight_side.png")
+    return self.build_axis_block(top, side, data)
 
 # Blackstone block
 block(blockid=[1004], top_image=BLOCKTEXTURE + "blackstone_top.png",
