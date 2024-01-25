@@ -1194,6 +1194,8 @@ class RegionSet(object):
             'minecraft:amethyst_cluster': (1232, 0), 
             'minecraft:sculk_catalyst': (1244, 0),
 
+            'minecraft:decorated_pot': (1242, 0),
+
             # Hanging wall signs
             'minecraft:oak_wall_hanging_sign': (12600, 0),
             'minecraft:spruce_wall_hanging_sign': (12601, 0),

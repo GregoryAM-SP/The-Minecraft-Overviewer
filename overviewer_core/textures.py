@@ -1267,7 +1267,6 @@ block(blockid=21, top_image=BLOCKTEXTURE + "lapis_ore.png")
 # lapis lazuli block
 block(blockid=22, top_image=BLOCKTEXTURE + "lapis_block.png")
 
-block(blockid=1242,top_image=BLOCKTEXTURE + "cherry_leaves.png")
 block(blockid=1226, top_image=BLOCKTEXTURE + "tinted_glass.png", transparent=True)
 
 block(blockid=1222, top_image=BLOCKTEXTURE + "sculk.png")
@@ -2567,6 +2566,31 @@ def chests(self, blockid, data):
         img = None
 
     return img
+
+@material(blockid=1242, data=[0], transparent=True)
+def decorated_pot(self, blockid, data):
+    side_tex = self.load_image("assets/minecraft/textures/entity/decorated_pot/decorated_pot_side.png").copy()
+    base_tex = self.load_image("assets/minecraft/textures/entity/decorated_pot/decorated_pot_base.png").copy()
+
+    end_tex = base_tex.crop((0, 13, 14, 27))
+    neck_tex = base_tex.crop((8, 0, 16, 8))
+
+    side_tex = self.transform_image_side(side_tex)
+
+    front_tex = side_tex.transpose(Image.FLIP_LEFT_RIGHT)
+    front_tex = ImageEnhance.Brightness(front_tex).enhance(0.8)
+
+    top_tex = Image.new("RGBA", (16,16), self.bgcolor)
+    alpha_over(top_tex, end_tex, (1,1))
+    alpha_over(top_tex, neck_tex, (6,3))
+
+    img = self.build_full_block(top_tex, None, None, None, None)
+
+    alpha_over(img, side_tex, (1,6))
+    alpha_over(img, front_tex, (11,5))
+
+    return img
+
 
 # redstone wire
 # uses pseudo-ancildata found in iterate.c
