@@ -1253,7 +1253,15 @@ def leaves(self, blockid, data):
     return self.build_block(t, t)
 
 # sponge
-block(blockid=19, top_image=BLOCKTEXTURE + "sponge.png")
+@material(blockid=19, data=[0, 1], solid=True)
+def sponge(self, blockid, data):
+    if data == 0:  # normal
+        dry = self.load_image_texture(BLOCKTEXTURE + "sponge.png")
+        return self.build_block(dry, dry)
+    elif data == 1:  # wet
+        wet = self.load_image_texture(BLOCKTEXTURE + "wet_sponge.png")
+        return self.build_block(wet, wet)
+
 # lapis lazuli ore
 block(blockid=21, top_image=BLOCKTEXTURE + "lapis_ore.png")
 # lapis lazuli block
@@ -1371,7 +1379,7 @@ def dead_coral(self, blockid, data):
 
 # Bed
 @material(blockid=26, data=list(range(256)), transparent=True, nospawn=True)
-def bed(self, blockid, data,):
+def bed(self, blockid, data):
     # Bits 1-2   Rotation
     # Bit 3      Occupancy, no impact on appearance
     # Bit 4      Foot/Head of bed (0 = foot, 1 = head)
