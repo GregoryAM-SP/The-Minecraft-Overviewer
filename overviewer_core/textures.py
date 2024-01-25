@@ -3127,9 +3127,17 @@ def signpost(self, blockid, data):
     texture_path, texture_stick_path = [BLOCKTEXTURE + "" + x for x in sign_texture[blockid]]
     
     texture = self.load_image_texture(texture_path).copy()
-    
-    # cut the planks to the size of a signpost
-    ImageDraw.Draw(texture).rectangle((0,12,15,15),outline=(0,0,0,0),fill=(0,0,0,0))
+
+    if blockid == 12514:
+        # override for bamboo, this is a different texture so load it from the sign texture directly.
+        texture = self.load_image("assets/minecraft/textures/entity/signs/bamboo.png").copy().crop((2, 2, 26, 14))
+        texture.resize((16,12), Image.LANCZOS)
+        teximg = Image.new("RGBA", (16,16), self.bgcolor)
+        alpha_over(teximg, texture)
+        texture = teximg
+    else:
+        # cut the planks to the size of a signpost
+        ImageDraw.Draw(texture).rectangle((0,12,15,15),outline=(0,0,0,0),fill=(0,0,0,0))
 
     # If the signpost is looking directly to the image, draw some 
     # random dots, they will look as text.
@@ -3420,18 +3428,18 @@ def wall_sign(self, blockid, data): # wall sign
     }
     texture_path = BLOCKTEXTURE + "" + sign_texture[blockid]
     texture = self.load_image_texture(texture_path).copy()
-    # cut the planks to the size of a signpost
-    ImageDraw.Draw(texture).rectangle((0,12,15,15),outline=(0,0,0,0),fill=(0,0,0,0))
 
-    # draw some random black dots, they will look as text
-    """ don't draw text at the moment, they are used in blank for decoration
-    
-    if data in (3,4):
-        for i in range(15):
-            x = randint(4,11)
-            y = randint(3,7)
-            texture.putpixel((x,y),(0,0,0,255))
-    """
+    if blockid == 12511:
+        # override for bamboo, this is a different texture so load it from the sign texture directly.
+        texture = self.load_image("assets/minecraft/textures/entity/signs/bamboo.png").copy().crop((2, 2, 26, 14))
+        texture.resize((16,12), Image.LANCZOS)
+        teximg = Image.new("RGBA", (16,16), self.bgcolor)
+        alpha_over(teximg, texture)
+        texture = teximg
+    else:
+        # cut the planks to the size of a signpost
+        ImageDraw.Draw(texture).rectangle((0,12,15,15),outline=(0,0,0,0),fill=(0,0,0,0))
+
     
     img = Image.new("RGBA", (24,24), self.bgcolor)
 
