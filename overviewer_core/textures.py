@@ -3570,6 +3570,79 @@ def hanging_wall_sign(self, blockid, data):
 
     return img
 
+
+@material(blockid=list(range(12620, 12631)), data=list(range(32)), transparent=True)
+def hanging_sign(self, blockid, data):
+
+    attached = (data & 0b10000) == 0b10000
+
+    data &= 0b01111
+
+    # first rotations
+    if self.rotation == 1:
+        data = (data + 4) % 16
+    elif self.rotation == 2:
+        data = (data + 8) % 16
+    elif self.rotation == 3:
+        data = (data + 12) % 16
+
+    sign_texture = {
+        12620: "oak.png",
+        12621: "spruce.png",
+        12622: "birch.png",
+        12623: "jungle.png",
+        12624: "acacia.png",
+        12625: "dark_oak.png",
+        12626: "crimson.png",
+        12627: "warped.png",
+        12628: "mangrove.png",
+        12629: "cherry.png",
+        12630: "bamboo.png",
+    }
+
+    texture_path = "assets/minecraft/textures/entity/signs/hanging/" + sign_texture[blockid]
+    full_texture = self.load_image(texture_path).copy()
+
+    sign_side_tex = full_texture.crop((2, 14, 16, 24))
+
+    texture = Image.new("RGBA", (16,16), self.bgcolor)
+    alpha_over(texture, sign_side_tex, (1, 6))
+
+    if attached:
+        chain_tex = full_texture.crop((12, 6, 28, 12))
+        alpha_over(texture, chain_tex)
+    else:
+        chain_tex_main = full_texture.crop((6, 6, 9, 12))
+        chain_tex_outer = full_texture.crop((0, 6, 3, 12))
+
+        alpha_over(texture, chain_tex_main, (2, 0))
+        alpha_over(texture, chain_tex_outer, (2, 0))
+        alpha_over(texture, chain_tex_main, (12, 0))
+        alpha_over(texture, chain_tex_outer, (12, 0))
+
+    img = Image.new("RGBA", (24,24), self.bgcolor)
+
+    #         W                N      ~90       E                   S        ~270
+    angles = (330.,345.,0.,15.,30.,55.,95.,120.,150.,165.,180.,195.,210.,230.,265.,310.)
+    angle = math.radians(angles[data])
+    post = self.transform_image_angle(texture, angle)
+
+    # choose the position of the "3D effect"
+    incrementx = 0
+    if data in (1,6,7,8,9,14):
+        incrementx = -1
+    elif data in (3,4,5,11,12,13):
+        incrementx = +1
+
+    # post2 is a brighter signpost pasted with a small shift,
+    # gives to the signpost some 3D effect.
+    post2 = ImageEnhance.Brightness(post).enhance(1.2)
+    alpha_over(img, post2,(incrementx, -3),post2)
+    alpha_over(img, post, (0,-2), post)
+
+    return img
+
+
 # levers
 @material(blockid=69, data=list(range(16)), transparent=True)
 def levers(self, blockid, data):

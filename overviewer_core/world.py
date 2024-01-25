@@ -1206,6 +1206,18 @@ class RegionSet(object):
             'minecraft:mangrove_wall_hanging_sign': (12608, 0),
             'minecraft:cherry_wall_hanging_sign': (12609, 0),
             'minecraft:bamboo_wall_hanging_sign': (12610, 0),
+            # Hanging signs
+            'minecraft:oak_hanging_sign': (12620, 0),
+            'minecraft:spruce_hanging_sign': (12621, 0),
+            'minecraft:birch_hanging_sign': (12622, 0),
+            'minecraft:jungle_hanging_sign': (12623, 0),
+            'minecraft:acacia_hanging_sign': (12624, 0),
+            'minecraft:dark_oak_hanging_sign': (12625, 0),
+            'minecraft:crimson_hanging_sign': (12626, 0),
+            'minecraft:warped_hanging_sign': (12627, 0),
+            'minecraft:mangrove_hanging_sign': (12628, 0),
+            'minecraft:cherry_hanging_sign': (12629, 0),
+            'minecraft:bamboo_hanging_sign': (12630, 0),
         }
 
         colors = [   'white', 'orange', 'magenta', 'light_blue',
@@ -1500,10 +1512,10 @@ class RegionSet(object):
                 elif facing == 'east':  data = 5
             else:
                 p = palette_entry['Properties']
-                data = p['rotation']
+                data = int(p['rotation'])
 
-                if key.endswith('_hanging_sign') and p['attached']:
-                    data |= 0x1F
+                if key.endswith('_hanging_sign') and p['attached'] == 'true':
+                    data |= 0x10
 
         elif key.endswith('_fence'):
             p = palette_entry['Properties']
