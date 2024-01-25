@@ -6473,20 +6473,40 @@ block(blockid=11414, top_image=BLOCKTEXTURE + "scaffolding_top.png", side_image=
 def chiseledBookshelf(self, blockid, data):
     t_top = self.load_image_texture(BLOCKTEXTURE + "chiseled_bookshelf_top.png")
     t_side = self.load_image_texture(BLOCKTEXTURE + "chiseled_bookshelf_side.png")
-    empty = self.load_image_texture(BLOCKTEXTURE + "chiseled_bookshelf_empty.png")
-    occupied = self.load_image_texture(BLOCKTEXTURE + "chiseled_bookshelf_occupied.png")
+    empty = self.load_image_texture(BLOCKTEXTURE + "chiseled_bookshelf_empty.png").copy()
+    occupied = self.load_image_texture(BLOCKTEXTURE + "chiseled_bookshelf_occupied.png").copy()
 
     direction = data & 0b00000011
-
     data &= 0b11111100
 
-    if data >= 4:
-        front = occupied
-    else:
-        front = empty
+    front = empty
+
+    # brighten the books to make them slightly more visible
+    occupied = ImageEnhance.Brightness(occupied).enhance(1.5)
+
+    # Copy over the books which are present
+    mask = Image.new("RGBA", (16, 16), self.bgcolor)
+    if data & 0b10000000 == 0b10000000:
+        ImageDraw.Draw(mask).rectangle((0,0,5,7),outline=(0,0,0,0),fill=(255,0,0,255))
+    if data & 0b01000000 == 0b01000000:
+        ImageDraw.Draw(mask).rectangle((5,0,10,7),outline=(0,0,0,0),fill=(255,255,0,255))
+    if data & 0b00100000 == 0b00100000:
+        ImageDraw.Draw(mask).rectangle((10,0,15,7),outline=(0,0,0,0),fill=(0,255,0,255))
+    if data & 0b00010000 == 0b00010000:
+        ImageDraw.Draw(mask).rectangle((0,8,5,15),outline=(0,0,0,0),fill=(0,255,255,255))
+    if data & 0b00001000 == 0b00001000:
+        ImageDraw.Draw(mask).rectangle((5,8,10,15),outline=(0,0,0,0),fill=(0,0,255,255))
+    if data & 0b00000100 == 0b00000100:
+        ImageDraw.Draw(mask).rectangle((10,8,15,15),outline=(0,0,0,0),fill=(255,0,255,255))
+    alpha_over(front, occupied, (0,0), mask)
+
+    img = Image.new("RGBA", (24, 24), self.bgcolor)
 
     if direction == (0 - self.rotation) % 4:  # south
-        return self.build_full_block(t_top, t_side, t_side, t_side, front)
+        # this side is flipped by build_full_block(), so we need to flip it ourselves too or the books will be on
+        # the wrong side of the bookshelf in certain orientations.
+        inv_front = front.transpose(Image.FLIP_LEFT_RIGHT)
+        return self.build_full_block(t_top, t_side, t_side, t_side, inv_front)
     elif direction == (1 - self.rotation) % 4:  # west
         return self.build_full_block(t_top, t_side, t_side, front, t_side)
     elif direction == (2 - self.rotation) % 4:  # north
