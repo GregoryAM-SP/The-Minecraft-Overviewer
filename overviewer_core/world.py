@@ -1387,9 +1387,13 @@ class RegionSet(object):
             facing = palette_entry['Properties']['facing']
             data = {'south': 0, 'west': 1, 'north': 2, 'east': 3}[facing]
             p = palette_entry['Properties']
+            occupancy = 0
             for i in range(6):
                 if p[f'slot_{i}_occupied'] == 'true':
-                    data |= 4
+                    occupancy |= 1
+                occupancy = occupancy << 1
+            occupancy = occupancy << 1
+            data |= occupancy
         elif (key in 'minecraft:calibrated_sculk_sensor'):
             facing = palette_entry['Properties']['facing']
             data = {'south': 0, 'west': 1, 'north': 2, 'east': 3}[facing]

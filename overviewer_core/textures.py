@@ -6469,57 +6469,30 @@ def sandstone(self, blockid, data):
 block(blockid=11414, top_image=BLOCKTEXTURE + "scaffolding_top.png", side_image=BLOCKTEXTURE + "scaffolding_side.png", solid=False, transparent=True)
 
 # Chiseled Bookshelf
-@material(blockid=1227, data=list(range(128)), transparent=False, solid=True)
+@material(blockid=1227, data=list(range(256)), transparent=False, solid=True)
 def chiseledBookshelf(self, blockid, data):
     t_top = self.load_image_texture(BLOCKTEXTURE + "chiseled_bookshelf_top.png")
     t_side = self.load_image_texture(BLOCKTEXTURE + "chiseled_bookshelf_side.png")
     empty = self.load_image_texture(BLOCKTEXTURE + "chiseled_bookshelf_empty.png")
     occupied = self.load_image_texture(BLOCKTEXTURE + "chiseled_bookshelf_occupied.png")
 
+    direction = data & 0b00000011
+
+    data &= 0b11111100
+
     if data >= 4:
         front = occupied
     else:
         front = empty
 
-    if self.rotation == 0: # rendering north upper-left
-        if data == 0 or data == 4: # south
-            return self.build_full_block(t_top, t_side, t_side, t_side, front)
-        elif data == 1 or data == 5: # west
-            return self.build_full_block(t_top, t_side, t_side, front, t_side)
-        elif data == 2 or data == 6: # north
-            return self.build_full_block(t_top, t_side, front, t_side, t_side)
-        elif data == 3 or data == 7: # east
-            return self.build_full_block(t_top, front, t_side, t_side, t_side)
-
-    elif self.rotation == 1: # north upper-right
-        if data == 0 or data == 4: # south
-            return self.build_full_block(t_top, t_side, t_side, front, t_side)
-        elif data == 1 or data == 5: # west
-            return self.build_full_block(t_top, t_side, front, t_side, t_side)
-        elif data == 2 or data == 6: # north
-            return self.build_full_block(t_top, front, t_side, t_side, t_side)
-        elif data == 3 or data == 7: # east
-            return self.build_full_block(t_top, t_side, t_side, t_side, front)            
-
-    elif self.rotation == 2: # north lower-right
-        if data == 0 or data == 4: # south
-            return self.build_full_block(t_top, t_side, front, t_side, t_side)
-        elif data == 1 or data == 5: # west
-            return self.build_full_block(t_top, front, t_side, t_side, t_side)
-        elif data == 2 or data == 6: # north
-            return self.build_full_block(t_top, t_side, t_side, t_side, front)
-        elif data == 3 or data == 7: # east
-            return self.build_full_block(t_top, t_side, t_side, front, t_side)
-            
-    elif self.rotation == 3: # north lower-left
-        if data == 0 or data == 4: # south
-            return self.build_full_block(t_top, front, t_side, t_side, t_side)
-        elif data == 1 or data == 5: # west
-            return self.build_full_block(t_top, t_side, t_side, t_side, front)
-        elif data == 2 or data == 6: # north
-            return self.build_full_block(t_top, t_side, t_side, front, t_side)
-        elif data == 3 or data == 7: # east
-            return self.build_full_block(t_top, t_side, front, t_side, t_side)
+    if direction == (0 - self.rotation) % 4:  # south
+        return self.build_full_block(t_top, t_side, t_side, t_side, front)
+    elif direction == (1 - self.rotation) % 4:  # west
+        return self.build_full_block(t_top, t_side, t_side, front, t_side)
+    elif direction == (2 - self.rotation) % 4:  # north
+        return self.build_full_block(t_top, t_side, front, t_side, t_side)
+    elif direction == (3 - self.rotation) % 4:  # east
+        return self.build_full_block(t_top, front, t_side, t_side, t_side)
 
 
 # beehive and bee_nest
