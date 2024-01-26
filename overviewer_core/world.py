@@ -2055,6 +2055,75 @@ class RegionSet(object):
 
         return chunk_data
 
+    def get_chunk_lite(self, x, z):
+        """Returns a dictionary object representing the "Level" NBT Compound
+        structure for a chunk given its x, z coordinates. The coordinates given
+        are chunk coordinates. Raises ChunkDoesntExist exception if the given
+        chunk does not exist.
+
+        The returned dictionary corresponds to the "Level" structure in the
+        chunk file. If you're doing anything with block data, you probably want
+        get_chunk() instead. This is mostly intended for doing silly stuff with
+        block entities fron genPOI.
+
+        Warning: the returned data may be cached and thus should not be
+        modified, lest it affect the return values of future calls for the same
+        chunk.
+        """
+        regionfile = self._get_region_path(x, z)
+        if regionfile is None:
+            raise ChunkDoesntExist("Chunk %s,%s doesn't exist (and neither does its region)" % (x,z))
+
+        # Try a few times to load and parse this chunk before giving up and
+        # raising an error
+        tries = 5
+        while True:
+            try:
+                region = self._get_regionobj(regionfile)
+                data = region.load_chunk(x, z)
+            except nbt.CorruptionError as e:
+                tries -= 1
+                if tries > 0:
+                    # Flush the region cache to possibly read a new region file header
+                    logging.debug("Encountered a corrupt chunk or read error at %s,%s. "
+                                  "Flushing cache and retrying", x, z)
+                    del self.regioncache[regionfile]
+                    time.sleep(0.25)
+                    continue
+                else:
+                    logging.warning("The following was encountered while reading from %s:", self.regiondir)
+                    if isinstance(e, nbt.CorruptRegionError):
+                        logging.warning("Tried several times to read chunk %d,%d. Its region (%d,%d) may be corrupt. Giving up.",
+                                        x, z,x//32,z//32)
+                    elif isinstance(e, nbt.CorruptChunkError):
+                        logging.warning("Tried several times to read chunk %d,%d. It may be corrupt. Giving up.",
+                                        x, z)
+                    else:
+                        logging.warning("Tried several times to read chunk %d,%d. Unknown error. Giving up.",
+                                        x, z)
+                    logging.debug("Full traceback:", exc_info=1)
+                    # Let this exception propagate out through the C code into
+                    # tileset.py, where it is caught and gracefully continues
+                    # with the next chunk
+                    raise
+            else:
+                # no exception raised: break out of the loop
+                break
+
+        if data is None:
+            raise ChunkDoesntExist("Chunk %s,%s doesn't exist" % (x,z))
+
+        chunk_data = data[1]
+
+        if chunk_data.get('DataVersion', 0) <= 2840 and 'Level' in chunk_data:
+            # This world was generated pre 21w43a and thus most chunk data is contained
+            # in the "Level" key
+            chunk_data = chunk_data['Level']
+
+        if chunk_data.get("Status", "") not in ("minecraft:full", "postprocessed", "fullchunk", "mobs_spawned", "spawn", "full", ""):
+            raise ChunkDoesntExist("Chunk %s,%s doesn't exist" % (x,z))
+
+        return chunk_data
 
     def iterate_chunks(self):
         """Returns an iterator over all chunk metadata in this world. Iterates
@@ -2177,6 +2246,8 @@ class RegionSetWrapper(object):
         return self._r.get_biome_data(x,z)
     def get_chunk(self, x, z):
         return self._r.get_chunk(x,z)
+    def get_chunk_lite(self, x, z):
+        return self._r.get_chunk_lite(x,z)
     def iterate_chunks(self):
         return self._r.iterate_chunks()
     def iterate_newer_chunks(self,filemtime):
@@ -2285,6 +2356,14 @@ class CroppedRegionSet(RegionSetWrapper):
                 self.zmin <= z <= self.zmax
                 ):
             return super(CroppedRegionSet, self).get_chunk(x,z)
+        else:
+            raise ChunkDoesntExist("This chunk is out of the requested bounds")
+    def get_chunk_lite(self,x,z):
+        if (
+                self.xmin <= x <= self.xmax and
+                self.zmin <= z <= self.zmax
+        ):
+            return super(CroppedRegionSet, self).get_chunk_lite(x,z)
         else:
             raise ChunkDoesntExist("This chunk is out of the requested bounds")
 
