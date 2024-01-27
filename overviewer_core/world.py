@@ -214,7 +214,7 @@ class World(object):
         inChunkY = spawnY % 16
 
         ## Open up the chunk that the spawn is in
-        regionset = self.get_regionset(None)
+        regionset = self.get_regionset('DIM0')
         if not regionset:
             return None
         try:
@@ -273,7 +273,7 @@ class RegionSet(object):
             self.type = self.rel[0:-len(os.path.normpath("/region"))]
         elif self.rel == "region":
             # this is the main world
-            self.type = None
+            self.type = "DIM0"
         elif "entities" in os.path.split(self.rel):
             self.type = "entities"
         else:

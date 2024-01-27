@@ -359,10 +359,7 @@ def handlePlayers(worldpath, filters, markers):
             # This has do be done every time, because we have filters for
             # different regionsets.
 
-            if rset.get_type():
-                dimension = int(re.match(r"^DIM(_MYST)?(-?\d+)$", rset.get_type()).group(2))
-            else:
-                dimension = 0
+            dimension = int(re.match(r"^DIM(_MYST)?(-?\d+)$", rset.get_type()).group(2))
             dimension = DIMENSION_INT_TO_STR.get(dimension, "minecraft:overworld")
 
             read_dim = data.get("Dimension", "minecraft:overworld")
