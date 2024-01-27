@@ -194,51 +194,32 @@ def handleEntities(rset, config, config_path, filters, markers):
     if numbuckets < 0:
         numbuckets = multiprocessing.cpu_count()
 
-    if numbuckets == 1:
-        for (x, z, mtime) in rset.iterate_chunks():
-            try:
-                data = rset.get_chunk_lite(x, z)
-                for poi in itertools.chain(data.get('TileEntities', []), data.get('Entities', []), data.get('block_entities', [])):
-                    if poi['id'] in ['Sign', 'minecraft:sign', 'minecraft:hanging_sign']:    # kill me
-                        poi = signWrangler(poi)
-                    for name, __, filter_function, __, __, __ in filters:
-                        result = filter_function(poi)
-                        if result:
-                            d = create_marker_from_filter_result(poi, result)
-                            markers[name]['raw'].append(d)
-            except nbt.CorruptChunkError:
-                logging.warning("Ignoring POIs in corrupt chunk %d,%d.", x, z)
-            except world.ChunkDoesntExist:
-                # iterate_chunks() doesn't inspect chunks and filter out
-                # placeholder ones. It's okay for this chunk to not exist.
-                pass
-    else:
-        buckets = [[] for i in range(numbuckets)]
+    buckets = [[] for i in range(numbuckets)]
 
-        for (x, z, mtime) in rset.iterate_chunks():
-            i = x // 32 + z // 32
-            i = i % numbuckets
-            buckets[i].append([x, z])
+    for (x, z, mtime) in rset.iterate_chunks():
+        i = x // 32 + z // 32
+        i = i % numbuckets
+        buckets[i].append([x, z])
 
-        for b in buckets:
-            logging.info("Buckets has %d entries.", len(b))
+    for b in buckets:
+        logging.info("Buckets has %d entries.", len(b))
 
-        # Create a pool of processes and run all the functions
-        pool = Pool(processes=numbuckets, initializer=initBucketChunks, initargs=(config_path,))
+    # Create a pool of processes and run all the functions
+    pool = Pool(processes=numbuckets, initializer=initBucketChunks, initargs=(config_path,))
 
-        # simplify the filters dict, so pickle doesn't have to do so much
-        filters = [(name, filter_function.__name__) for name, __, filter_function, __, __, __
-                   in filters]
+    # simplify the filters dict, so pickle doesn't have to do so much
+    filters = [(name, filter_function.__name__) for name, __, filter_function, __, __, __
+               in filters]
 
-        results = pool.map(parseBucketChunks, ((buck, rset, filters) for buck in buckets))
+    results = pool.map(parseBucketChunks, ((buck, rset, filters) for buck in buckets))
 
-        pool.close()
-        pool.join()
-        logging.info("All the threads completed.")
+    pool.close()
+    pool.join()
+    logging.info("All the threads completed.")
 
-        for marker_dict in results:
-            for name, marker_list in marker_dict.items():
-                markers[name]['raw'].extend(marker_list)
+    for marker_dict in results:
+        for name, marker_list in marker_dict.items():
+            markers[name]['raw'].extend(marker_list)
 
     logging.info("Done.")
 
