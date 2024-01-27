@@ -1774,6 +1774,35 @@ sprite(blockid=1018, imagename=BLOCKTEXTURE + "warped_roots.png")
 # crimson roots
 sprite(blockid=1019, imagename=BLOCKTEXTURE + "crimson_roots.png")
 
+@material(blockid=[2052, 2053], data=list(range(4)), transparent=True)
+def dripleaf(self, blockid, data):
+    stem_texture = self.load_image_texture(BLOCKTEXTURE + "big_dripleaf_stem.png").copy()
+    stem = self.build_billboard(stem_texture)
+
+    if blockid == 2053:
+        return stem
+
+    leaf_top = self.load_image_texture(BLOCKTEXTURE + "big_dripleaf_top.png").copy()
+    leaf_side = self.load_image_texture(BLOCKTEXTURE + "big_dripleaf_side.png").copy()
+    leaf_tip = self.load_image_texture(BLOCKTEXTURE + "big_dripleaf_tip.png").copy()
+
+    if data == (0 - self.rotation) % 4:
+        leaf = self.build_full_block(leaf_top, None, leaf_side, leaf_side, leaf_tip)
+    elif data == (1 - self.rotation) % 4:
+        leaf = self.build_full_block(leaf_top, leaf_side, None, leaf_tip, leaf_side)
+    elif data == (2 - self.rotation) % 4:
+        leaf = self.build_full_block(leaf_top, leaf_side, leaf_tip, None, leaf_side)
+    elif data == (3 - self.rotation) % 4:
+        leaf = self.build_full_block(leaf_top, leaf_tip, leaf_side, leaf_side, None)
+
+    img = Image.new("RGBA", (24,24), self.bgcolor)
+    alpha_over(img, stem)
+    alpha_over(img, leaf)
+
+    return img
+
+
+
 # block of gold
 block(blockid=41, top_image=BLOCKTEXTURE + "gold_block.png")
 # block of iron

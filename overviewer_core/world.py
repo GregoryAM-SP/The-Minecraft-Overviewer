@@ -1196,6 +1196,9 @@ class RegionSet(object):
 
             'minecraft:decorated_pot': (1242, 0),
 
+            'minecraft:big_dripleaf': (2052,0),
+            'minecraft:big_dripleaf_stem': (2053,0),
+
             # Hanging wall signs
             'minecraft:oak_wall_hanging_sign': (12600, 0),
             'minecraft:spruce_wall_hanging_sign': (12601, 0),
@@ -1396,7 +1399,10 @@ class RegionSet(object):
                 occupancy = occupancy << 1
             occupancy = occupancy << 1
             data |= occupancy
-        elif (key in 'minecraft:calibrated_sculk_sensor'):
+        elif key == 'minecraft:calibrated_sculk_sensor':
+            facing = palette_entry['Properties']['facing']
+            data = {'south': 0, 'west': 1, 'north': 2, 'east': 3}[facing]
+        elif key in ['minecraft:small_dripleaf', 'minecraft:big_dripleaf', 'minecraft:big_dripleaf_stem']:
             facing = palette_entry['Properties']['facing']
             data = {'south': 0, 'west': 1, 'north': 2, 'east': 3}[facing]
         elif key in wood_slabs + stone_slabs + prismarine_slabs + copper_slabs:
