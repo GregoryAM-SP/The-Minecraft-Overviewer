@@ -359,6 +359,9 @@ def handlePlayers(worldpath, filters, markers):
             # This has do be done every time, because we have filters for
             # different regionsets.
 
+            if rset.get_type().endswith("/entities"):
+                continue
+
             dimension = int(re.match(r"^DIM(_MYST)?(-?\d+)$", rset.get_type()).group(2))
             dimension = DIMENSION_INT_TO_STR.get(dimension, "minecraft:overworld")
 
@@ -539,13 +542,18 @@ def main():
             logging.warning("Sorry, you requested dimension '%s' for the render '%s', but I "
                             "couldn't find it.", render['dimension'][0], rname)
             continue
+
+        erset = w.get_regionset(render['dimension'][1] + '/entities')
+
         # List of regionsets that should be handled
         rsets = []
         if "crop" in render:
             for zone in render['crop']:
                 rsets.append(world.CroppedRegionSet(rset, *zone))
+                rsets.append(world.CroppedRegionSet(erset, *zone))
         else:
             rsets.append(rset)
+            rsets.append(erset)
 
         # find filters for this render
         for f in render['markers']:
