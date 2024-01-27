@@ -410,7 +410,7 @@ overviewer.util = {
                                 // Convert coords
                                 let latlng = overviewer.util.fromWorldToLatLng(db.x, db.y, db.z, obj);
                                 // Set icon and use default icon if not specified
-                                let m_icon = L.divIcon({html: `<img class="ov-marker" src="${db.icon == undefined ? marker_entry.icon : db.icon}">`});
+                                let m_icon = L.divIcon({html: `<img class="ov-marker ${db.cssClass == undefined ? '' : db.cssClass}" src="${db.icon == undefined ? marker_entry.icon : db.icon}">`});
                                 // Create marker
                                 layerObj = new L.marker(latlng, {icon: m_icon, title: db.hovertext});
                             }

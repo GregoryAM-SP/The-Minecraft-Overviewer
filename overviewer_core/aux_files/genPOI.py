@@ -414,6 +414,8 @@ def create_marker_from_filter_result(poi, result):
         d["icon"] = poi['icon']
     if "createInfoWindow" in poi:
         d["createInfoWindow"] = poi['createInfoWindow']
+    if "cssClass" in poi:
+        d["cssClass"] = poi['cssClass']
 
     # Fill in the rest from result
     if isinstance(result, str):
