@@ -271,11 +271,13 @@ class RegionSet(object):
         # we want to get rid of /regions, if it exists
         if self.rel.endswith(os.path.normpath("/region")):
             self.type = self.rel[0:-len(os.path.normpath("/region"))]
+        elif self.rel.endswith(os.path.normpath("/entities")):
+            self.type = self.rel
         elif self.rel == "region":
             # this is the main world
             self.type = "DIM0"
-        elif "entities" in os.path.split(self.rel):
-            self.type = "entities"
+        elif self.rel == "entities":
+            self.type = "DIM0/entities"
         else:
             logging.warning("Unknown region type in %r, rel %r", regiondir, self.rel)
             self.type = "__unknown"
