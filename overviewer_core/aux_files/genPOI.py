@@ -133,6 +133,11 @@ def parseBucketChunks(task_tuple):
             for poi in itertools.chain(data.get('TileEntities', []), data.get('Entities', []), data.get('block_entities', [])):
                 if poi['id'] in ['Sign', 'minecraft:sign', 'minecraft:hanging_sign']:
                     poi = signWrangler(poi)
+
+                if 'CustomName' in poi:
+                    poi['CustomNameRaw'] = poi['CustomName']
+                    poi['CustomName'] = jsonText(poi['CustomName'])
+
                 for name, filter_function in filters:
                     ff = bucketChunkFuncs[filter_function]
                     result = ff(poi)
@@ -161,6 +166,7 @@ def signWrangler(poi):
     """
     if "Text1" in poi:
         for field in ["Text1", "Text2", "Text3", "Text4"]:
+            poi[field + "Raw"] = poi[field]
             poi[field] = jsonText(poi[field])
         poi.update({
             "back_text": {"has_glowing_text": 0, "color": "black", "messages": ["", "", "", ""]},
@@ -173,6 +179,8 @@ def signWrangler(poi):
         for field in ["front_text", "back_text"]:
             if field in poi:
                 messages = poi[field].get("messages", [])
+                poi[field]["messagesRaw"] = messages.copy()
+
                 for i in range(len(messages)):
                     messages[i] = jsonText(messages[i])
     return poi
