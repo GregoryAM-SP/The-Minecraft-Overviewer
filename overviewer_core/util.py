@@ -55,33 +55,6 @@ def findGitHash():
     return "unknown"
 
 
-def findGitVersion():
-    try:
-        p = Popen('git describe --tags --match "v*.*.*"', stdout=PIPE, stderr=PIPE, shell=True)
-        p.stderr.close()
-        line = p.stdout.readlines()[0].decode('utf-8')
-        if line.startswith('release-'):
-            line = line.split('-', 1)[1]
-        if line.startswith('v'):
-            line = line[1:]
-        # turn 0.1.0-50-somehash into 0.1.50
-        # and 0.1.0 into 0.1.0
-        line = line.strip().replace('-', '.').split('.')
-        if len(line) == 5:
-            del line[4]
-            del line[2]
-        else:
-            assert len(line) == 3
-            line[2] = '0'
-        line = '.'.join(line)
-        return line
-    except Exception:
-        try:
-            from . import overviewer_version
-            return overviewer_version.VERSION
-        except Exception:
-            return "unknown"
-        
 def findGitTag():
     try:
         p = Popen('git describe --tags --abbrev=0', stdout=PIPE, stderr=PIPE, shell=True)
@@ -95,7 +68,6 @@ def findGitTag():
         except Exception:
             pass
     return "unknown"
-
 
 
 def is_bare_console():
