@@ -963,15 +963,20 @@ def grass(self, blockid, data):
 
 
 # dirt
-@material(blockid=3, data=list(range(3)), solid=True)
+@material(blockid=3, data=list(range(3))+[18], solid=True)
 def dirt_blocks(self, blockid, data):
+    block_type = data & 0x0F
+
     texture_map = [{"top": "dirt",        "side": "dirt"},         # Normal
                    {"top": "coarse_dirt", "side": "coarse_dirt"},  # Coarse
                    {"top": "podzol_top",  "side": "podzol_side"}]  # Podzol
     top_img = self.load_image_texture(BLOCKTEXTURE + "%s.png"
-                                      % texture_map[data]["top"])
+                                      % texture_map[block_type]["top"])
     side_img = self.load_image_texture(BLOCKTEXTURE + "%s.png"
-                                       % texture_map[data]["side"])
+                                       % texture_map[block_type]["side"])
+
+    if data & 0x10:
+        side_img = self.load_image_texture(BLOCKTEXTURE + "grass_block_snow.png")
 
     return self.build_block(top_img, side_img)
 
@@ -4948,7 +4953,15 @@ def fence_gate(self, blockid, data):
     return img
 
 # mycelium
-block(blockid=110, top_image=BLOCKTEXTURE + "mycelium_top.png", side_image=BLOCKTEXTURE + "mycelium_side.png")
+@material(blockid=110, data=[0, 0x10], solid=True)
+def mycelium(self, blockid, data):
+    side_img = self.load_image_texture(BLOCKTEXTURE + "mycelium_side.png")
+    if data & 0x10:
+        side_img = self.load_image_texture(BLOCKTEXTURE + "grass_block_snow.png")
+    img = self.build_block(self.load_image_texture(BLOCKTEXTURE + "mycelium_top.png"), side_img)
+
+    return img
+
 # warped_nylium & crimson_nylium
 block(blockid=1006, top_image=BLOCKTEXTURE + "warped_nylium.png", side_image=BLOCKTEXTURE + "warped_nylium_side.png")
 block(blockid=1007, top_image=BLOCKTEXTURE + "crimson_nylium.png", side_image=BLOCKTEXTURE + "crimson_nylium_side.png")
