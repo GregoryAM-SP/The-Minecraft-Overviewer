@@ -1341,7 +1341,7 @@ class RegionSet(object):
                 block = 178
         elif key == 'minecraft:redstone_wire':
             data = palette_entry['Properties']['power']
-        elif key == 'minecraft:grass_block':
+        elif key in ['minecraft:grass_block', 'minecraft:mycelium', 'minecraft:podzol']:
             if palette_entry['Properties']['snowy'] == 'true':
                 data |= 0x10
         elif key == 'minecraft:snow':
