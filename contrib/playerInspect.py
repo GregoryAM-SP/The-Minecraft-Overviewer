@@ -20,7 +20,7 @@ def print_player(data, sub_entry=False):
     indent = ""
     if sub_entry:
         indent = "\t"
-    print("%sPosition:\t%i, %i, %i\t(dim: %i)"
+    print("%sPosition:\t%i, %i, %i\t(dim: %s)"
           % (indent, data['Pos'][0], data['Pos'][1], data['Pos'][2], data['Dimension']))
     try:
         print("%sSpawn:\t\t%i, %i, %i"
