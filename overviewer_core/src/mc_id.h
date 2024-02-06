@@ -447,6 +447,9 @@ enum mc_block_id {
     block_polished_deepslate_wall = 1810,
     block_deepslate_brick_wall = 1811,
     block_deepslate_tile_wall = 1812,
+    block_tuff_wall = 1813,
+    block_polished_tuff_wall = 1814,
+    block_tuff_brick_wall = 1815,
     // end of walls
 
     block_prismarine_stairs = 11337,
@@ -559,6 +562,14 @@ enum mc_block_id {
     block_mangrove_slab = 1194,
     block_bamboo_slab = 1213,
     block_cherry_slab = 1203,
+
+    block_tuff_slab = 12665,
+    block_polished_tuff_slab = 12668,
+    block_tuff_brick_slab = 12672,
+
+    block_tuff_stairs = 12664,
+    block_polished_tuff_stairs = 12667,
+    block_tuff_brick_stairs = 12671,
 };
 
 typedef uint16_t mc_block_t;

@@ -1812,10 +1812,10 @@ block(blockid=42, top_image=BLOCKTEXTURE + "iron_block.png")
 # these wooden slabs are unobtainable without cheating, they are still
 # here because lots of pre-1.3 worlds use this blocks, add prismarine slabs
 @material(blockid=[43, 44, 181, 182, 204, 205, 1124, 1194, 1203, 1213, 1214] + list(range(11340, 11359)) +
-          list(range(1027, 1030)) + list(range(1072, 1080)) + list(range(1103, 1107)),
+          list(range(1027, 1030)) + list(range(1072, 1080)) + list(range(1103, 1107)) + [12665, 12668, 12672],
           data=list(range(16)),
           transparent=[44, 182, 205, 1124, 1194, 1203, 1213, 1214] + list(range(11340, 11359)) + list(range(1027, 1030)) +
-          list(range(1072, 1080)) + list(range(1103, 1107)), solid=True)
+          list(range(1072, 1080)) + list(range(1103, 1107)) + [12665, 12668, 12672], solid=True)
 def slabs(self, blockid, data):
     if blockid == 44 or blockid == 182: 
         texture = data & 7
@@ -1940,6 +1940,12 @@ def slabs(self, blockid, data):
         top = side = self.load_image_texture(deepslate_tex[blockid]).copy()
     elif blockid == 1124:
         top = side = self.load_image_texture(BLOCKTEXTURE + "mud_bricks.png").copy()
+    elif blockid == 12665: # tuff_slab
+        top = side = self.load_image_texture(BLOCKTEXTURE + "tuff.png").copy()
+    elif blockid == 12668: # polished_tuff_slab
+        top = side = self.load_image_texture(BLOCKTEXTURE + "polished_tuff.png").copy()
+    elif blockid == 12672: # tuff_brick_slab
+        top = side = self.load_image_texture(BLOCKTEXTURE + "tuff_bricks.png").copy()
 
     if blockid == 43 or blockid == 181 or blockid == 204 or (blockid == 11358 and data == 1): # double slab
         return self.build_block(top, side)
@@ -2201,10 +2207,12 @@ block(blockid=52, top_image=BLOCKTEXTURE + "spawner.png", transparent=True)
 # smooth_red_sandstone blackstone polished_blackstone polished_blackstone_brick
 # also all the copper variants
 # also all deepslate variants
+# also all the tuff variants
 @material(blockid=[53, 67, 108, 109, 114, 128, 134, 135, 136, 156, 163, 164, 180, 203, 509, 510,
                    11337, 11338, 11339, 11370, 11371, 11374, 11375, 11376, 11377, 11378, 11379,
                    11380, 11381, 11382, 11383, 11384, 11415, 1030, 1031, 1032, 1064, 1065, 1066,
-                   1067, 1068, 1069, 1070, 1071, 1099, 1100, 1101, 1102, 1193, 1202, 1211, 1212, 1224],
+                   1067, 1068, 1069, 1070, 1071, 1099, 1100, 1101, 1102, 1193, 1202, 1211, 1212, 1224,
+                   12664, 12667, 12671],
           data=list(range(128)), transparent=True, solid=True, nospawn=True)
 def stairs(self, blockid, data):
     # preserve the upside-down bit
@@ -2276,10 +2284,15 @@ def stairs(self, blockid, data):
         # Cherry
         1202: BLOCKTEXTURE + "cherry_planks.png",
         # Bamboo
-        1211:BLOCKTEXTURE + "bamboo_planks.png",
-        1212:BLOCKTEXTURE + "bamboo_mosaic.png",
+        1211: BLOCKTEXTURE + "bamboo_planks.png",
+        1212: BLOCKTEXTURE + "bamboo_mosaic.png",
         # Mud
-        1224:BLOCKTEXTURE + "mud_bricks.png"
+        1224: BLOCKTEXTURE + "mud_bricks.png",
+
+        # Tuff
+        12664: BLOCKTEXTURE + "tuff.png",
+        12667: BLOCKTEXTURE + "polished_tuff.png",
+        12671: BLOCKTEXTURE + "tuff_bricks.png",
     }
 
     texture = self.load_image_texture(stair_id_to_tex[blockid]).copy()
@@ -3229,7 +3242,7 @@ def signpost(self, blockid, data):
 
 # wooden and iron door
 # uses pseudo-ancildata found in iterate.c
-@material(blockid=[64,71,193,194,195,196,197, 499, 500, 1197, 1206, 1217], data=list(range(32)), transparent=True)
+@material(blockid=[64, 71, 193, 194, 195, 196, 197, 499, 500, 1197, 1206, 1217, 12654, 12655, 12656, 12657], data=list(range(32)), transparent=True)
 def door(self, blockid, data):
     #Masked to not clobber block top/bottom & swung info
     if self.rotation == 1:
@@ -3274,6 +3287,15 @@ def door(self, blockid, data):
             raw_door = self.load_image_texture(BLOCKTEXTURE + "cherry_door_top.png")
         elif blockid == 1217: # Bamboo Door
             raw_door = self.load_image_texture(BLOCKTEXTURE + "bamboo_door_top.png")
+
+        elif blockid == 12654: # copper door
+            raw_door = self.load_image_texture(BLOCKTEXTURE + "copper_door_top.png")
+        elif blockid == 12655: # exposed_copper door
+            raw_door = self.load_image_texture(BLOCKTEXTURE + "exposed_copper_door_top.png")
+        elif blockid == 12656: # weathered_copper door
+            raw_door = self.load_image_texture(BLOCKTEXTURE + "weathered_copper_door_top.png")
+        elif blockid == 12657: # oxidized_copper door
+            raw_door = self.load_image_texture(BLOCKTEXTURE + "oxidized_copper_door_top.png")
     else: # bottom of the door
         if blockid == 64:
             raw_door = self.load_image_texture(BLOCKTEXTURE + "oak_door_bottom.png")
@@ -3300,6 +3322,15 @@ def door(self, blockid, data):
             raw_door = self.load_image_texture(BLOCKTEXTURE + "cherry_door_bottom.png")
         elif blockid == 1217: # Bamboo Door
             raw_door = self.load_image_texture(BLOCKTEXTURE + "bamboo_door_bottom.png")
+
+        elif blockid == 12654: # copper door
+            raw_door = self.load_image_texture(BLOCKTEXTURE + "copper_door_bottom.png")
+        elif blockid == 12655: # exposed_copper door
+            raw_door = self.load_image_texture(BLOCKTEXTURE + "exposed_copper_door_bottom.png")
+        elif blockid == 12656: # weathered_copper door
+            raw_door = self.load_image_texture(BLOCKTEXTURE + "weathered_copper_door_bottom.png")
+        elif blockid == 12657: # oxidized_copper door
+            raw_door = self.load_image_texture(BLOCKTEXTURE + "oxidized_copper_door_bottom.png")
 
     # if you want to render all doors as closed, then force
     # force closed to be True
@@ -4714,7 +4745,8 @@ def comparator(self, blockid, data):
     
 # trapdoor
 # the trapdoor is looks like a sprite when opened, that's not good
-@material(blockid=[96,167,11332,11333,11334,11335,11336,12501,12502, 1198, 1207, 1218, 1223, 1230, 1231], data=list(range(16)), transparent=True, nospawn=True)
+@material(blockid=[96,167,11332,11333,11334,11335,11336,12501,12502, 1198, 1207, 1218, 1223, 1230, 1231, 12658, 12659, 12660, 12661],
+          data=list(range(16)), transparent=True, nospawn=True)
 def trapdoor(self, blockid, data):
 
     # rotation
@@ -4751,7 +4783,13 @@ def trapdoor(self, blockid, data):
                    1218:BLOCKTEXTURE + "bamboo_trapdoor.png",
                    1223:BLOCKTEXTURE + "sculk_vein.png",
                    1230:BLOCKTEXTURE + "pink_petals.png",
-                   1231:BLOCKTEXTURE + "frogspawn.png"
+                   1231:BLOCKTEXTURE + "frogspawn.png",
+
+                   12658: BLOCKTEXTURE + "copper_trapdoor.png",
+                   12659: BLOCKTEXTURE + "exposed_copper_trapdoor.png",
+                   12660: BLOCKTEXTURE + "weathered_copper_trapdoor.png",
+                   12661: BLOCKTEXTURE + "oxidized_copper_trapdoor.png"
+
                   }[blockid]
 
     if data & 0x4 == 0x4: # opened trapdoor
@@ -5480,7 +5518,7 @@ def beacon(self, blockid, data):
 
 # cobblestone and mossy cobblestone walls, chorus plants, mossy stone brick walls
 # one additional bit of data value added for mossy and cobblestone
-@material(blockid=[199, 1225]+list(range(1792, 1812 + 1)), data=list(range(32)), transparent=True, nospawn=True)
+@material(blockid=[199, 1225]+list(range(1792, 1815 + 1)), data=list(range(32)), transparent=True, nospawn=True)
 def cobblestone_wall(self, blockid, data):
     walls_id_to_tex = {
           199: BLOCKTEXTURE + "chorus_plant.png", # chorus plants
@@ -5505,7 +5543,10 @@ def cobblestone_wall(self, blockid, data):
         1810: BLOCKTEXTURE + "polished_deepslate.png",
         1811: BLOCKTEXTURE + "deepslate_bricks.png",
         1812: BLOCKTEXTURE + "deepslate_tiles.png",
-        
+        1813: BLOCKTEXTURE + "tuff.png",
+        1814: BLOCKTEXTURE + "polished_tuff.png",
+        1815: BLOCKTEXTURE + "tuff_bricks.png",
+
         1225: BLOCKTEXTURE + "mud_bricks.png"
     }
     t = self.load_image_texture(walls_id_to_tex[blockid]).copy()
@@ -7404,3 +7445,122 @@ block(blockid=1125, top_image=BLOCKTEXTURE + "mangrove_roots_top.png",
       side_image=BLOCKTEXTURE + "mangrove_roots_side.png")
 block(blockid=1127, top_image=BLOCKTEXTURE + "muddy_mangrove_roots_top.png",
       side_image=BLOCKTEXTURE + "muddy_mangrove_roots_side.png")
+
+
+block(blockid=12642, top_image=BLOCKTEXTURE + "chiseled_copper.png")
+block(blockid=12643, top_image=BLOCKTEXTURE + "exposed_chiseled_copper.png")
+block(blockid=12644, top_image=BLOCKTEXTURE + "weathered_chiseled_copper.png")
+block(blockid=12645, top_image=BLOCKTEXTURE + "oxidized_chiseled_copper.png")
+
+block(blockid=12646, top_image=BLOCKTEXTURE + "copper_grate.png", transparent=True)
+block(blockid=12647, top_image=BLOCKTEXTURE + "exposed_copper_grate.png", transparent=True)
+block(blockid=12648, top_image=BLOCKTEXTURE + "weathered_copper_grate.png", transparent=True)
+block(blockid=12649, top_image=BLOCKTEXTURE + "oxidized_copper_grate.png", transparent=True)
+
+@material(blockid=[12650, 12651, 12652, 12653], data=list(range(1 << 2)), transparent=False)
+def copper_bulb(self, blockid, data):
+    waxed = False
+    lit = False
+    powered = False
+
+    if data & 1 == 1:
+        lit = True
+    if data & 2 == 2:
+        powered = True
+
+    prefix = ''
+    if blockid == 12651:
+        prefix = 'exposed_'
+    if blockid == 12652:
+        prefix = 'weathered_'
+    if blockid == 12653:
+        prefix = 'oxidized_'
+
+    texture = prefix + 'copper_bulb'
+
+    if lit:
+        texture += '_lit'
+    if powered:
+        texture += '_powered'
+
+    img = self.load_image_texture(BLOCKTEXTURE + texture + ".png")
+    return self.build_block(img, img)
+
+
+@material(blockid=[12640], data=list(range(1 << 6)))
+def crafter(self, blockid, data):
+
+    triggered = data & 32 == 32
+    crafting = data & 16 == 16
+
+    facing_up = data & 8 == 8
+    facing_down = data & 4 == 4
+
+    direction = data & 3
+
+    direction = (direction + self.rotation) % 4
+
+    bottom = self.load_image_texture(BLOCKTEXTURE + "crafter_bottom.png").copy()
+
+    if crafting:
+        top = self.load_image_texture(BLOCKTEXTURE + "crafter_top_crafting.png").copy()
+        left = self.load_image_texture(BLOCKTEXTURE + "crafter_east_crafting.png").copy()
+        right = self.load_image_texture(BLOCKTEXTURE + "crafter_west_crafting.png").copy()
+        front = self.load_image_texture(BLOCKTEXTURE + "crafter_north_crafting.png").copy()
+        rear = self.load_image_texture(BLOCKTEXTURE + "crafter_south_triggered.png").copy()
+    elif triggered:
+        top = self.load_image_texture(BLOCKTEXTURE + "crafter_top_triggered.png").copy()
+        left = self.load_image_texture(BLOCKTEXTURE + "crafter_east_triggered.png").copy()
+        right = self.load_image_texture(BLOCKTEXTURE + "crafter_west_triggered.png").copy()
+        front = self.load_image_texture(BLOCKTEXTURE + "crafter_north.png").copy()
+        rear = self.load_image_texture(BLOCKTEXTURE + "crafter_south_triggered.png").copy()
+    else:
+        top = self.load_image_texture(BLOCKTEXTURE + "crafter_top.png").copy()
+        left = self.load_image_texture(BLOCKTEXTURE + "crafter_east.png").copy()
+        right = self.load_image_texture(BLOCKTEXTURE + "crafter_west.png").copy()
+        front = self.load_image_texture(BLOCKTEXTURE + "crafter_north.png").copy()
+        rear = self.load_image_texture(BLOCKTEXTURE + "crafter_south.png").copy()
+
+    if facing_up:
+        top, bottom, front, left, rear, right = (front, rear, bottom, left, top, right)
+        left = left.rotate(90)
+        right = right.rotate(270)
+
+    if facing_down:
+        top, bottom, front, left, rear, right = (rear, front, top, left, bottom, right)
+        left = left.rotate(270)
+        right = right.rotate(90)
+        top = top.rotate(180)
+
+    sides = [left, front, right, rear]
+    for i in range(direction):
+        sides = sides[1:] + sides[:1]
+        top = top.rotate(270)
+
+    return self.build_full_block(top, sides[3], sides[2], sides[0], sides[1].transpose(Image.FLIP_LEFT_RIGHT), bottom)
+
+@material(blockid=[12641], data=[0, 1, 2])
+def trial_spawner(self, blockid, data):
+    side = self.load_image_texture(BLOCKTEXTURE + "trial_spawner_side_inactive.png").copy()
+    side_active = self.load_image_texture(BLOCKTEXTURE + "trial_spawner_side_active.png").copy()
+    top = self.load_image_texture(BLOCKTEXTURE + "trial_spawner_top_inactive.png").copy()
+    top_active = self.load_image_texture(BLOCKTEXTURE + "trial_spawner_top_active.png").copy()
+    top_ejecting = self.load_image_texture(BLOCKTEXTURE + "trial_spawner_top_ejecting_reward.png").copy()
+
+    if data == 0:
+        return self.build_block(top, side)
+    elif data == 1:
+        return self.build_block(top_active, side_active)
+    elif data == 2:
+        return self.build_block(top_ejecting, side_active)
+
+@material(blockid=[12662], data=list(range(1 << 4)))
+def vault(self, blockid, data):
+    # Placeholder for when this is included in a released version of Minecraft
+    return None
+
+block(blockid=12663, top_image=BLOCKTEXTURE + "chiseled_tuff.png")
+block(blockid=12666, top_image=BLOCKTEXTURE + "polished_tuff.png")
+block(blockid=12669, top_image=BLOCKTEXTURE + "tuff_bricks.png")
+block(blockid=12670, top_image=BLOCKTEXTURE + "chiseled_tuff_bricks.png")
+

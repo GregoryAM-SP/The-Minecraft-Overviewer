@@ -1111,6 +1111,9 @@ class RegionSet(object):
             'minecraft:polished_deepslate_wall': (1810, 0),
             'minecraft:deepslate_brick_wall': (1811, 0),
             'minecraft:deepslate_tile_wall': (1812, 0),
+            'minecraft:tuff_wall': (1813, 0),
+            'minecraft:polished_tuff_wall': (1814, 0),
+            'minecraft:tuff_brick_wall': (1815, 0),
             # 1.20.♾
             # Mangrove
             'minecraft:mangrove_wood': (1192, 0),
@@ -1225,6 +1228,68 @@ class RegionSet(object):
             'minecraft:mangrove_hanging_sign': (12628, 0),
             'minecraft:cherry_hanging_sign': (12629, 0),
             'minecraft:bamboo_hanging_sign': (12630, 0),
+
+            # 1.20 experimental stuff
+            'minecraft:crafter': (12640, 0),
+            'minecraft:trial_spawner': (12641, 0),
+
+            'minecraft:chiseled_copper': (12642, 0),
+            'minecraft:exposed_chiseled_copper': (12643, 0),
+            'minecraft:weathered_chiseled_copper': (12644, 0),
+            'minecraft:oxidized_chiseled_copper': (12645, 0),
+            'minecraft:waxed_chiseled_copper': (12642, 1),
+            'minecraft:waxed_exposed_chiseled_copper': (12643, 1),
+            'minecraft:waxed_weathered_chiseled_copper': (12644, 1),
+            'minecraft:waxed_oxidized_chiseled_copper': (12645, 1),
+
+            'minecraft:copper_grate': (12646, 0),
+            'minecraft:exposed_copper_grate': (12647, 0),
+            'minecraft:weathered_copper_grate': (12648, 0),
+            'minecraft:oxidized_copper_grate': (12649, 0),
+            'minecraft:waxed_copper_grate': (12646, 1),
+            'minecraft:waxed_exposed_copper_grate': (12647, 1),
+            'minecraft:waxed_weathered_copper_grate': (12648, 1),
+            'minecraft:waxed_oxidized_copper_grate': (12649, 1),
+
+            'minecraft:copper_bulb': (12650, 0),
+            'minecraft:exposed_copper_bulb': (12651, 0),
+            'minecraft:weathered_copper_bulb': (12652, 0),
+            'minecraft:oxidized_copper_bulb': (12653, 0),
+            'minecraft:waxed_copper_bulb': (12650, 0),
+            'minecraft:waxed_exposed_copper_bulb': (12651, 0),
+            'minecraft:waxed_weathered_copper_bulb': (12652, 0),
+            'minecraft:waxed_oxidized_copper_bulb': (12653, 0),
+
+            'minecraft:copper_door': (12654, 0),
+            'minecraft:exposed_copper_door': (12655, 0),
+            'minecraft:weathered_copper_door': (12656, 0),
+            'minecraft:oxidized_copper_door': (12657, 0),
+            'minecraft:waxed_copper_door': (12654, 0),
+            'minecraft:waxed_exposed_copper_door': (12655, 0),
+            'minecraft:waxed_weathered_copper_door': (12656, 0),
+            'minecraft:waxed_oxidized_copper_door': (12657, 0),
+
+            'minecraft:copper_trapdoor': (12658, 0),
+            'minecraft:exposed_copper_trapdoor': (12659, 0),
+            'minecraft:weathered_copper_trapdoor': (12660, 0),
+            'minecraft:oxidized_copper_trapdoor': (12661, 0),
+            'minecraft:waxed_copper_trapdoor': (12658, 0),
+            'minecraft:waxed_exposed_copper_trapdoor': (12659, 0),
+            'minecraft:waxed_weathered_copper_trapdoor': (12660, 0),
+            'minecraft:waxed_oxidized_copper_trapdoor': (12661, 0),
+
+            'minecraft:vault': (12662, 0),
+
+            'minecraft:chiseled_tuff': (12663, 0),
+            'minecraft:tuff_stairs': (12664, 0),
+            'minecraft:tuff_slab': (12665, 0),
+            'minecraft:polished_tuff': (12666, 0),
+            'minecraft:polished_tuff_stairs': (12667, 0),
+            'minecraft:polished_tuff_slab': (12668, 0),
+            'minecraft:tuff_bricks': (12669, 0),
+            'minecraft:chiseled_tuff_bricks': (12670, 0),
+            'minecraft:tuff_brick_stairs': (12671, 0),
+            'minecraft:tuff_brick_slab': (12672, 0),
         }
 
         colors = [   'white', 'orange', 'magenta', 'light_blue',
@@ -1276,7 +1341,8 @@ class RegionSet(object):
                         'minecraft:blackstone_slab','minecraft:polished_blackstone_slab',
                         'minecraft:polished_blackstone_brick_slab', 'minecraft:cobbled_deepslate_slab',
                         'minecraft:polished_deepslate_slab', 'minecraft:deepslate_brick_slab',
-                        'minecraft:deepslate_tile_slab', 'minecraft:mud_brick_slab'
+                        'minecraft:deepslate_tile_slab', 'minecraft:mud_brick_slab',
+                        'minecraft:tuff_slab', 'minecraft:polished_tuff_slab', 'minecraft:tuff_brick_slab'
                          )
 
         prismarine_slabs = ('minecraft:prismarine_slab','minecraft:dark_prismarine_slab','minecraft:prismarine_brick_slab')
@@ -1336,6 +1402,9 @@ class RegionSet(object):
             'minecraft:dark_prismarine_slab': 'minecraft:dark_prismarine',
             'minecraft:prismarine_brick_slab': 'minecraft:prismarine_bricks',
             'minecraft:stone_brick_slab': 'minecraft:stone_bricks',
+            'minecraft:tuff_slab': 'minecraft:tuff',
+            'minecraft:polished_tuff_slab': 'minecraft:polished_tuff',
+            'minecraft:tuff_brick_slab': 'minecraft:tuff_bricks',
 
             # Additional wooden double slabs not handled by the wooden slab function
             'minecraft:mangrove_slab': 'minecraft:mangrove_planks',
@@ -1662,8 +1731,68 @@ class RegionSet(object):
                 data |= 1 << 4
             if p['north'] == 'true':
                 data |= 1 << 5
+        elif key.endswith('copper_bulb'):
+            p = palette_entry['Properties']
+            if p['lit'] == 'true':
+                data |= (1 << 0)
+            if p['powered'] == 'true':
+                data |= (1 << 1)
+        elif key == 'minecraft:crafter':
+            p = palette_entry['Properties']
+
+            if p['crafting'] == 'true':
+                data |= (1 << 4)
+            if p['triggered'] == 'true':
+                data |= (1 << 5)
+
+            if p['orientation'] in ['up_north', 'up_south', 'up_east', 'up_west']:
+                # facing up
+                data |= (1 << 3)
+            if p['orientation'] in ['down_north', 'down_south', 'down_east', 'down_west']:
+                # facing down
+                data |= (1 << 2)
+
+            if p['orientation'] in ['south_up', 'down_south', 'up_north']:
+                # facing south
+                data |= 0
+            if p['orientation'] in ['west_up', 'down_west', 'up_east']:
+                # facing west
+                data |= 1
+            if p['orientation'] in ['north_up', 'down_north', 'up_south']:
+                # facing north
+                data |= 2
+            if p['orientation'] in ['east_up', 'down_east', 'up_west']:
+                # facing east
+                data |= 3
+
+        elif key == 'minecraft:trial_spawner':
+            p = palette_entry['Properties']
+            if p['trial_spawner_state'] in ['cooldown', 'inactive']:
+                data = 0
+            if p['trial_spawner_state'] in ['active', 'waiting_for_players', 'waiting_for_reward_ejection']:
+                data = 1
+            if p['trial_spawner_state'] in ['ejecting_reward']:
+                data = 2
+
+        elif key == 'minecraft:vault':
+            p = palette_entry['Properties']
+
+            if p['facing'] == 'south':
+                data |= 0
+            if p['facing'] == 'west':
+                data |= 1
+            if p['facing'] == 'north':
+                data |= 2
+            if p['facing'] == 'east':
+                data |= 3
+
+            if p['vault_state'] in ['active', 'unlocking']:
+                data |= 4
+            if p['vault_state'] in ['ejecting']:
+                data |= 12
 
         return (block, data)
+
 
     def _packed_longarray_to_shorts_v118_biome(self, long_array, n, num_palette_entries):
 
