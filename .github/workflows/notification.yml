@@ -1,8 +1,7 @@
-name: Discord Release Notification
-
 on:
   release:
-    types: [published]
+    types:
+      - published
 
 jobs:
   send_discord_notification:
@@ -12,12 +11,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Send Discord Message
+      - name: Send Discord Message for Pre-Release
+        if: github.event_name == 'release' && github.event.action == 'published' && github.event.release.prerelease
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           RELEASE_NAME: ${{ github.event.release.name }}
-          RELEASE_DESC: ${{ github.event.release.body }}
+          RELEASE_DESC: ${{ vars.RELEASE_DESC }}
           RELEASE_URL: ${{ github.event.release.html_url }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
           RELEASE_CREATED_AT: ${{ github.event.release.created_at }}
         run: |
           PAYLOAD=$(cat <<-EOF
@@ -26,10 +27,16 @@ jobs:
             "embeds": [
               {
                 "title": "${RELEASE_NAME}",
+                "description": "${RELEASE_DESC}",
                 "url": "${RELEASE_URL}",
-                "color": 8435015,
+                "color": 16753920,
+                "author": {
+                  "name": "GregoryAM-SP / The-Minecraft-Overviewer",
+                  "url": "https://github.com/GregoryAM-SP/The-Minecraft-Overviewer",
+                  "icon_url": "https://cdn.discordapp.com/avatars/366005296813834242/9cc3c892d3b817e09fa567c4bc992247.webp?size=32"
+                },
                 "footer": {
-                  "text": "Released"
+                  "text": "${RELEASE_TAG} • Pre-Release"
                 },
                 "timestamp": "${RELEASE_CREATED_AT}",
                 "image": {
@@ -41,5 +48,42 @@ jobs:
           }
           EOF
           )
-          
+          curl -X POST -H "Content-Type: application/json" -d "$PAYLOAD" $DISCORD_WEBHOOK_URL
+      - name: Send Discord Message for Release
+        if: github.event_name == 'release' && github.event.action == 'published' && !github.event.release.prerelease
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          RELEASE_NAME: ${{ github.event.release.name }}
+          RELEASE_DESC: ${{ vars.RELEASE_DESC }}
+          RELEASE_URL: ${{ github.event.release.html_url }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          RELEASE_CREATED_AT: ${{ github.event.release.created_at }}
+        run: |
+          PAYLOAD=$(cat <<-EOF
+          {
+            "content": null,
+            "embeds": [
+              {
+                "title": "${RELEASE_NAME}",
+                "description": "${RELEASE_DESC}",
+                "url": "${RELEASE_URL}",
+                "color": 8435015,
+                "author": {
+                  "name": "GregoryAM-SP / The-Minecraft-Overviewer",
+                  "url": "https://github.com/GregoryAM-SP/The-Minecraft-Overviewer",
+                  "icon_url": "https://cdn.discordapp.com/avatars/366005296813834242/9cc3c892d3b817e09fa567c4bc992247.webp?size=32"
+                },
+                "footer": {
+                  "text": "${RELEASE_TAG} • Released"
+                },
+                "timestamp": "${RELEASE_CREATED_AT}",
+                "image": {
+                  "url": "https://gregoryam.com/assets/img/github/overviewer-img.webp?h=0347c3bd38ae284637ade776034fd281"
+                }
+              }
+            ],
+            "attachments": []
+          }
+          EOF
+          )
           curl -X POST -H "Content-Type: application/json" -d "$PAYLOAD" $DISCORD_WEBHOOK_URL
