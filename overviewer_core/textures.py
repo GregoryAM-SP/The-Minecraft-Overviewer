@@ -5324,7 +5324,7 @@ def daylight_sensor(self, blockid, data):
 # wooden double and normal slabs
 # these are the new wooden slabs, blockids 43 44 still have wooden
 # slabs, but those are unobtainable without cheating
-@material(blockid=[125, 126], data=list(range(16)), transparent=(44,), solid=True)
+@material(blockid=[125, 126], data=list(range(16)), transparent=(44,126), solid=True)
 def wooden_slabs(self, blockid, data):
     texture = data & 7
     if texture== 0: # oak 
