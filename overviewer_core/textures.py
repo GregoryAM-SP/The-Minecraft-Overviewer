@@ -664,15 +664,15 @@ class Textures(object):
 
     def build_full_block(self, top, side1, side2, side3, side4, bottom=None):
         """From a top texture, a bottom texture and 4 different side textures,
-        build a full block with four differnts faces. All images should be 16x16 
+        build a full block with four different faces. All images should be 16x16
         image objects. Returns a 24x24 image. Can be used to render any block.
 
-        side1 is in the -y face of the cube     (top left, east)
-        side2 is in the +x                      (top right, south)
-        side3 is in the -x                      (bottom left, north)
-        side4 is in the +y                      (bottom right, west)
+        side1 is in the -z face of the cube     (top left, north)
+        side2 is in the +x                      (top right, east)
+        side3 is in the -x                      (bottom left, west)
+        side4 is in the +z                      (bottom right, south)
 
-        A non transparent block uses top, side 3 and side 4.
+        A non-transparent block uses top, side 3 and side 4.
 
         If top is a tuple then first item is the top image and the second
         item is an increment (integer) from 0 to 16 (pixels in the
