@@ -1411,6 +1411,11 @@ class RegionSet(object):
             # handle double slabs
             if palette_entry['Properties']['type'] == 'top':
                 data |= 0x08
+            elif key == 'minecraft:smooth_stone_slab' and palette_entry['Properties']['type'] == 'double':
+                # smooth stone slabs are special because they have a different texture for double slabs than the full
+                # block.
+                block = 11358
+                data |= 1
             elif palette_entry['Properties']['type'] == 'double':
                 # Not all wooden slabs are listed here. Block ID 125 has a 4 bit data field, one bit of which is used
                 # for top/bottom indication allowing only 8 distinct slab types. These are listed here. Everything else

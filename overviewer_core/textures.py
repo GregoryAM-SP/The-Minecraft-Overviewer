@@ -1823,27 +1823,25 @@ def slabs(self, blockid, data):
         texture = data
 
     if blockid == 44 or blockid == 43:
-        if texture== 0: # stone slab
+        if texture == 0:  # stone slab
             top = self.load_image_texture(BLOCKTEXTURE + "stone.png")
             side = self.load_image_texture(BLOCKTEXTURE + "stone.png")
-        elif texture== 1: # sandstone slab
+        elif texture == 1:  # sandstone slab
             top = self.load_image_texture(BLOCKTEXTURE + "sandstone_top.png")
             side = self.load_image_texture(BLOCKTEXTURE + "sandstone.png")
-        elif texture== 2: # wooden slab
+        elif texture == 2:  # wooden slab
             top = side = self.load_image_texture(BLOCKTEXTURE + "oak_planks.png")
-        elif texture== 3: # cobblestone slab
+        elif texture == 3:  # cobblestone slab
             top = side = self.load_image_texture(BLOCKTEXTURE + "cobblestone.png")
-        elif texture== 4: # brick
+        elif texture == 4:  # brick
             top = side = self.load_image_texture(BLOCKTEXTURE + "bricks.png")
-        elif texture== 5: # stone brick
+        elif texture == 5:  # stone brick
             top = side = self.load_image_texture(BLOCKTEXTURE + "stone_bricks.png")
-        elif texture== 6: # nether brick slab
+        elif texture == 6:  # nether brick slab
             top = side = self.load_image_texture(BLOCKTEXTURE + "nether_bricks.png")
-        elif texture== 7: #quartz        
+        elif texture == 7:  # quartz
             top = side = self.load_image_texture(BLOCKTEXTURE + "quartz_block_side.png")
-        elif texture== 8: # special stone double slab with top texture only
-            top = side = self.load_image_texture(BLOCKTEXTURE + "smooth_stone.png")
-        elif texture== 9: # special sandstone double slab with top texture only
+        elif texture == 9:  # sandstone
             top = side = self.load_image_texture(BLOCKTEXTURE + "sandstone_top.png")
         else:
             return None
@@ -1943,7 +1941,7 @@ def slabs(self, blockid, data):
     elif blockid == 1124:
         top = side = self.load_image_texture(BLOCKTEXTURE + "mud_bricks.png").copy()
 
-    if blockid == 43 or blockid == 181 or blockid == 204: # double slab
+    if blockid == 43 or blockid == 181 or blockid == 204 or (blockid == 11358 and data == 1): # double slab
         return self.build_block(top, side)
     
     return self.build_slab_block(top, side, data & 8 == 8);
