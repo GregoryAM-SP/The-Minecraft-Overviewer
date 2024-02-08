@@ -11,16 +11,25 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Send Discord Message for Pre-Release
-        if: github.event_name == 'release' && github.event.action == 'published' && github.event.release.prerelease
+      - name: Send Discord Message
+        if: github.event_name == 'release' && github.event.action == 'published'
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           RELEASE_NAME: ${{ github.event.release.name }}
-          RELEASE_DESC: ${{ vars.RELEASE_DESC }}
+          RELEASE_DESC: ${{ github.event.release.body }}
           RELEASE_URL: ${{ github.event.release.html_url }}
           RELEASE_TAG: ${{ github.event.release.tag_name }}
           RELEASE_CREATED_AT: ${{ github.event.release.created_at }}
+          IS_PRERELEASE: ${{ github.event.release.prerelease }}
         run: |
+          if [ "${IS_PRERELEASE}" = true ]; then
+            COLOR=10381827
+            FOOTER_TEXT="${RELEASE_TAG} • Pre-Release"
+          else
+            COLOR=2328118
+            FOOTER_TEXT="${RELEASE_TAG} • Latest"
+          fi
+          
           PAYLOAD=$(cat <<-EOF
           {
             "content": null,
@@ -29,52 +38,14 @@ jobs:
                 "title": "${RELEASE_NAME}",
                 "description": "${RELEASE_DESC}",
                 "url": "${RELEASE_URL}",
-                "color": 16753920,
+                "color": ${COLOR},
                 "author": {
                   "name": "GregoryAM-SP / The-Minecraft-Overviewer",
                   "url": "https://github.com/GregoryAM-SP/The-Minecraft-Overviewer",
                   "icon_url": "https://cdn.discordapp.com/avatars/366005296813834242/9cc3c892d3b817e09fa567c4bc992247.webp?size=32"
                 },
                 "footer": {
-                  "text": "${RELEASE_TAG} • Pre-Release"
-                },
-                "timestamp": "${RELEASE_CREATED_AT}",
-                "image": {
-                  "url": "https://gregoryam.com/assets/img/github/overviewer-img.webp?h=0347c3bd38ae284637ade776034fd281"
-                }
-              }
-            ],
-            "attachments": []
-          }
-          EOF
-          )
-          curl -X POST -H "Content-Type: application/json" -d "$PAYLOAD" $DISCORD_WEBHOOK_URL
-      - name: Send Discord Message for Release
-        if: github.event_name == 'release' && github.event.action == 'published' && !github.event.release.prerelease
-        env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          RELEASE_NAME: ${{ github.event.release.name }}
-          RELEASE_DESC: ${{ vars.RELEASE_DESC }}
-          RELEASE_URL: ${{ github.event.release.html_url }}
-          RELEASE_TAG: ${{ github.event.release.tag_name }}
-          RELEASE_CREATED_AT: ${{ github.event.release.created_at }}
-        run: |
-          PAYLOAD=$(cat <<-EOF
-          {
-            "content": null,
-            "embeds": [
-              {
-                "title": "${RELEASE_NAME}",
-                "description": "${RELEASE_DESC}",
-                "url": "${RELEASE_URL}",
-                "color": 8435015,
-                "author": {
-                  "name": "GregoryAM-SP / The-Minecraft-Overviewer",
-                  "url": "https://github.com/GregoryAM-SP/The-Minecraft-Overviewer",
-                  "icon_url": "https://cdn.discordapp.com/avatars/366005296813834242/9cc3c892d3b817e09fa567c4bc992247.webp?size=32"
-                },
-                "footer": {
-                  "text": "${RELEASE_TAG} • Released"
+                  "text": "${FOOTER_TEXT}"
                 },
                 "timestamp": "${RELEASE_CREATED_AT}",
                 "image": {
