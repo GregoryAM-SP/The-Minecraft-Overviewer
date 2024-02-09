@@ -45,5 +45,4 @@ overviewer_core/src/primitives.h
 ImagingUtils.h
 
 *_CONFIG.PY
-*.spec
 

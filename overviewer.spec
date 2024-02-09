@@ -41,4 +41,4 @@ coll = COLLECT(exe,
                a.datas,
                strip=False,
                upx=False,
-               name=get_overviewer_pkgname())
+               name='overviewer')
