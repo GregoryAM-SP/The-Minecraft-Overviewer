@@ -7243,8 +7243,33 @@ def trial_spawner(self, blockid, data):
 
 @material(blockid=[12662], data=list(range(1 << 4)))
 def vault(self, blockid, data):
-    # Placeholder for when this is included in a released version of Minecraft
-    return None
+    try:
+        side = self.load_image_texture(BLOCKTEXTURE + "vault_side_off.png").copy()
+        front = self.load_image_texture(BLOCKTEXTURE + "vault_front_off.png").copy()
+        top = self.load_image_texture(BLOCKTEXTURE + "vault_top.png").copy()
+        bottom = self.load_image_texture(BLOCKTEXTURE + "vault_bottom.png").copy()
+
+        if data & 4 == 4:
+            side = self.load_image_texture(BLOCKTEXTURE + "vault_side_on.png").copy()
+            front = self.load_image_texture(BLOCKTEXTURE + "vault_front_on.png").copy()
+        if data & 8 == 8:
+            side = self.load_image_texture(BLOCKTEXTURE + "vault_side_on.png").copy()
+            top = self.load_image_texture(BLOCKTEXTURE + "vault_top_ejecting.png").copy()
+            front = self.load_image_texture(BLOCKTEXTURE + "vault_front_ejecting.png").copy()
+
+        direction = data & 3
+        direction = (direction + self.rotation) % 4
+
+        sides = [side, front, side, side]
+        for i in range(direction):
+            sides = sides[1:] + sides[:1]
+            top = top.rotate(270)
+
+        return self.build_full_block(top, sides[3], sides[2], sides[0], sides[1], bottom)
+    except TextureException:
+        # This isn't included in 1.20.4; if we happen to be using a snapshot jar, then great. Otherwise just don't
+        # render for now.
+        return None
 
 
 @material(blockid=[11372], data=[0])
