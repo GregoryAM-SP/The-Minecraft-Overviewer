@@ -6,7 +6,7 @@ on:
       - main
 
 env:
-  VERSION: v1.20.4
+  VERSION: 1.20.4
 
 jobs:
   build_and_release_windows:
@@ -33,11 +33,14 @@ jobs:
       
       - name: Fetch Pillow files
         run: |
-          ${{vars.PILLOW_WIN}}
+          Invoke-WebRequest -Uri "https://raw.githubusercontent.com/python-pillow/Pillow/main/src/libImaging/Imaging.h" -OutFile "Imaging.h"
+          Invoke-WebRequest -Uri "https://raw.githubusercontent.com/python-pillow/Pillow/main/src/libImaging/ImagingUtils.h" -OutFile "ImagingUtils.h"
+          Invoke-WebRequest -Uri "https://raw.githubusercontent.com/python-pillow/Pillow/main/src/libImaging/ImPlatform.h" -OutFile "ImPlatform.h"
       
       - name: Build project for Windows
         run: |
-          ${{vars.OV_BUILD}}
+          python setup.py build
+          pyinstaller overviewer.spec
       
       - name: Create ZIP file for Windows
         run: |
@@ -50,7 +53,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ env.VERSION }}
-          release_name: Release ${{ env.VERSION }}
+          release_name: Release v${{ env.VERSION }}
           body: |
             Created using [The Minecraft Overviewer v1.20.4](https://github.com/GregoryAM-SP/The-Minecraft-Overviewer/releases/tag/v1.20.4)
           draft: false
@@ -91,11 +94,14 @@ jobs:
               
       - name: Fetch Pillow files
         run: |
-            ${{vars.PILLOW_LINUX}}
+            curl -o Imaging.h https://raw.githubusercontent.com/python-pillow/Pillow/main/src/libImaging/Imaging.h
+            curl -o ImagingUtils.h https://raw.githubusercontent.com/python-pillow/Pillow/main/src/libImaging/ImagingUtils.h
+            curl -o ImPlatform.h https://raw.githubusercontent.com/python-pillow/Pillow/main/src/libImaging/ImPlatform.h
               
       - name: Build project for Linux
         run: |
-            ${{vars.OV_BUILD}}
+            python setup.py build
+            pyinstaller overviewer.spec
               
       - name: Create tar.xz archive for Linux
         run: |
@@ -118,3 +124,54 @@ jobs:
             asset_name: overviewer-${{ env.VERSION }}-linux.tar.xz
             asset_content_type: application/x-xz
 
+  build_and_release_linux_deb:
+    runs-on: ubuntu-latest
+    needs: build_and_release_windows
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.START_BUILD == 'True'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Install Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.x"
+
+      - name: Install dependencies (apt)
+        run: sudo DEBIAN_FRONTEND=noninteractive apt-get -y install zlib1g-dev libjpeg-dev devscripts python3-all-dev debhelper python3-pil python3-numpy dh-python
+
+      - name: Install dependencies (pip)
+        run: python -m pip install numpy Pillow==9.1.1
+
+      - name: Clone Pillow 9.1.1
+        run: git clone --branch=9.1.1 --depth=1 https://github.com/python-pillow/Pillow.git /tmp/pillow_checkout
+
+      - name: Build extension
+        run: env PIL_INCLUDE_DIR=/tmp/pillow_checkout/src/libImaging/ python setup.py build
+
+      - name: Create .deb changelog
+        run: |
+          export VERSION=$(python3 setup.py --version)
+          export DESC=$(git describe --tags)
+          export DATE=$(date -u +'%a, %d %b %Y %H:%M:%S %z')
+          envsubst < debian/changelog.in > debian/changelog
+
+      - name: Build .deb
+        run: env DEB_BUILD_OPTIONS=nocheck debuild -i -us -uc -b -Zxz
+
+      - name: List deb files
+        run: ls -l ../*.deb
+
+      - name: Upload .deb as release asset
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ needs.build_and_release_windows.outputs.upload_url }}
+          asset_path: ../minecraft-overviewer_${{ env.VERSION }}-0~overviewer1_amd64.deb
+          asset_name: minecraft-overviewer_${{ env.VERSION }}_amd64.deb
+          asset_content_type: application/octet-stream
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
