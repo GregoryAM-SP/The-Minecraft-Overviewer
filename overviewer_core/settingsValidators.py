@@ -234,7 +234,7 @@ def validateDimension(d):
     # these are provided as arguments to RegionSet.get_type()
     pretty_names = {
         "nether": "DIM-1",
-        "overworld": None,
+        "overworld": "DIM0",
         "end": "DIM1",
         "default": 0,
     }

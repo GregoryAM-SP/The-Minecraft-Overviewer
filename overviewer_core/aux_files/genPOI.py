@@ -129,10 +129,15 @@ def parseBucketChunks(task_tuple):
     cnt = 0
     for b in bucket:
         try:
-            data = rset.get_chunk(b[0], b[1])
+            data = rset.get_chunk_lite(b[0], b[1])
             for poi in itertools.chain(data.get('TileEntities', []), data.get('Entities', []), data.get('block_entities', [])):
                 if poi['id'] in ['Sign', 'minecraft:sign', 'minecraft:hanging_sign']:
                     poi = signWrangler(poi)
+
+                if 'CustomName' in poi:
+                    poi['CustomNameRaw'] = poi['CustomName']
+                    poi['CustomName'] = jsonText(poi['CustomName'])
+
                 for name, filter_function in filters:
                     ff = bucketChunkFuncs[filter_function]
                     result = ff(poi)
@@ -161,11 +166,22 @@ def signWrangler(poi):
     """
     if "Text1" in poi:
         for field in ["Text1", "Text2", "Text3", "Text4"]:
+            poi[field + "Raw"] = poi[field]
             poi[field] = jsonText(poi[field])
+
         poi.update({
-            "back_text": {"has_glowing_text": 0, "color": "black", "messages": ["", "", "", ""]},
-            "front_text": {"has_glowing_text": 0, "color": "black",
-                           "messages": [poi["Text1"], poi["Text2"], poi["Text3"], poi["Text4"]]},
+            "back_text": {
+                "has_glowing_text": 0,
+                "color": "black",
+                "messages": ["", "", "", ""],
+                "messagesRaw": ['""', '""', '""', '""']
+            },
+            "front_text": {
+                "has_glowing_text": poi.get('GlowingText', 0),
+                "color": poi.get('Color', 'black'),
+                "messages": [poi["Text1"], poi["Text2"], poi["Text3"], poi["Text4"]],
+                "messagesRaw": [poi["Text1Raw"], poi["Text2Raw"], poi["Text3Raw"], poi["Text4Raw"]]
+            },
             "keepPacked": 0,
             "is_waxed": 0,
         })
@@ -173,10 +189,11 @@ def signWrangler(poi):
         for field in ["front_text", "back_text"]:
             if field in poi:
                 messages = poi[field].get("messages", [])
+                poi[field]["messagesRaw"] = messages.copy()
+
                 for i in range(len(messages)):
                     messages[i] = jsonText(messages[i])
     return poi
-
 
 
 def handleEntities(rset, config, config_path, filters, markers):
@@ -194,51 +211,32 @@ def handleEntities(rset, config, config_path, filters, markers):
     if numbuckets < 0:
         numbuckets = multiprocessing.cpu_count()
 
-    if numbuckets == 1:
-        for (x, z, mtime) in rset.iterate_chunks():
-            try:
-                data = rset.get_chunk(x, z)
-                for poi in itertools.chain(data.get('TileEntities', []), data.get('Entities', []), data.get('block_entities', [])):
-                    if poi['id'] in ['Sign', 'minecraft:sign', 'minecraft:hanging_sign']:    # kill me
-                        poi = signWrangler(poi)
-                    for name, __, filter_function, __, __, __ in filters:
-                        result = filter_function(poi)
-                        if result:
-                            d = create_marker_from_filter_result(poi, result)
-                            markers[name]['raw'].append(d)
-            except nbt.CorruptChunkError:
-                logging.warning("Ignoring POIs in corrupt chunk %d,%d.", x, z)
-            except world.ChunkDoesntExist:
-                # iterate_chunks() doesn't inspect chunks and filter out
-                # placeholder ones. It's okay for this chunk to not exist.
-                pass
-    else:
-        buckets = [[] for i in range(numbuckets)]
+    buckets = [[] for i in range(numbuckets)]
 
-        for (x, z, mtime) in rset.iterate_chunks():
-            i = x // 32 + z // 32
-            i = i % numbuckets
-            buckets[i].append([x, z])
+    for (x, z, mtime) in rset.iterate_chunks():
+        i = x // 32 + z // 32
+        i = i % numbuckets
+        buckets[i].append([x, z])
 
-        for b in buckets:
-            logging.info("Buckets has %d entries.", len(b))
+    for b in buckets:
+        logging.info("Buckets has %d entries.", len(b))
 
-        # Create a pool of processes and run all the functions
-        pool = Pool(processes=numbuckets, initializer=initBucketChunks, initargs=(config_path,))
+    # Create a pool of processes and run all the functions
+    pool = Pool(processes=numbuckets, initializer=initBucketChunks, initargs=(config_path,))
 
-        # simplify the filters dict, so pickle doesn't have to do so much
-        filters = [(name, filter_function.__name__) for name, __, filter_function, __, __, __
-                   in filters]
+    # simplify the filters dict, so pickle doesn't have to do so much
+    filters = [(name, filter_function.__name__) for name, __, filter_function, __, __, __
+               in filters]
 
-        results = pool.map(parseBucketChunks, ((buck, rset, filters) for buck in buckets))
+    results = pool.map(parseBucketChunks, ((buck, rset, filters) for buck in buckets))
 
-        pool.close()
-        pool.join()
-        logging.info("All the threads completed.")
+    pool.close()
+    pool.join()
+    logging.info("All the threads completed.")
 
-        for marker_dict in results:
-            for name, marker_list in marker_dict.items():
-                markers[name]['raw'].extend(marker_list)
+    for marker_dict in results:
+        for name, marker_list in marker_dict.items():
+            markers[name]['raw'].extend(marker_list)
 
     logging.info("Done.")
 
@@ -378,10 +376,10 @@ def handlePlayers(worldpath, filters, markers):
             # This has do be done every time, because we have filters for
             # different regionsets.
 
-            if rset.get_type():
-                dimension = int(re.match(r"^DIM(_MYST)?(-?\d+)$", rset.get_type()).group(2))
-            else:
-                dimension = 0
+            if rset.get_type().endswith("/entities"):
+                continue
+
+            dimension = int(re.match(r"^DIM(_MYST)?(-?\d+)$", rset.get_type()).group(2))
             dimension = DIMENSION_INT_TO_STR.get(dimension, "minecraft:overworld")
 
             read_dim = data.get("Dimension", "minecraft:overworld")
@@ -433,6 +431,8 @@ def create_marker_from_filter_result(poi, result):
         d["icon"] = poi['icon']
     if "createInfoWindow" in poi:
         d["createInfoWindow"] = poi['createInfoWindow']
+    if "cssClass" in poi:
+        d["cssClass"] = poi['cssClass']
 
     # Fill in the rest from result
     if isinstance(result, str):
@@ -561,13 +561,18 @@ def main():
             logging.warning("Sorry, you requested dimension '%s' for the render '%s', but I "
                             "couldn't find it.", render['dimension'][0], rname)
             continue
+
+        erset = w.get_regionset(render['dimension'][1] + '/entities')
+
         # List of regionsets that should be handled
         rsets = []
         if "crop" in render:
             for zone in render['crop']:
                 rsets.append(world.CroppedRegionSet(rset, *zone))
+                rsets.append(world.CroppedRegionSet(erset, *zone))
         else:
             rsets.append(rset)
+            rsets.append(erset)
 
         # find filters for this render
         for f in render['markers']:

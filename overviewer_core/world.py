@@ -214,7 +214,7 @@ class World(object):
         inChunkY = spawnY % 16
 
         ## Open up the chunk that the spawn is in
-        regionset = self.get_regionset(None)
+        regionset = self.get_regionset('DIM0')
         if not regionset:
             return None
         try:
@@ -271,11 +271,13 @@ class RegionSet(object):
         # we want to get rid of /regions, if it exists
         if self.rel.endswith(os.path.normpath("/region")):
             self.type = self.rel[0:-len(os.path.normpath("/region"))]
+        elif self.rel.endswith(os.path.normpath("/entities")):
+            self.type = self.rel
         elif self.rel == "region":
             # this is the main world
-            self.type = None
-        elif "entities" in os.path.split(self.rel):
-            self.type = "entities"
+            self.type = "DIM0"
+        elif self.rel == "entities":
+            self.type = "DIM0/entities"
         else:
             logging.warning("Unknown region type in %r, rel %r", regiondir, self.rel)
             self.type = "__unknown"
@@ -416,15 +418,18 @@ class RegionSet(object):
             'minecraft:spruce_log': (17, 1),
             'minecraft:birch_log': (17, 2),
             'minecraft:jungle_log': (17, 3),
+            # leaves. Block ID 18 will have biome colouring applied, ID 161 will not.
             'minecraft:oak_leaves': (18, 0),
-            'minecraft:spruce_leaves': (18, 1),
-            'minecraft:birch_leaves': (18, 2),
+            'minecraft:spruce_leaves': (18, 1), # biome overlay needed, though locked to specific value
+            'minecraft:birch_leaves': (18, 2), # biome overlay needed, though locked to specific value
             'minecraft:jungle_leaves': (18, 3),
             'minecraft:acacia_leaves': (18, 4),
             'minecraft:dark_oak_leaves': (18, 5),
-            'minecraft:flowering_azalea_leaves': (18, 6),
-            'minecraft:azalea_leaves': (18, 7),
+            'minecraft:flowering_azalea_leaves': (161, 6),
+            'minecraft:azalea_leaves': (161, 7),
             'minecraft:mangrove_leaves': (18, 8),
+            'minecraft:cherry_leaves': (161, 9),
+            # end of leaves
             'minecraft:sponge': (19, 0),
             'minecraft:wet_sponge': (19, 1),
             'minecraft:glass': (20, 0),
@@ -1106,6 +1111,9 @@ class RegionSet(object):
             'minecraft:polished_deepslate_wall': (1810, 0),
             'minecraft:deepslate_brick_wall': (1811, 0),
             'minecraft:deepslate_tile_wall': (1812, 0),
+            'minecraft:tuff_wall': (1813, 0),
+            'minecraft:polished_tuff_wall': (1814, 0),
+            'minecraft:tuff_brick_wall': (1815, 0),
             # 1.20.♾
             # Mangrove
             'minecraft:mangrove_wood': (1192, 0),
@@ -1149,11 +1157,11 @@ class RegionSet(object):
             'minecraft:bamboo_pressure_plate': (1219, 0),
             'minecraft:bamboo_button': (1220, 0),
             # Reinforced Deepslate
-            'minecraft:reinforced_deepslate': (1221, 0),
+            'minecraft:reinforced_deepslate': (2048, 0),
             # Froglight
-            'minecraft:ochre_froglight': (1221, 1),
-            'minecraft:verdant_froglight': (1221, 2),
-            'minecraft:pearlescent_froglight': (1221, 3),
+            'minecraft:ochre_froglight': (2049, 1),
+            'minecraft:verdant_froglight': (2050, 2),
+            'minecraft:pearlescent_froglight': (2051, 3),
             # Sculk
             'minecraft:sculk': (1222, 0),
             'minecraft:sculk_vein': (1223, 0),
@@ -1163,7 +1171,6 @@ class RegionSet(object):
             # Flowers, Leaves & Saplings
             'minecraft:torchflower_crop': (1240, 0),
             'minecraft:torchflower': (1241, 0),
-            'minecraft:cherry_leaves': (1242, 0),
             'minecraft:mangrove_propagule': (1233, 0),
             'minecraft:cherry_sapling': (1234, 0),
             'minecraft:azalea': (1235, 0),
@@ -1179,7 +1186,7 @@ class RegionSet(object):
             'minecraft:chiseled_bookshelf': (1227, 0),
             # Suspicious Blocks
             'minecraft:suspicious_sand': (1228, 0),
-            'minecraft:suspicious_gravel': (1228, 1),
+            'minecraft:suspicious_gravel': (1248, 0),
             # Target Block
             'minecraft:target': (1229, 0),
             # Nether Sprout
@@ -1191,6 +1198,98 @@ class RegionSet(object):
             # Amethyst Cluster
             'minecraft:amethyst_cluster': (1232, 0), 
             'minecraft:sculk_catalyst': (1244, 0),
+
+            'minecraft:decorated_pot': (1242, 0),
+
+            'minecraft:big_dripleaf': (2052,0),
+            'minecraft:big_dripleaf_stem': (2053,0),
+
+            # Hanging wall signs
+            'minecraft:oak_wall_hanging_sign': (12600, 0),
+            'minecraft:spruce_wall_hanging_sign': (12601, 0),
+            'minecraft:birch_wall_hanging_sign': (12602, 0),
+            'minecraft:jungle_wall_hanging_sign': (12603, 0),
+            'minecraft:acacia_wall_hanging_sign': (12604, 0),
+            'minecraft:dark_oak_wall_hanging_sign': (12605, 0),
+            'minecraft:crimson_wall_hanging_sign': (12606, 0),
+            'minecraft:warped_wall_hanging_sign': (12607, 0),
+            'minecraft:mangrove_wall_hanging_sign': (12608, 0),
+            'minecraft:cherry_wall_hanging_sign': (12609, 0),
+            'minecraft:bamboo_wall_hanging_sign': (12610, 0),
+            # Hanging signs
+            'minecraft:oak_hanging_sign': (12620, 0),
+            'minecraft:spruce_hanging_sign': (12621, 0),
+            'minecraft:birch_hanging_sign': (12622, 0),
+            'minecraft:jungle_hanging_sign': (12623, 0),
+            'minecraft:acacia_hanging_sign': (12624, 0),
+            'minecraft:dark_oak_hanging_sign': (12625, 0),
+            'minecraft:crimson_hanging_sign': (12626, 0),
+            'minecraft:warped_hanging_sign': (12627, 0),
+            'minecraft:mangrove_hanging_sign': (12628, 0),
+            'minecraft:cherry_hanging_sign': (12629, 0),
+            'minecraft:bamboo_hanging_sign': (12630, 0),
+
+            # 1.20 experimental stuff
+            'minecraft:crafter': (12640, 0),
+            'minecraft:trial_spawner': (12641, 0),
+
+            'minecraft:chiseled_copper': (12642, 0),
+            'minecraft:exposed_chiseled_copper': (12643, 0),
+            'minecraft:weathered_chiseled_copper': (12644, 0),
+            'minecraft:oxidized_chiseled_copper': (12645, 0),
+            'minecraft:waxed_chiseled_copper': (12642, 1),
+            'minecraft:waxed_exposed_chiseled_copper': (12643, 1),
+            'minecraft:waxed_weathered_chiseled_copper': (12644, 1),
+            'minecraft:waxed_oxidized_chiseled_copper': (12645, 1),
+
+            'minecraft:copper_grate': (12646, 0),
+            'minecraft:exposed_copper_grate': (12647, 0),
+            'minecraft:weathered_copper_grate': (12648, 0),
+            'minecraft:oxidized_copper_grate': (12649, 0),
+            'minecraft:waxed_copper_grate': (12646, 1),
+            'minecraft:waxed_exposed_copper_grate': (12647, 1),
+            'minecraft:waxed_weathered_copper_grate': (12648, 1),
+            'minecraft:waxed_oxidized_copper_grate': (12649, 1),
+
+            'minecraft:copper_bulb': (12650, 0),
+            'minecraft:exposed_copper_bulb': (12651, 0),
+            'minecraft:weathered_copper_bulb': (12652, 0),
+            'minecraft:oxidized_copper_bulb': (12653, 0),
+            'minecraft:waxed_copper_bulb': (12650, 0),
+            'minecraft:waxed_exposed_copper_bulb': (12651, 0),
+            'minecraft:waxed_weathered_copper_bulb': (12652, 0),
+            'minecraft:waxed_oxidized_copper_bulb': (12653, 0),
+
+            'minecraft:copper_door': (12654, 0),
+            'minecraft:exposed_copper_door': (12655, 0),
+            'minecraft:weathered_copper_door': (12656, 0),
+            'minecraft:oxidized_copper_door': (12657, 0),
+            'minecraft:waxed_copper_door': (12654, 0),
+            'minecraft:waxed_exposed_copper_door': (12655, 0),
+            'minecraft:waxed_weathered_copper_door': (12656, 0),
+            'minecraft:waxed_oxidized_copper_door': (12657, 0),
+
+            'minecraft:copper_trapdoor': (12658, 0),
+            'minecraft:exposed_copper_trapdoor': (12659, 0),
+            'minecraft:weathered_copper_trapdoor': (12660, 0),
+            'minecraft:oxidized_copper_trapdoor': (12661, 0),
+            'minecraft:waxed_copper_trapdoor': (12658, 0),
+            'minecraft:waxed_exposed_copper_trapdoor': (12659, 0),
+            'minecraft:waxed_weathered_copper_trapdoor': (12660, 0),
+            'minecraft:waxed_oxidized_copper_trapdoor': (12661, 0),
+
+            'minecraft:vault': (12662, 0),
+
+            'minecraft:chiseled_tuff': (12663, 0),
+            'minecraft:tuff_stairs': (12664, 0),
+            'minecraft:tuff_slab': (12665, 0),
+            'minecraft:polished_tuff': (12666, 0),
+            'minecraft:polished_tuff_stairs': (12667, 0),
+            'minecraft:polished_tuff_slab': (12668, 0),
+            'minecraft:tuff_bricks': (12669, 0),
+            'minecraft:chiseled_tuff_bricks': (12670, 0),
+            'minecraft:tuff_brick_stairs': (12671, 0),
+            'minecraft:tuff_brick_slab': (12672, 0),
         }
 
         colors = [   'white', 'orange', 'magenta', 'light_blue',
@@ -1242,7 +1341,8 @@ class RegionSet(object):
                         'minecraft:blackstone_slab','minecraft:polished_blackstone_slab',
                         'minecraft:polished_blackstone_brick_slab', 'minecraft:cobbled_deepslate_slab',
                         'minecraft:polished_deepslate_slab', 'minecraft:deepslate_brick_slab',
-                        'minecraft:deepslate_tile_slab', 'minecraft:mud_brick_slab'
+                        'minecraft:deepslate_tile_slab', 'minecraft:mud_brick_slab',
+                        'minecraft:tuff_slab', 'minecraft:polished_tuff_slab', 'minecraft:tuff_brick_slab'
                          )
 
         prismarine_slabs = ('minecraft:prismarine_slab','minecraft:dark_prismarine_slab','minecraft:prismarine_brick_slab')
@@ -1302,6 +1402,9 @@ class RegionSet(object):
             'minecraft:dark_prismarine_slab': 'minecraft:dark_prismarine',
             'minecraft:prismarine_brick_slab': 'minecraft:prismarine_bricks',
             'minecraft:stone_brick_slab': 'minecraft:stone_bricks',
+            'minecraft:tuff_slab': 'minecraft:tuff',
+            'minecraft:polished_tuff_slab': 'minecraft:polished_tuff',
+            'minecraft:tuff_brick_slab': 'minecraft:tuff_bricks',
 
             # Additional wooden double slabs not handled by the wooden slab function
             'minecraft:mangrove_slab': 'minecraft:mangrove_planks',
@@ -1360,16 +1463,28 @@ class RegionSet(object):
             facing = palette_entry['Properties']['facing']
             data = {'south': 0, 'west': 1, 'north': 2, 'east': 3}[facing]
             p = palette_entry['Properties']
+            occupancy = 0
             for i in range(6):
                 if p[f'slot_{i}_occupied'] == 'true':
-                    data |= 4
-        elif (key in 'minecraft:calibrated_sculk_sensor'):
+                    occupancy |= 1
+                occupancy = occupancy << 1
+            occupancy = occupancy << 1
+            data |= occupancy
+        elif key == 'minecraft:calibrated_sculk_sensor':
+            facing = palette_entry['Properties']['facing']
+            data = {'south': 0, 'west': 1, 'north': 2, 'east': 3}[facing]
+        elif key in ['minecraft:small_dripleaf', 'minecraft:big_dripleaf', 'minecraft:big_dripleaf_stem']:
             facing = palette_entry['Properties']['facing']
             data = {'south': 0, 'west': 1, 'north': 2, 'east': 3}[facing]
         elif key in wood_slabs + stone_slabs + prismarine_slabs + copper_slabs:
             # handle double slabs
             if palette_entry['Properties']['type'] == 'top':
                 data |= 0x08
+            elif key == 'minecraft:smooth_stone_slab' and palette_entry['Properties']['type'] == 'double':
+                # smooth stone slabs are special because they have a different texture for double slabs than the full
+                # block.
+                block = 11358
+                data |= 1
             elif palette_entry['Properties']['type'] == 'double':
                 # Not all wooden slabs are listed here. Block ID 125 has a 4 bit data field, one bit of which is used
                 # for top/bottom indication allowing only 8 distinct slab types. These are listed here. Everything else
@@ -1438,7 +1553,7 @@ class RegionSet(object):
             if axis == 'z':
                 data = 4
         elif key in ['minecraft:basalt', 'minecraft:polished_basalt', 'minecraft:chain', 'minecraft:purpur_pillar',
-                     'minecraft:deepslate']:
+                     'minecraft:deepslate'] or key.endswith('_froglight'):
             axis = palette_entry['Properties']['axis']
             data = {'y': 0, 'x': 1, 'z': 2}[axis]
         elif key in ['minecraft:redstone_torch','minecraft:redstone_wall_torch','minecraft:wall_torch',
@@ -1477,7 +1592,7 @@ class RegionSet(object):
             if facing == 'north': data += 2
             if facing == 'east':  data += 3
         elif key.endswith('sign'):
-            if key.endswith('wall_sign'):
+            if key.endswith('wall_sign') or key.endswith('_wall_hanging_sign'):
                 facing = palette_entry['Properties']['facing']
                 if   facing == 'north': data = 2
                 elif facing == 'west':  data = 4
@@ -1485,7 +1600,11 @@ class RegionSet(object):
                 elif facing == 'east':  data = 5
             else:
                 p = palette_entry['Properties']
-                data = p['rotation']
+                data = int(p['rotation'])
+
+                if key.endswith('_hanging_sign') and p['attached'] == 'true':
+                    data |= 0x10
+
         elif key.endswith('_fence'):
             p = palette_entry['Properties']
             if p['north'] == 'true':
@@ -1612,8 +1731,68 @@ class RegionSet(object):
                 data |= 1 << 4
             if p['north'] == 'true':
                 data |= 1 << 5
+        elif key.endswith('copper_bulb'):
+            p = palette_entry['Properties']
+            if p['lit'] == 'true':
+                data |= (1 << 0)
+            if p['powered'] == 'true':
+                data |= (1 << 1)
+        elif key == 'minecraft:crafter':
+            p = palette_entry['Properties']
+
+            if p['crafting'] == 'true':
+                data |= (1 << 4)
+            if p['triggered'] == 'true':
+                data |= (1 << 5)
+
+            if p['orientation'] in ['up_north', 'up_south', 'up_east', 'up_west']:
+                # facing up
+                data |= (1 << 3)
+            if p['orientation'] in ['down_north', 'down_south', 'down_east', 'down_west']:
+                # facing down
+                data |= (1 << 2)
+
+            if p['orientation'] in ['south_up', 'down_south', 'up_north']:
+                # facing south
+                data |= 0
+            if p['orientation'] in ['west_up', 'down_west', 'up_east']:
+                # facing west
+                data |= 1
+            if p['orientation'] in ['north_up', 'down_north', 'up_south']:
+                # facing north
+                data |= 2
+            if p['orientation'] in ['east_up', 'down_east', 'up_west']:
+                # facing east
+                data |= 3
+
+        elif key == 'minecraft:trial_spawner':
+            p = palette_entry['Properties']
+            if p['trial_spawner_state'] in ['cooldown', 'inactive']:
+                data = 0
+            if p['trial_spawner_state'] in ['active', 'waiting_for_players', 'waiting_for_reward_ejection']:
+                data = 1
+            if p['trial_spawner_state'] in ['ejecting_reward']:
+                data = 2
+
+        elif key == 'minecraft:vault':
+            p = palette_entry['Properties']
+
+            if p['facing'] == 'south':
+                data |= 0
+            if p['facing'] == 'west':
+                data |= 1
+            if p['facing'] == 'north':
+                data |= 2
+            if p['facing'] == 'east':
+                data |= 3
+
+            if p['vault_state'] in ['active', 'unlocking']:
+                data |= 4
+            if p['vault_state'] in ['ejecting']:
+                data |= 12
 
         return (block, data)
+
 
     def _packed_longarray_to_shorts_v118_biome(self, long_array, n, num_palette_entries):
 
@@ -2018,6 +2197,75 @@ class RegionSet(object):
 
         return chunk_data
 
+    def get_chunk_lite(self, x, z):
+        """Returns a dictionary object representing the "Level" NBT Compound
+        structure for a chunk given its x, z coordinates. The coordinates given
+        are chunk coordinates. Raises ChunkDoesntExist exception if the given
+        chunk does not exist.
+
+        The returned dictionary corresponds to the "Level" structure in the
+        chunk file. If you're doing anything with block data, you probably want
+        get_chunk() instead. This is mostly intended for doing silly stuff with
+        block entities fron genPOI.
+
+        Warning: the returned data may be cached and thus should not be
+        modified, lest it affect the return values of future calls for the same
+        chunk.
+        """
+        regionfile = self._get_region_path(x, z)
+        if regionfile is None:
+            raise ChunkDoesntExist("Chunk %s,%s doesn't exist (and neither does its region)" % (x,z))
+
+        # Try a few times to load and parse this chunk before giving up and
+        # raising an error
+        tries = 5
+        while True:
+            try:
+                region = self._get_regionobj(regionfile)
+                data = region.load_chunk(x, z)
+            except nbt.CorruptionError as e:
+                tries -= 1
+                if tries > 0:
+                    # Flush the region cache to possibly read a new region file header
+                    logging.debug("Encountered a corrupt chunk or read error at %s,%s. "
+                                  "Flushing cache and retrying", x, z)
+                    del self.regioncache[regionfile]
+                    time.sleep(0.25)
+                    continue
+                else:
+                    logging.warning("The following was encountered while reading from %s:", self.regiondir)
+                    if isinstance(e, nbt.CorruptRegionError):
+                        logging.warning("Tried several times to read chunk %d,%d. Its region (%d,%d) may be corrupt. Giving up.",
+                                        x, z,x//32,z//32)
+                    elif isinstance(e, nbt.CorruptChunkError):
+                        logging.warning("Tried several times to read chunk %d,%d. It may be corrupt. Giving up.",
+                                        x, z)
+                    else:
+                        logging.warning("Tried several times to read chunk %d,%d. Unknown error. Giving up.",
+                                        x, z)
+                    logging.debug("Full traceback:", exc_info=1)
+                    # Let this exception propagate out through the C code into
+                    # tileset.py, where it is caught and gracefully continues
+                    # with the next chunk
+                    raise
+            else:
+                # no exception raised: break out of the loop
+                break
+
+        if data is None:
+            raise ChunkDoesntExist("Chunk %s,%s doesn't exist" % (x,z))
+
+        chunk_data = data[1]
+
+        if chunk_data.get('DataVersion', 0) <= 2840 and 'Level' in chunk_data:
+            # This world was generated pre 21w43a and thus most chunk data is contained
+            # in the "Level" key
+            chunk_data = chunk_data['Level']
+
+        if chunk_data.get("Status", "") not in ("minecraft:full", "postprocessed", "fullchunk", "mobs_spawned", "spawn", "full", ""):
+            raise ChunkDoesntExist("Chunk %s,%s doesn't exist" % (x,z))
+
+        return chunk_data
 
     def iterate_chunks(self):
         """Returns an iterator over all chunk metadata in this world. Iterates
@@ -2140,6 +2388,8 @@ class RegionSetWrapper(object):
         return self._r.get_biome_data(x,z)
     def get_chunk(self, x, z):
         return self._r.get_chunk(x,z)
+    def get_chunk_lite(self, x, z):
+        return self._r.get_chunk_lite(x,z)
     def iterate_chunks(self):
         return self._r.iterate_chunks()
     def iterate_newer_chunks(self,filemtime):
@@ -2248,6 +2498,14 @@ class CroppedRegionSet(RegionSetWrapper):
                 self.zmin <= z <= self.zmax
                 ):
             return super(CroppedRegionSet, self).get_chunk(x,z)
+        else:
+            raise ChunkDoesntExist("This chunk is out of the requested bounds")
+    def get_chunk_lite(self,x,z):
+        if (
+                self.xmin <= x <= self.xmax and
+                self.zmin <= z <= self.zmax
+        ):
+            return super(CroppedRegionSet, self).get_chunk_lite(x,z)
         else:
             raise ChunkDoesntExist("This chunk is out of the requested bounds")
 

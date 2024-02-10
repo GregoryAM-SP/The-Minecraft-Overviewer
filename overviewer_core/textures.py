@@ -664,15 +664,15 @@ class Textures(object):
 
     def build_full_block(self, top, side1, side2, side3, side4, bottom=None):
         """From a top texture, a bottom texture and 4 different side textures,
-        build a full block with four differnts faces. All images should be 16x16 
+        build a full block with four different faces. All images should be 16x16
         image objects. Returns a 24x24 image. Can be used to render any block.
 
-        side1 is in the -y face of the cube     (top left, east)
-        side2 is in the +x                      (top right, south)
-        side3 is in the -x                      (bottom left, north)
-        side4 is in the +y                      (bottom right, west)
+        side1 is in the -z face of the cube     (top left, north)
+        side2 is in the +x                      (top right, east)
+        side3 is in the -x                      (bottom left, west)
+        side4 is in the +z                      (bottom right, south)
 
-        A non transparent block uses top, side 3 and side 4.
+        A non-transparent block uses top, side 3 and side 4.
 
         If top is a tuple then first item is the top image and the second
         item is an increment (integer) from 0 to 16 (pixels in the
@@ -1120,11 +1120,12 @@ block(blockid=14, top_image=BLOCKTEXTURE + "gold_ore.png")
 block(blockid=15, top_image=BLOCKTEXTURE + "iron_ore.png")
 # coal ore
 block(blockid=16, top_image=BLOCKTEXTURE + "coal_ore.png")
+# reinforced deepslate
+block(blockid=2048, top_image=BLOCKTEXTURE + "reinforced_deepslate_top.png", side_image=BLOCKTEXTURE + "reinforced_deepslate_side.png")
 
 @material(blockid=[17, 162, 11306, 11307, 11308,
                     11309, 11310, 11311, 1008, 1009, 
-                    1126, 1192, 1201, 1210, 1221, 
-                    1222, 1228, 1229, 1244],
+                    1126, 1192, 1201, 1210],
           data=list(range(12)), solid=True)
 def wood(self, blockid, data):
     # extract orientation and wood type frorm data bits
@@ -1211,25 +1212,6 @@ def wood(self, blockid, data):
             1: ("stripped_bamboo_block_top.png", "stripped_bamboo_block.png"),
             2: ("bamboo_mosaic.png", None)
         },
-        1221: {
-            0: ("reinforced_deepslate_top.png", "reinforced_deepslate_side.png"),
-            1: ("ochre_froglight_top.png", "ochre_froglight_side.png"),
-            2: ("verdant_froglight_top.png", "verdant_froglight_side.png"),
-            3: ("pearlescent_froglight_top.png", "pearlescent_froglight_side.png"),
-        },
-        1222: {
-            0: ("sculk_sensor_bottom.png", None)
-        }, 
-        1228: {
-            0: ("suspicious_sand_0.png", None), 
-            1: ("suspicious_gravel_0.png", None)
-        },
-        1229: {
-            0: ("target_top.png", "target_side.png")
-        },
-        1244: {
-            0: ("sculk_catalyst_top.png", "sculk_catalyst_side.png")
-        }
     }
 
     top_f, side_f = wood_tex[blockid].get(wood_type, wood_tex[blockid][0])
@@ -1246,40 +1228,52 @@ def wood(self, blockid, data):
     elif wood_orientation == 8: # north-south orientation
         return self.build_full_block(side, None, None, side.rotate(270), top)
 
-@material(blockid=18, data=list(range(16)), transparent=True, solid=True)
+@material(blockid=[18, 161], data=list(range(16)), transparent=True, solid=True)
 def leaves(self, blockid, data):
-    # mask out the bits 4 and 8
-    # they are used for player placed and check-for-decay blocks
-    data = data & 0x7
     t = self.load_image_texture(BLOCKTEXTURE + "oak_leaves.png")
-    if (blockid, data) == (18, 1): # pine!
+    if data == 1:
         t = self.load_image_texture(BLOCKTEXTURE + "spruce_leaves.png")
-    elif (blockid, data) == (18, 2): # birth tree
+    elif data == 2:
         t = self.load_image_texture(BLOCKTEXTURE + "birch_leaves.png")
-    elif (blockid, data) == (18, 3): # jungle tree
+    elif data == 3:
         t = self.load_image_texture(BLOCKTEXTURE + "jungle_leaves.png")
-    elif (blockid, data) == (18, 4): # acacia tree
+    elif data == 4:
         t = self.load_image_texture(BLOCKTEXTURE + "acacia_leaves.png")
-    elif (blockid, data) == (18, 5): 
+    elif data == 5:
         t = self.load_image_texture(BLOCKTEXTURE + "dark_oak_leaves.png")
-    elif (blockid, data) == (18, 6):
+    elif data == 6:
         t = self.load_image_texture(BLOCKTEXTURE + "flowering_azalea_leaves.png")
-    elif (blockid, data) == (18, 7):
+    elif data == 7:
         t = self.load_image_texture(BLOCKTEXTURE + "azalea_leaves.png")
-    elif (blockid, data) == (18, 8):
+    elif data == 8:
         t = self.load_image_texture(BLOCKTEXTURE + "mangrove_leaves.png")
+    elif data == 9:
+        t = self.load_image_texture(BLOCKTEXTURE + "cherry_leaves.png")
+
     return self.build_block(t, t)
 
 # sponge
-block(blockid=19, top_image=BLOCKTEXTURE + "sponge.png")
+@material(blockid=19, data=[0, 1], solid=True)
+def sponge(self, blockid, data):
+    if data == 0:  # normal
+        dry = self.load_image_texture(BLOCKTEXTURE + "sponge.png")
+        return self.build_block(dry, dry)
+    elif data == 1:  # wet
+        wet = self.load_image_texture(BLOCKTEXTURE + "wet_sponge.png")
+        return self.build_block(wet, wet)
+
 # lapis lazuli ore
 block(blockid=21, top_image=BLOCKTEXTURE + "lapis_ore.png")
 # lapis lazuli block
 block(blockid=22, top_image=BLOCKTEXTURE + "lapis_block.png")
 
-block(blockid=1242,top_image=BLOCKTEXTURE + "cherry_leaves.png")
 block(blockid=1226, top_image=BLOCKTEXTURE + "tinted_glass.png", transparent=True)
 
+block(blockid=1222, top_image=BLOCKTEXTURE + "sculk.png")
+block(blockid=1228, top_image=BLOCKTEXTURE + "suspicious_sand_0.png")
+block(blockid=1248, top_image=BLOCKTEXTURE + "suspicious_gravel_0.png")
+block(blockid=1229, top_image=BLOCKTEXTURE + "target_top.png", side_image=BLOCKTEXTURE + "target_side.png")
+block(blockid=1244, top_image=BLOCKTEXTURE + "sculk_catalyst_top.png", side_image=BLOCKTEXTURE + "sculk_catalyst_side.png")
 
 # dispenser, dropper, furnace, blast furnace, and smoker
 @material(blockid=[23, 61, 158, 11362, 11364], data=list(range(14)), solid=True)
@@ -1384,7 +1378,7 @@ def dead_coral(self, blockid, data):
 
 # Bed
 @material(blockid=26, data=list(range(256)), transparent=True, nospawn=True)
-def bed(self, blockid, data,):
+def bed(self, blockid, data):
     # Bits 1-2   Rotation
     # Bit 3      Occupancy, no impact on appearance
     # Bit 4      Foot/Head of bed (0 = foot, 1 = head)
@@ -1780,6 +1774,35 @@ sprite(blockid=1018, imagename=BLOCKTEXTURE + "warped_roots.png")
 # crimson roots
 sprite(blockid=1019, imagename=BLOCKTEXTURE + "crimson_roots.png")
 
+@material(blockid=[2052, 2053], data=list(range(4)), transparent=True)
+def dripleaf(self, blockid, data):
+    stem_texture = self.load_image_texture(BLOCKTEXTURE + "big_dripleaf_stem.png").copy()
+    stem = self.build_billboard(stem_texture)
+
+    if blockid == 2053:
+        return stem
+
+    leaf_top = self.load_image_texture(BLOCKTEXTURE + "big_dripleaf_top.png").copy()
+    leaf_side = self.load_image_texture(BLOCKTEXTURE + "big_dripleaf_side.png").copy()
+    leaf_tip = self.load_image_texture(BLOCKTEXTURE + "big_dripleaf_tip.png").copy()
+
+    if data == (0 - self.rotation) % 4:
+        leaf = self.build_full_block(leaf_top, None, leaf_side, leaf_side, leaf_tip)
+    elif data == (1 - self.rotation) % 4:
+        leaf = self.build_full_block(leaf_top, leaf_side, None, leaf_tip, leaf_side)
+    elif data == (2 - self.rotation) % 4:
+        leaf = self.build_full_block(leaf_top, leaf_side, leaf_tip, None, leaf_side)
+    elif data == (3 - self.rotation) % 4:
+        leaf = self.build_full_block(leaf_top, leaf_tip, leaf_side, leaf_side, None)
+
+    img = Image.new("RGBA", (24,24), self.bgcolor)
+    alpha_over(img, stem)
+    alpha_over(img, leaf)
+
+    return img
+
+
+
 # block of gold
 block(blockid=41, top_image=BLOCKTEXTURE + "gold_block.png")
 # block of iron
@@ -1789,10 +1812,10 @@ block(blockid=42, top_image=BLOCKTEXTURE + "iron_block.png")
 # these wooden slabs are unobtainable without cheating, they are still
 # here because lots of pre-1.3 worlds use this blocks, add prismarine slabs
 @material(blockid=[43, 44, 181, 182, 204, 205, 1124, 1194, 1203, 1213, 1214] + list(range(11340, 11359)) +
-          list(range(1027, 1030)) + list(range(1072, 1080)) + list(range(1103, 1107)),
+          list(range(1027, 1030)) + list(range(1072, 1080)) + list(range(1103, 1107)) + [12665, 12668, 12672],
           data=list(range(16)),
           transparent=[44, 182, 205, 1124, 1194, 1203, 1213, 1214] + list(range(11340, 11359)) + list(range(1027, 1030)) +
-          list(range(1072, 1080)) + list(range(1103, 1107)), solid=True)
+          list(range(1072, 1080)) + list(range(1103, 1107)) + [12665, 12668, 12672], solid=True)
 def slabs(self, blockid, data):
     if blockid == 44 or blockid == 182: 
         texture = data & 7
@@ -1800,27 +1823,25 @@ def slabs(self, blockid, data):
         texture = data
 
     if blockid == 44 or blockid == 43:
-        if texture== 0: # stone slab
+        if texture == 0:  # stone slab
             top = self.load_image_texture(BLOCKTEXTURE + "stone.png")
             side = self.load_image_texture(BLOCKTEXTURE + "stone.png")
-        elif texture== 1: # sandstone slab
+        elif texture == 1:  # sandstone slab
             top = self.load_image_texture(BLOCKTEXTURE + "sandstone_top.png")
             side = self.load_image_texture(BLOCKTEXTURE + "sandstone.png")
-        elif texture== 2: # wooden slab
+        elif texture == 2:  # wooden slab
             top = side = self.load_image_texture(BLOCKTEXTURE + "oak_planks.png")
-        elif texture== 3: # cobblestone slab
+        elif texture == 3:  # cobblestone slab
             top = side = self.load_image_texture(BLOCKTEXTURE + "cobblestone.png")
-        elif texture== 4: # brick
+        elif texture == 4:  # brick
             top = side = self.load_image_texture(BLOCKTEXTURE + "bricks.png")
-        elif texture== 5: # stone brick
+        elif texture == 5:  # stone brick
             top = side = self.load_image_texture(BLOCKTEXTURE + "stone_bricks.png")
-        elif texture== 6: # nether brick slab
+        elif texture == 6:  # nether brick slab
             top = side = self.load_image_texture(BLOCKTEXTURE + "nether_bricks.png")
-        elif texture== 7: #quartz        
+        elif texture == 7:  # quartz
             top = side = self.load_image_texture(BLOCKTEXTURE + "quartz_block_side.png")
-        elif texture== 8: # special stone double slab with top texture only
-            top = side = self.load_image_texture(BLOCKTEXTURE + "smooth_stone.png")
-        elif texture== 9: # special sandstone double slab with top texture only
+        elif texture == 9:  # sandstone
             top = side = self.load_image_texture(BLOCKTEXTURE + "sandstone_top.png")
         else:
             return None
@@ -1919,8 +1940,14 @@ def slabs(self, blockid, data):
         top = side = self.load_image_texture(deepslate_tex[blockid]).copy()
     elif blockid == 1124:
         top = side = self.load_image_texture(BLOCKTEXTURE + "mud_bricks.png").copy()
+    elif blockid == 12665: # tuff_slab
+        top = side = self.load_image_texture(BLOCKTEXTURE + "tuff.png").copy()
+    elif blockid == 12668: # polished_tuff_slab
+        top = side = self.load_image_texture(BLOCKTEXTURE + "polished_tuff.png").copy()
+    elif blockid == 12672: # tuff_brick_slab
+        top = side = self.load_image_texture(BLOCKTEXTURE + "tuff_bricks.png").copy()
 
-    if blockid == 43 or blockid == 181 or blockid == 204: # double slab
+    if blockid == 43 or blockid == 181 or blockid == 204 or (blockid == 11358 and data == 1): # double slab
         return self.build_block(top, side)
     
     return self.build_slab_block(top, side, data & 8 == 8);
@@ -2180,10 +2207,12 @@ block(blockid=52, top_image=BLOCKTEXTURE + "spawner.png", transparent=True)
 # smooth_red_sandstone blackstone polished_blackstone polished_blackstone_brick
 # also all the copper variants
 # also all deepslate variants
+# also all the tuff variants
 @material(blockid=[53, 67, 108, 109, 114, 128, 134, 135, 136, 156, 163, 164, 180, 203, 509, 510,
                    11337, 11338, 11339, 11370, 11371, 11374, 11375, 11376, 11377, 11378, 11379,
                    11380, 11381, 11382, 11383, 11384, 11415, 1030, 1031, 1032, 1064, 1065, 1066,
-                   1067, 1068, 1069, 1070, 1071, 1099, 1100, 1101, 1102, 1193, 1202, 1211, 1212, 1224],
+                   1067, 1068, 1069, 1070, 1071, 1099, 1100, 1101, 1102, 1193, 1202, 1211, 1212, 1224,
+                   12664, 12667, 12671],
           data=list(range(128)), transparent=True, solid=True, nospawn=True)
 def stairs(self, blockid, data):
     # preserve the upside-down bit
@@ -2255,10 +2284,15 @@ def stairs(self, blockid, data):
         # Cherry
         1202: BLOCKTEXTURE + "cherry_planks.png",
         # Bamboo
-        1211:BLOCKTEXTURE + "bamboo_planks.png",
-        1212:BLOCKTEXTURE + "bamboo_mosaic.png",
+        1211: BLOCKTEXTURE + "bamboo_planks.png",
+        1212: BLOCKTEXTURE + "bamboo_mosaic.png",
         # Mud
-        1224:BLOCKTEXTURE + "mud_bricks.png"
+        1224: BLOCKTEXTURE + "mud_bricks.png",
+
+        # Tuff
+        12664: BLOCKTEXTURE + "tuff.png",
+        12667: BLOCKTEXTURE + "polished_tuff.png",
+        12671: BLOCKTEXTURE + "tuff_bricks.png",
     }
 
     texture = self.load_image_texture(stair_id_to_tex[blockid]).copy()
@@ -2572,6 +2606,31 @@ def chests(self, blockid, data):
         img = None
 
     return img
+
+@material(blockid=1242, data=[0], transparent=True)
+def decorated_pot(self, blockid, data):
+    side_tex = self.load_image("assets/minecraft/textures/entity/decorated_pot/decorated_pot_side.png").copy()
+    base_tex = self.load_image("assets/minecraft/textures/entity/decorated_pot/decorated_pot_base.png").copy()
+
+    end_tex = base_tex.crop((0, 13, 14, 27))
+    neck_tex = base_tex.crop((8, 0, 16, 8))
+
+    side_tex = self.transform_image_side(side_tex)
+
+    front_tex = side_tex.transpose(Image.FLIP_LEFT_RIGHT)
+    front_tex = ImageEnhance.Brightness(front_tex).enhance(0.8)
+
+    top_tex = Image.new("RGBA", (16,16), self.bgcolor)
+    alpha_over(top_tex, end_tex, (1,1))
+    alpha_over(top_tex, neck_tex, (6,3))
+
+    img = self.build_full_block(top_tex, None, None, None, None)
+
+    alpha_over(img, side_tex, (1,6))
+    alpha_over(img, front_tex, (11,5))
+
+    return img
+
 
 # redstone wire
 # uses pseudo-ancildata found in iterate.c
@@ -2918,150 +2977,55 @@ def calibrated_sculk_sensor(self, blockid, data):
     tendril = ImageEnhance.Brightness(tendril).enhance(0.8)
     tendril.putalpha(tendrilAlpha)
 
-    # img = self.build_full_block((top_t, 8), None, None, side_t, side_t, None)
-
     tendril_swap = self.transform_image_side(tendril)
     tendril_swap = tendril_swap.transpose(Image.FLIP_LEFT_RIGHT)
-    
-    # alpha_over(img, tendril, (4, 1), tendril)
-    # alpha_over(img, tendril, (4, -5), tendril)
-    # alpha_over(img, tendril_swap, (-1, -2), tendril_swap)
-    # alpha_over(img, tendril_swap, (13, -2), tendril_swap)
+
+    # default something (probably wrong) in case we fall through this if
+    img = self.build_full_block((t_top, 8), t_side, front, t_side, t_side)
 
     if self.rotation == 0: # rendering north upper-left
         if data == 0 or data == 4: # south
             img = self.build_full_block((t_top.rotate(180), 8), t_side, front, t_side, t_side)
-            alpha_over(img, tendril, (4, 1), tendril)
-            alpha_over(img, tendril, (4, -5), tendril)
-            alpha_over(img, tendril_swap, (-1, -2), tendril_swap)
-            alpha_over(img, tendril_swap, (13, -2), tendril_swap)
-            alpha_over(img, sensor_amethyst, (5, -4), sensor_amethyst)
-            return img
         elif data == 1 or data == 5: # west
             img = self.build_full_block((t_top.rotate(90), 8), front, t_side, t_side, t_side)
-            alpha_over(img, tendril, (4, 1), tendril)
-            alpha_over(img, tendril, (4, -5), tendril)
-            alpha_over(img, tendril_swap, (-1, -2), tendril_swap)
-            alpha_over(img, tendril_swap, (13, -2), tendril_swap)
-            alpha_over(img, sensor_amethyst, (5, -4), sensor_amethyst)
-            return img
         elif data == 2 or data == 6: # north
             img = self.build_full_block((t_top.rotate(0), 8), t_side, t_side, t_side, front)
-            alpha_over(img, tendril, (4, 1), tendril)
-            alpha_over(img, tendril, (4, -5), tendril)
-            alpha_over(img, tendril_swap, (-1, -2), tendril_swap)
-            alpha_over(img, tendril_swap, (13, -2), tendril_swap)
-            alpha_over(img, sensor_amethyst, (5, -4), sensor_amethyst)
-            return img
         elif data == 3 or data == 7: # east
             img = self.build_full_block((t_top.rotate(270), 8), t_side, t_side, front, t_side)
-            alpha_over(img, tendril, (4, 1), tendril)
-            alpha_over(img, tendril, (4, -5), tendril)
-            alpha_over(img, tendril_swap, (-1, -2), tendril_swap)
-            alpha_over(img, tendril_swap, (13, -2), tendril_swap)
-            alpha_over(img, sensor_amethyst, (5, -4), sensor_amethyst)
-            return img
     if self.rotation == 1: # north upper-right
         if data == 0 or data == 4: # south
             img = self.build_full_block((t_top.rotate(90), 8), front, t_side, t_side, t_side)
-            alpha_over(img, tendril, (4, 1), tendril)
-            alpha_over(img, tendril, (4, -5), tendril)
-            alpha_over(img, tendril_swap, (-1, -2), tendril_swap)
-            alpha_over(img, tendril_swap, (13, -2), tendril_swap)
-            alpha_over(img, sensor_amethyst, (5, -4), sensor_amethyst)
-            return img
         elif data == 1 or data == 5: # west
             img = self.build_full_block((t_top.rotate(0), 8), t_side, t_side, t_side, front)
-            alpha_over(img, tendril, (4, 1), tendril)
-            alpha_over(img, tendril, (4, -5), tendril)
-            alpha_over(img, tendril_swap, (-1, -2), tendril_swap)
-            alpha_over(img, tendril_swap, (13, -2), tendril_swap)
-            alpha_over(img, sensor_amethyst, (5, -4), sensor_amethyst)
-            return img
         elif data == 2 or data == 6: # north
             img = self.build_full_block((t_top.rotate(270), 8), t_side, t_side, front, t_side)
-            alpha_over(img, tendril, (4, 1), tendril)
-            alpha_over(img, tendril, (4, -5), tendril)
-            alpha_over(img, tendril_swap, (-1, -2), tendril_swap)
-            alpha_over(img, tendril_swap, (13, -2), tendril_swap)
-            alpha_over(img, sensor_amethyst, (5, -4), sensor_amethyst)
-            return img
         elif data == 3 or data == 7: # east
             img = self.build_full_block((t_top.rotate(180), 8), t_side, front, t_side, t_side)
-            alpha_over(img, tendril, (4, 1), tendril)
-            alpha_over(img, tendril, (4, -5), tendril)
-            alpha_over(img, tendril_swap, (-1, -2), tendril_swap)
-            alpha_over(img, tendril_swap, (13, -2), tendril_swap)
-            alpha_over(img, sensor_amethyst, (5, -4), sensor_amethyst)
-            return img           
     if self.rotation == 2: # north lower-right
         if data == 0 or data == 4: # south
             img = self.build_full_block((t_top.rotate(0), 8), t_side, t_side, t_side, front)
-            alpha_over(img, tendril, (4, 1), tendril)
-            alpha_over(img, tendril, (4, -5), tendril)
-            alpha_over(img, tendril_swap, (-1, -2), tendril_swap)
-            alpha_over(img, tendril_swap, (13, -2), tendril_swap)
-            alpha_over(img, sensor_amethyst, (5, -4), sensor_amethyst)
-            return img
         elif data == 1 or data == 5: # west
             img = self.build_full_block((t_top.rotate(270), 8), t_side, t_side, front, t_side)
-            alpha_over(img, tendril, (4, 1), tendril)
-            alpha_over(img, tendril, (4, -5), tendril)
-            alpha_over(img, tendril_swap, (-1, -2), tendril_swap)
-            alpha_over(img, tendril_swap, (13, -2), tendril_swap)
-            alpha_over(img, sensor_amethyst, (5, -4), sensor_amethyst)
-            return img
         elif data == 2 or data == 6: # north
             img = self.build_full_block((t_top.rotate(180), 8), t_side, front, t_side, t_side)
-            alpha_over(img, tendril, (4, 1), tendril)
-            alpha_over(img, tendril, (4, -5), tendril)
-            alpha_over(img, tendril_swap, (-1, -2), tendril_swap)
-            alpha_over(img, tendril_swap, (13, -2), tendril_swap)
-            alpha_over(img, sensor_amethyst, (5, -4), sensor_amethyst)
-            return img
         elif data == 3 or data == 7: # east
             img = self.build_full_block((t_top.rotate(90), 8), front, t_side, t_side, t_side)
-            alpha_over(img, tendril, (4, 1), tendril)
-            alpha_over(img, tendril, (4, -5), tendril)
-            alpha_over(img, tendril_swap, (-1, -2), tendril_swap)
-            alpha_over(img, tendril_swap, (13, -2), tendril_swap)
-            alpha_over(img, sensor_amethyst, (5, -4), sensor_amethyst)
-            return img       
     if self.rotation == 3: # north lower-left
         if data == 0 or data == 4: # south
             img = self.build_full_block((t_top.rotate(270), 8), t_side, t_side, front, t_side)
-            alpha_over(img, tendril, (4, 1), tendril)
-            alpha_over(img, tendril, (4, -5), tendril)
-            alpha_over(img, tendril_swap, (-1, -2), tendril_swap)
-            alpha_over(img, tendril_swap, (13, -2), tendril_swap)
-            alpha_over(img, sensor_amethyst, (5, -4), sensor_amethyst)
-            return img
         elif data == 1 or data == 5: # west
             img = self.build_full_block((t_top.rotate(180), 8), t_side, front, t_side, t_side)
-            alpha_over(img, tendril, (4, 1), tendril)
-            alpha_over(img, tendril, (4, -5), tendril)
-            alpha_over(img, tendril_swap, (-1, -2), tendril_swap)
-            alpha_over(img, tendril_swap, (13, -2), tendril_swap)
-            alpha_over(img, sensor_amethyst, (5, -4), sensor_amethyst)
-            return img
         elif data == 2 or data == 6: # north
             img = self.build_full_block((t_top.rotate(90), 8), front, t_side, t_side, t_side)
-            alpha_over(img, tendril, (4, 1), tendril)
-            alpha_over(img, tendril, (4, -5), tendril)
-            alpha_over(img, tendril_swap, (-1, -2), tendril_swap)
-            alpha_over(img, tendril_swap, (13, -2), tendril_swap)
-            alpha_over(img, sensor_amethyst, (5, -4), sensor_amethyst)
-            return img
         elif data == 3 or data == 7: # east
             img = self.build_full_block((t_top.rotate(0), 8), t_side, t_side, t_side, front)
-            alpha_over(img, tendril, (4, 1), tendril)
-            alpha_over(img, tendril, (4, -5), tendril)
-            alpha_over(img, tendril_swap, (-1, -2), tendril_swap)
-            alpha_over(img, tendril_swap, (13, -2), tendril_swap)
-            alpha_over(img, sensor_amethyst, (5, -4), sensor_amethyst)
-            return img 
 
-
+    alpha_over(img, tendril, (4, 1), tendril)
+    alpha_over(img, tendril, (4, -5), tendril)
+    alpha_over(img, tendril_swap, (-1, -2), tendril_swap)
+    alpha_over(img, tendril_swap, (13, -2), tendril_swap)
+    alpha_over(img, sensor_amethyst, (5, -4), sensor_amethyst)
+    return img
 
 
 @material(blockid=11369, data=list(range(12)), transparent=True, solid=True, nospawn=True)
@@ -3227,9 +3191,17 @@ def signpost(self, blockid, data):
     texture_path, texture_stick_path = [BLOCKTEXTURE + "" + x for x in sign_texture[blockid]]
     
     texture = self.load_image_texture(texture_path).copy()
-    
-    # cut the planks to the size of a signpost
-    ImageDraw.Draw(texture).rectangle((0,12,15,15),outline=(0,0,0,0),fill=(0,0,0,0))
+
+    if blockid == 12514:
+        # override for bamboo, this is a different texture so load it from the sign texture directly.
+        texture = self.load_image("assets/minecraft/textures/entity/signs/bamboo.png").copy().crop((2, 2, 26, 14))
+        texture.resize((16,12), Image.LANCZOS)
+        teximg = Image.new("RGBA", (16,16), self.bgcolor)
+        alpha_over(teximg, texture)
+        texture = teximg
+    else:
+        # cut the planks to the size of a signpost
+        ImageDraw.Draw(texture).rectangle((0,12,15,15),outline=(0,0,0,0),fill=(0,0,0,0))
 
     # If the signpost is looking directly to the image, draw some 
     # random dots, they will look as text.
@@ -3270,7 +3242,7 @@ def signpost(self, blockid, data):
 
 # wooden and iron door
 # uses pseudo-ancildata found in iterate.c
-@material(blockid=[64,71,193,194,195,196,197, 499, 500, 1197, 1206, 1217], data=list(range(32)), transparent=True)
+@material(blockid=[64, 71, 193, 194, 195, 196, 197, 499, 500, 1197, 1206, 1217, 12654, 12655, 12656, 12657], data=list(range(32)), transparent=True)
 def door(self, blockid, data):
     #Masked to not clobber block top/bottom & swung info
     if self.rotation == 1:
@@ -3315,6 +3287,15 @@ def door(self, blockid, data):
             raw_door = self.load_image_texture(BLOCKTEXTURE + "cherry_door_top.png")
         elif blockid == 1217: # Bamboo Door
             raw_door = self.load_image_texture(BLOCKTEXTURE + "bamboo_door_top.png")
+
+        elif blockid == 12654: # copper door
+            raw_door = self.load_image_texture(BLOCKTEXTURE + "copper_door_top.png")
+        elif blockid == 12655: # exposed_copper door
+            raw_door = self.load_image_texture(BLOCKTEXTURE + "exposed_copper_door_top.png")
+        elif blockid == 12656: # weathered_copper door
+            raw_door = self.load_image_texture(BLOCKTEXTURE + "weathered_copper_door_top.png")
+        elif blockid == 12657: # oxidized_copper door
+            raw_door = self.load_image_texture(BLOCKTEXTURE + "oxidized_copper_door_top.png")
     else: # bottom of the door
         if blockid == 64:
             raw_door = self.load_image_texture(BLOCKTEXTURE + "oak_door_bottom.png")
@@ -3341,6 +3322,15 @@ def door(self, blockid, data):
             raw_door = self.load_image_texture(BLOCKTEXTURE + "cherry_door_bottom.png")
         elif blockid == 1217: # Bamboo Door
             raw_door = self.load_image_texture(BLOCKTEXTURE + "bamboo_door_bottom.png")
+
+        elif blockid == 12654: # copper door
+            raw_door = self.load_image_texture(BLOCKTEXTURE + "copper_door_bottom.png")
+        elif blockid == 12655: # exposed_copper door
+            raw_door = self.load_image_texture(BLOCKTEXTURE + "exposed_copper_door_bottom.png")
+        elif blockid == 12656: # weathered_copper door
+            raw_door = self.load_image_texture(BLOCKTEXTURE + "weathered_copper_door_bottom.png")
+        elif blockid == 12657: # oxidized_copper door
+            raw_door = self.load_image_texture(BLOCKTEXTURE + "oxidized_copper_door_bottom.png")
 
     # if you want to render all doors as closed, then force
     # force closed to be True
@@ -3520,18 +3510,18 @@ def wall_sign(self, blockid, data): # wall sign
     }
     texture_path = BLOCKTEXTURE + "" + sign_texture[blockid]
     texture = self.load_image_texture(texture_path).copy()
-    # cut the planks to the size of a signpost
-    ImageDraw.Draw(texture).rectangle((0,12,15,15),outline=(0,0,0,0),fill=(0,0,0,0))
 
-    # draw some random black dots, they will look as text
-    """ don't draw text at the moment, they are used in blank for decoration
-    
-    if data in (3,4):
-        for i in range(15):
-            x = randint(4,11)
-            y = randint(3,7)
-            texture.putpixel((x,y),(0,0,0,255))
-    """
+    if blockid == 12511:
+        # override for bamboo, this is a different texture so load it from the sign texture directly.
+        texture = self.load_image("assets/minecraft/textures/entity/signs/bamboo.png").copy().crop((2, 2, 26, 14))
+        texture.resize((16,12), Image.LANCZOS)
+        teximg = Image.new("RGBA", (16,16), self.bgcolor)
+        alpha_over(teximg, texture)
+        texture = teximg
+    else:
+        # cut the planks to the size of a signpost
+        ImageDraw.Draw(texture).rectangle((0,12,15,15),outline=(0,0,0,0),fill=(0,0,0,0))
+
     
     img = Image.new("RGBA", (24,24), self.bgcolor)
 
@@ -3554,6 +3544,186 @@ def wall_sign(self, blockid, data): # wall sign
     alpha_over(img, sign, (0,3), sign)
 
     return img
+
+
+@material(blockid=list(range(12600,12611)), data=[2, 3, 4, 5], transparent=True)
+def hanging_wall_sign(self, blockid, data):
+
+    # first rotations
+    if self.rotation == 1:
+        if data == 2: data = 5
+        elif data == 3: data = 4
+        elif data == 4: data = 2
+        elif data == 5: data = 3
+    elif self.rotation == 2:
+        if data == 2: data = 3
+        elif data == 3: data = 2
+        elif data == 4: data = 5
+        elif data == 5: data = 4
+    elif self.rotation == 3:
+        if data == 2: data = 4
+        elif data == 3: data = 5
+        elif data == 4: data = 3
+        elif data == 5: data = 2
+
+    sign_texture = {
+        12600: "oak.png",
+        12601: "spruce.png",
+        12602: "birch.png",
+        12603: "jungle.png",
+        12604: "acacia.png",
+        12605: "dark_oak.png",
+        12606: "crimson.png",
+        12607: "warped.png",
+        12608: "mangrove.png",
+        12609: "cherry.png",
+        12610: "bamboo.png",
+    }
+
+    texture_path = "assets/minecraft/textures/entity/signs/hanging/" + sign_texture[blockid]
+    texture = self.load_image(texture_path).copy()
+
+    # texture is the full multi-face sign texture. It's not a 16x16 face texture, so
+    # we need to load the underlying image with load_image() rather than load_image_texture()
+    # We also need to crop it into bits for the relevant parts
+    # top == the top face, side == the main side face, end == the small side face
+
+    bar_top_tex = texture.crop((4, 0, 20, 4))
+    bar_side_tex = texture.crop((4, 4, 20, 6))
+    bar_end_tex = texture.crop((0, 4, 4, 6))
+
+    sign_top_tex = texture.crop((2, 12, 16, 14))
+    sign_side_tex = texture.crop((2, 14, 16, 24))
+    sign_end_tex = texture.crop((0, 14, 2, 24))
+
+    # For each part, we need to put the texture in the correct place in a 16x16 image
+    # before transforming it. The transform rescales to 16x16, then squashes it into
+    # the isometric view.
+
+    # New image to handle the correct location of the top of the bar
+    bar_top = Image.new("RGBA", (16,16), self.bgcolor)
+    # Render the bar top into the new image with an offset.
+    alpha_over(bar_top, bar_top_tex, (0, 7))
+    # Transform the bar top into isometric view
+    bar_top = self.transform_image_top(bar_top)
+
+    # As above...
+    bar_side = Image.new("RGBA", (16,16), self.bgcolor)
+    alpha_over(bar_side, bar_side_tex)
+    bar_side = self.transform_image_side(bar_side)
+    # transform_side targets the left side by default. Cheat and flip to get the right side.
+    bar_side = bar_side.transpose(Image.FLIP_LEFT_RIGHT)
+    # Darken it down a bit for 3D effects.
+    bar_side = ImageEnhance.Brightness(bar_side).enhance(0.8)
+
+    bar_end = Image.new("RGBA", (16,16), self.bgcolor)
+    alpha_over(bar_end, bar_end_tex)
+    bar_end = self.transform_image_side(bar_end)
+    bar_end = ImageEnhance.Brightness(bar_end).enhance(0.9)
+
+    sign_top = Image.new("RGBA", (16,16), self.bgcolor)
+    alpha_over(sign_top, sign_top_tex, (1, 8))
+    sign_top = self.transform_image_top(sign_top)
+
+    sign_side = Image.new("RGBA", (16,16), self.bgcolor)
+    alpha_over(sign_side, sign_side_tex, (1, 6))
+    sign_side = self.transform_image_side(sign_side)
+    sign_side = sign_side.transpose(Image.FLIP_LEFT_RIGHT)
+    sign_side = ImageEnhance.Brightness(sign_side).enhance(0.8)
+
+    sign_end = Image.new("RGBA", (16,16), self.bgcolor)
+    alpha_over(sign_end, sign_end_tex, (8, 6))
+    sign_end = self.transform_image_side(sign_end)
+    sign_end = ImageEnhance.Brightness(sign_end).enhance(0.9)
+
+    img = Image.new("RGBA", (24,24), self.bgcolor)
+
+    alpha_over(img, sign_side, (7, 3))
+    alpha_over(img, sign_end, (1, 5))
+    alpha_over(img, sign_top, (1, 4))
+
+    alpha_over(img, bar_side, (8, 4))
+    alpha_over(img, bar_end, (6, 9))
+    alpha_over(img, bar_top)
+
+    # if sign is oriented east/west, flip it.
+    if data in [4, 5]:
+        img = img.transpose(Image.FLIP_LEFT_RIGHT)
+
+    return img
+
+
+@material(blockid=list(range(12620, 12631)), data=list(range(32)), transparent=True)
+def hanging_sign(self, blockid, data):
+
+    attached = (data & 0b10000) == 0b10000
+
+    data &= 0b01111
+
+    # first rotations
+    if self.rotation == 1:
+        data = (data + 4) % 16
+    elif self.rotation == 2:
+        data = (data + 8) % 16
+    elif self.rotation == 3:
+        data = (data + 12) % 16
+
+    sign_texture = {
+        12620: "oak.png",
+        12621: "spruce.png",
+        12622: "birch.png",
+        12623: "jungle.png",
+        12624: "acacia.png",
+        12625: "dark_oak.png",
+        12626: "crimson.png",
+        12627: "warped.png",
+        12628: "mangrove.png",
+        12629: "cherry.png",
+        12630: "bamboo.png",
+    }
+
+    texture_path = "assets/minecraft/textures/entity/signs/hanging/" + sign_texture[blockid]
+    full_texture = self.load_image(texture_path).copy()
+
+    sign_side_tex = full_texture.crop((2, 14, 16, 24))
+
+    texture = Image.new("RGBA", (16,16), self.bgcolor)
+    alpha_over(texture, sign_side_tex, (1, 6))
+
+    if attached:
+        chain_tex = full_texture.crop((12, 6, 28, 12))
+        alpha_over(texture, chain_tex)
+    else:
+        chain_tex_main = full_texture.crop((6, 6, 9, 12))
+        chain_tex_outer = full_texture.crop((0, 6, 3, 12))
+
+        alpha_over(texture, chain_tex_main, (2, 0))
+        alpha_over(texture, chain_tex_outer, (2, 0))
+        alpha_over(texture, chain_tex_main, (12, 0))
+        alpha_over(texture, chain_tex_outer, (12, 0))
+
+    img = Image.new("RGBA", (24,24), self.bgcolor)
+
+    #         W                N      ~90       E                   S        ~270
+    angles = (330.,345.,0.,15.,30.,55.,95.,120.,150.,165.,180.,195.,210.,230.,265.,310.)
+    angle = math.radians(angles[data])
+    post = self.transform_image_angle(texture, angle)
+
+    # choose the position of the "3D effect"
+    incrementx = 0
+    if data in (1,6,7,8,9,14):
+        incrementx = -1
+    elif data in (3,4,5,11,12,13):
+        incrementx = +1
+
+    # post2 is a brighter signpost pasted with a small shift,
+    # gives to the signpost some 3D effect.
+    post2 = ImageEnhance.Brightness(post).enhance(1.2)
+    alpha_over(img, post2,(incrementx, -3),post2)
+    alpha_over(img, post, (0,-2), post)
+
+    return img
+
 
 # levers
 @material(blockid=69, data=list(range(16)), transparent=True)
@@ -4575,7 +4745,8 @@ def comparator(self, blockid, data):
     
 # trapdoor
 # the trapdoor is looks like a sprite when opened, that's not good
-@material(blockid=[96,167,11332,11333,11334,11335,11336,12501,12502, 1198, 1207, 1218, 1223, 1230, 1231], data=list(range(16)), transparent=True, nospawn=True)
+@material(blockid=[96,167,11332,11333,11334,11335,11336,12501,12502, 1198, 1207, 1218, 1223, 1230, 1231, 12658, 12659, 12660, 12661],
+          data=list(range(16)), transparent=True, nospawn=True)
 def trapdoor(self, blockid, data):
 
     # rotation
@@ -4612,7 +4783,13 @@ def trapdoor(self, blockid, data):
                    1218:BLOCKTEXTURE + "bamboo_trapdoor.png",
                    1223:BLOCKTEXTURE + "sculk_vein.png",
                    1230:BLOCKTEXTURE + "pink_petals.png",
-                   1231:BLOCKTEXTURE + "frogspawn.png"
+                   1231:BLOCKTEXTURE + "frogspawn.png",
+
+                   12658: BLOCKTEXTURE + "copper_trapdoor.png",
+                   12659: BLOCKTEXTURE + "exposed_copper_trapdoor.png",
+                   12660: BLOCKTEXTURE + "weathered_copper_trapdoor.png",
+                   12661: BLOCKTEXTURE + "oxidized_copper_trapdoor.png"
+
                   }[blockid]
 
     if data & 0x4 == 0x4: # opened trapdoor
@@ -5183,7 +5360,7 @@ def daylight_sensor(self, blockid, data):
 # wooden double and normal slabs
 # these are the new wooden slabs, blockids 43 44 still have wooden
 # slabs, but those are unobtainable without cheating
-@material(blockid=[125, 126], data=list(range(16)), transparent=(44,), solid=True)
+@material(blockid=[125, 126], data=list(range(16)), transparent=(44,126), solid=True)
 def wooden_slabs(self, blockid, data):
     texture = data & 7
     if texture== 0: # oak 
@@ -5341,7 +5518,7 @@ def beacon(self, blockid, data):
 
 # cobblestone and mossy cobblestone walls, chorus plants, mossy stone brick walls
 # one additional bit of data value added for mossy and cobblestone
-@material(blockid=[199, 1225]+list(range(1792, 1812 + 1)), data=list(range(32)), transparent=True, nospawn=True)
+@material(blockid=[199, 1225]+list(range(1792, 1815 + 1)), data=list(range(32)), transparent=True, nospawn=True)
 def cobblestone_wall(self, blockid, data):
     walls_id_to_tex = {
           199: BLOCKTEXTURE + "chorus_plant.png", # chorus plants
@@ -5366,7 +5543,10 @@ def cobblestone_wall(self, blockid, data):
         1810: BLOCKTEXTURE + "polished_deepslate.png",
         1811: BLOCKTEXTURE + "deepslate_bricks.png",
         1812: BLOCKTEXTURE + "deepslate_tiles.png",
-        
+        1813: BLOCKTEXTURE + "tuff.png",
+        1814: BLOCKTEXTURE + "polished_tuff.png",
+        1815: BLOCKTEXTURE + "tuff_bricks.png",
+
         1225: BLOCKTEXTURE + "mud_bricks.png"
     }
     t = self.load_image_texture(walls_id_to_tex[blockid]).copy()
@@ -6381,57 +6561,50 @@ def sandstone(self, blockid, data):
 block(blockid=11414, top_image=BLOCKTEXTURE + "scaffolding_top.png", side_image=BLOCKTEXTURE + "scaffolding_side.png", solid=False, transparent=True)
 
 # Chiseled Bookshelf
-@material(blockid=1227, data=list(range(128)), transparent=False, solid=True)
+@material(blockid=1227, data=list(range(256)), transparent=False, solid=True)
 def chiseledBookshelf(self, blockid, data):
     t_top = self.load_image_texture(BLOCKTEXTURE + "chiseled_bookshelf_top.png")
     t_side = self.load_image_texture(BLOCKTEXTURE + "chiseled_bookshelf_side.png")
-    empty = self.load_image_texture(BLOCKTEXTURE + "chiseled_bookshelf_empty.png")
-    occupied = self.load_image_texture(BLOCKTEXTURE + "chiseled_bookshelf_occupied.png")
+    empty = self.load_image_texture(BLOCKTEXTURE + "chiseled_bookshelf_empty.png").copy()
+    occupied = self.load_image_texture(BLOCKTEXTURE + "chiseled_bookshelf_occupied.png").copy()
 
-    if data >= 4:
-        front = occupied
-    else:
-        front = empty
+    direction = data & 0b00000011
+    data &= 0b11111100
 
-    if self.rotation == 0: # rendering north upper-left
-        if data == 0 or data == 4: # south
-            return self.build_full_block(t_top, t_side, t_side, t_side, front)
-        elif data == 1 or data == 5: # west
-            return self.build_full_block(t_top, t_side, t_side, front, t_side)
-        elif data == 2 or data == 6: # north
-            return self.build_full_block(t_top, t_side, front, t_side, t_side)
-        elif data == 3 or data == 7: # east
-            return self.build_full_block(t_top, front, t_side, t_side, t_side)
+    front = empty
 
-    elif self.rotation == 1: # north upper-right
-        if data == 0 or data == 4: # south
-            return self.build_full_block(t_top, t_side, t_side, front, t_side)
-        elif data == 1 or data == 5: # west
-            return self.build_full_block(t_top, t_side, front, t_side, t_side)
-        elif data == 2 or data == 6: # north
-            return self.build_full_block(t_top, front, t_side, t_side, t_side)
-        elif data == 3 or data == 7: # east
-            return self.build_full_block(t_top, t_side, t_side, t_side, front)            
+    # brighten the books to make them slightly more visible
+    occupied = ImageEnhance.Brightness(occupied).enhance(1.5)
 
-    elif self.rotation == 2: # north lower-right
-        if data == 0 or data == 4: # south
-            return self.build_full_block(t_top, t_side, front, t_side, t_side)
-        elif data == 1 or data == 5: # west
-            return self.build_full_block(t_top, front, t_side, t_side, t_side)
-        elif data == 2 or data == 6: # north
-            return self.build_full_block(t_top, t_side, t_side, t_side, front)
-        elif data == 3 or data == 7: # east
-            return self.build_full_block(t_top, t_side, t_side, front, t_side)
-            
-    elif self.rotation == 3: # north lower-left
-        if data == 0 or data == 4: # south
-            return self.build_full_block(t_top, front, t_side, t_side, t_side)
-        elif data == 1 or data == 5: # west
-            return self.build_full_block(t_top, t_side, t_side, t_side, front)
-        elif data == 2 or data == 6: # north
-            return self.build_full_block(t_top, t_side, t_side, front, t_side)
-        elif data == 3 or data == 7: # east
-            return self.build_full_block(t_top, t_side, front, t_side, t_side)
+    # Copy over the books which are present
+    mask = Image.new("RGBA", (16, 16), self.bgcolor)
+    if data & 0b10000000 == 0b10000000:
+        ImageDraw.Draw(mask).rectangle((0,0,5,7),outline=(0,0,0,0),fill=(255,0,0,255))
+    if data & 0b01000000 == 0b01000000:
+        ImageDraw.Draw(mask).rectangle((5,0,10,7),outline=(0,0,0,0),fill=(255,255,0,255))
+    if data & 0b00100000 == 0b00100000:
+        ImageDraw.Draw(mask).rectangle((10,0,15,7),outline=(0,0,0,0),fill=(0,255,0,255))
+    if data & 0b00010000 == 0b00010000:
+        ImageDraw.Draw(mask).rectangle((0,8,5,15),outline=(0,0,0,0),fill=(0,255,255,255))
+    if data & 0b00001000 == 0b00001000:
+        ImageDraw.Draw(mask).rectangle((5,8,10,15),outline=(0,0,0,0),fill=(0,0,255,255))
+    if data & 0b00000100 == 0b00000100:
+        ImageDraw.Draw(mask).rectangle((10,8,15,15),outline=(0,0,0,0),fill=(255,0,255,255))
+    alpha_over(front, occupied, (0,0), mask)
+
+    img = Image.new("RGBA", (24, 24), self.bgcolor)
+
+    if direction == (0 - self.rotation) % 4:  # south
+        # this side is flipped by build_full_block(), so we need to flip it ourselves too or the books will be on
+        # the wrong side of the bookshelf in certain orientations.
+        inv_front = front.transpose(Image.FLIP_LEFT_RIGHT)
+        return self.build_full_block(t_top, t_side, t_side, t_side, inv_front)
+    elif direction == (1 - self.rotation) % 4:  # west
+        return self.build_full_block(t_top, t_side, t_side, front, t_side)
+    elif direction == (2 - self.rotation) % 4:  # north
+        return self.build_full_block(t_top, t_side, front, t_side, t_side)
+    elif direction == (3 - self.rotation) % 4:  # east
+        return self.build_full_block(t_top, front, t_side, t_side, t_side)
 
 
 # beehive and bee_nest
@@ -6824,6 +6997,19 @@ def basalt(self, blockid, data):
     side = self.load_image_texture(BLOCKTEXTURE + "" + block_name + "_side.png")
     return self.build_axis_block(top, side, data)
 
+# Froglights
+@material(blockid=[2049, 2050, 2051], data=list(range(3)), solid=True)
+def froglight(self, blockid, data):
+
+    froglights = {
+        2049: 'ochre',
+        2050: 'verdant',
+        2051: 'pearlescent',
+    }
+
+    top = self.load_image_texture(BLOCKTEXTURE + "" + froglights[blockid] + "_froglight_top.png")
+    side = self.load_image_texture(BLOCKTEXTURE + "" + froglights[blockid] + "_froglight_side.png")
+    return self.build_axis_block(top, side, data)
 
 # Blackstone block
 block(blockid=[1004], top_image=BLOCKTEXTURE + "blackstone_top.png",
@@ -7259,3 +7445,122 @@ block(blockid=1125, top_image=BLOCKTEXTURE + "mangrove_roots_top.png",
       side_image=BLOCKTEXTURE + "mangrove_roots_side.png")
 block(blockid=1127, top_image=BLOCKTEXTURE + "muddy_mangrove_roots_top.png",
       side_image=BLOCKTEXTURE + "muddy_mangrove_roots_side.png")
+
+
+block(blockid=12642, top_image=BLOCKTEXTURE + "chiseled_copper.png")
+block(blockid=12643, top_image=BLOCKTEXTURE + "exposed_chiseled_copper.png")
+block(blockid=12644, top_image=BLOCKTEXTURE + "weathered_chiseled_copper.png")
+block(blockid=12645, top_image=BLOCKTEXTURE + "oxidized_chiseled_copper.png")
+
+block(blockid=12646, top_image=BLOCKTEXTURE + "copper_grate.png", transparent=True)
+block(blockid=12647, top_image=BLOCKTEXTURE + "exposed_copper_grate.png", transparent=True)
+block(blockid=12648, top_image=BLOCKTEXTURE + "weathered_copper_grate.png", transparent=True)
+block(blockid=12649, top_image=BLOCKTEXTURE + "oxidized_copper_grate.png", transparent=True)
+
+@material(blockid=[12650, 12651, 12652, 12653], data=list(range(1 << 2)), transparent=False)
+def copper_bulb(self, blockid, data):
+    waxed = False
+    lit = False
+    powered = False
+
+    if data & 1 == 1:
+        lit = True
+    if data & 2 == 2:
+        powered = True
+
+    prefix = ''
+    if blockid == 12651:
+        prefix = 'exposed_'
+    if blockid == 12652:
+        prefix = 'weathered_'
+    if blockid == 12653:
+        prefix = 'oxidized_'
+
+    texture = prefix + 'copper_bulb'
+
+    if lit:
+        texture += '_lit'
+    if powered:
+        texture += '_powered'
+
+    img = self.load_image_texture(BLOCKTEXTURE + texture + ".png")
+    return self.build_block(img, img)
+
+
+@material(blockid=[12640], data=list(range(1 << 6)))
+def crafter(self, blockid, data):
+
+    triggered = data & 32 == 32
+    crafting = data & 16 == 16
+
+    facing_up = data & 8 == 8
+    facing_down = data & 4 == 4
+
+    direction = data & 3
+
+    direction = (direction + self.rotation) % 4
+
+    bottom = self.load_image_texture(BLOCKTEXTURE + "crafter_bottom.png").copy()
+
+    if crafting:
+        top = self.load_image_texture(BLOCKTEXTURE + "crafter_top_crafting.png").copy()
+        left = self.load_image_texture(BLOCKTEXTURE + "crafter_east_crafting.png").copy()
+        right = self.load_image_texture(BLOCKTEXTURE + "crafter_west_crafting.png").copy()
+        front = self.load_image_texture(BLOCKTEXTURE + "crafter_north_crafting.png").copy()
+        rear = self.load_image_texture(BLOCKTEXTURE + "crafter_south_triggered.png").copy()
+    elif triggered:
+        top = self.load_image_texture(BLOCKTEXTURE + "crafter_top_triggered.png").copy()
+        left = self.load_image_texture(BLOCKTEXTURE + "crafter_east_triggered.png").copy()
+        right = self.load_image_texture(BLOCKTEXTURE + "crafter_west_triggered.png").copy()
+        front = self.load_image_texture(BLOCKTEXTURE + "crafter_north.png").copy()
+        rear = self.load_image_texture(BLOCKTEXTURE + "crafter_south_triggered.png").copy()
+    else:
+        top = self.load_image_texture(BLOCKTEXTURE + "crafter_top.png").copy()
+        left = self.load_image_texture(BLOCKTEXTURE + "crafter_east.png").copy()
+        right = self.load_image_texture(BLOCKTEXTURE + "crafter_west.png").copy()
+        front = self.load_image_texture(BLOCKTEXTURE + "crafter_north.png").copy()
+        rear = self.load_image_texture(BLOCKTEXTURE + "crafter_south.png").copy()
+
+    if facing_up:
+        top, bottom, front, left, rear, right = (front, rear, bottom, left, top, right)
+        left = left.rotate(90)
+        right = right.rotate(270)
+
+    if facing_down:
+        top, bottom, front, left, rear, right = (rear, front, top, left, bottom, right)
+        left = left.rotate(270)
+        right = right.rotate(90)
+        top = top.rotate(180)
+
+    sides = [left, front, right, rear]
+    for i in range(direction):
+        sides = sides[1:] + sides[:1]
+        top = top.rotate(270)
+
+    return self.build_full_block(top, sides[3], sides[2], sides[0], sides[1].transpose(Image.FLIP_LEFT_RIGHT), bottom)
+
+@material(blockid=[12641], data=[0, 1, 2])
+def trial_spawner(self, blockid, data):
+    side = self.load_image_texture(BLOCKTEXTURE + "trial_spawner_side_inactive.png").copy()
+    side_active = self.load_image_texture(BLOCKTEXTURE + "trial_spawner_side_active.png").copy()
+    top = self.load_image_texture(BLOCKTEXTURE + "trial_spawner_top_inactive.png").copy()
+    top_active = self.load_image_texture(BLOCKTEXTURE + "trial_spawner_top_active.png").copy()
+    top_ejecting = self.load_image_texture(BLOCKTEXTURE + "trial_spawner_top_ejecting_reward.png").copy()
+
+    if data == 0:
+        return self.build_block(top, side)
+    elif data == 1:
+        return self.build_block(top_active, side_active)
+    elif data == 2:
+        return self.build_block(top_ejecting, side_active)
+
+@material(blockid=[12662], data=list(range(1 << 4)))
+def vault(self, blockid, data):
+    # Placeholder for when this is included in a released version of Minecraft
+    return None
+
+block(blockid=12663, top_image=BLOCKTEXTURE + "chiseled_tuff.png")
+block(blockid=12666, top_image=BLOCKTEXTURE + "polished_tuff.png")
+block(blockid=12669, top_image=BLOCKTEXTURE + "tuff_bricks.png")
+block(blockid=12670, top_image=BLOCKTEXTURE + "chiseled_tuff_bricks.png")
+

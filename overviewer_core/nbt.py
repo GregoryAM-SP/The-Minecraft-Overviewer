@@ -160,7 +160,10 @@ class NBTFileReader(object):
         # Read the string
         string = self._file.read(length)
         # decode it and return
-        return string.decode("UTF-8", 'replace')
+        # We need to account for Java's strings being UTF-16 by default which is naively encoded into UTF-8.
+        # This leads to UTF-16 surrogate pairs encoded again as UTF-8. This abomination fixes it and allows what few
+        # emoji that Minecraft supports to pass through. h/t to ChrisE for figuring out the encoding mechanism.
+        return string.decode('utf-8', 'surrogatepass').encode('utf-16', 'surrogatepass').decode('utf-16')
 
     def _read_tag_list(self):
         tagid = self._read_tag_byte()

@@ -447,6 +447,9 @@ enum mc_block_id {
     block_polished_deepslate_wall = 1810,
     block_deepslate_brick_wall = 1811,
     block_deepslate_tile_wall = 1812,
+    block_tuff_wall = 1813,
+    block_polished_tuff_wall = 1814,
+    block_tuff_brick_wall = 1815,
     // end of walls
 
     block_prismarine_stairs = 11337,
@@ -559,6 +562,14 @@ enum mc_block_id {
     block_mangrove_slab = 1194,
     block_bamboo_slab = 1213,
     block_cherry_slab = 1203,
+
+    block_tuff_slab = 12665,
+    block_polished_tuff_slab = 12668,
+    block_tuff_brick_slab = 12672,
+
+    block_tuff_stairs = 12664,
+    block_polished_tuff_stairs = 12667,
+    block_tuff_brick_stairs = 12671,
 };
 
 typedef uint16_t mc_block_t;
@@ -775,6 +786,18 @@ enum mc_item_id {
     item_record_ward = 2265,
     item_record_11 = 2266,
     item_record_wait = 2267,
+
+    oak_wall_hanging_sign = 12600,
+    spruce_wall_hanging_sign = 12601,
+    birch_wall_hanging_sign = 12602,
+    jungle_wall_hanging_sign = 12603,
+    acacia_wall_hanging_sign = 12604,
+    dark_oak_wall_hanging_sign = 12605,
+    crimson_wall_hanging_sign = 12606,
+    warped_wall_hanging_sign = 12607,
+    mangrove_wall_hanging_sign = 12608,
+    cherry_wall_hanging_sign = 12609,
+    bamboo_wall_hanging_sign = 12610,
 };
 
 typedef uint16_t mc_item_t;
