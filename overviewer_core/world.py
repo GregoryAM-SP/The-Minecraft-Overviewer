@@ -1312,6 +1312,8 @@ class RegionSet(object):
         for i in range(len(coral_list)):
             self._blockmap['minecraft:dead_%s_coral' % coral_list[i]] = (1237, i)
             self._blockmap['minecraft:dead_%s_coral_fan' % coral_list[i]] = (1238, i)
+            self._blockmap['minecraft:%s_coral' % coral_list[i]] = (1249, i)
+            self._blockmap['minecraft:%s_coral_fan' % coral_list[i]] = (1250, i)
 
     # Re-initialize upon unpickling
     def __getstate__(self):
@@ -1790,6 +1792,11 @@ class RegionSet(object):
                 data |= 4
             if p['vault_state'] in ['ejecting']:
                 data |= 12
+
+        elif (key.endswith('_coral') or key.endswith('fan')):
+            if palette_entry['Properties']['waterlogged'] == 'true':
+                block = 8
+
 
         return (block, data)
 

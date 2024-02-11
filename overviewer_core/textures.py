@@ -155,7 +155,7 @@ class Textures(object):
                 block = tex[0]
                 scaled_block = block.resize(self.texture_dimensions, Image.LANCZOS)
                 blockmap[i] = self.generate_texture_tuple(scaled_block)
-        
+                
         self.generated = True
     
     ##
@@ -1364,17 +1364,34 @@ def sandstone(self, blockid, data):
 # note block
 block(blockid=25, top_image=BLOCKTEXTURE + "note_block.png")
 
-# Dead Coral
-@material(blockid=1237, data=list(range(5)), transparent=True)
-def dead_coral(self, blockid, data):
-    tex = self.load_image_texture(BLOCKTEXTURE + "dead_%s_coral.png" % coral_map[data])
-    return self.build_sprite(tex)
+# # Dead Coral
+# @material(blockid=1237, data=list(range(5)), transparent=True)
+# def dead_coral(self, blockid, data):
+#     tex = self.load_image_texture(BLOCKTEXTURE + "dead_%s_coral.png" % coral_map[data])
+#     return self.build_sprite(tex)
 
-# Dead Coral Fan
-@material(blockid=1238, data=list(range(5)), transparent=True)
-def dead_coral(self, blockid, data):
-    tex = self.load_image_texture(BLOCKTEXTURE + "dead_%s_coral_fan.png" % coral_map[data])
-    return self.build_sprite(tex)
+# # Dead Coral Fan
+# @material(blockid=1238, data=list(range(5)), transparent=True)
+# def dead_coral(self, blockid, data):
+#     tex = self.load_image_texture(BLOCKTEXTURE + "dead_%s_coral_fan.png" % coral_map[data])
+#     return self.build_sprite(tex)
+
+@material(blockid=[1237, 1238, 1249, 1250, 1251], data=list(range(5)), transparent=(1237, 1238, 1249, 1250))
+def coral(self, blockid, data):
+    if blockid == 1237:
+        tex = self.load_image_texture(BLOCKTEXTURE + 'dead_%s_coral.png' % coral_map[data])
+        return self.build_sprite(tex)
+    elif blockid == 1238:
+        tex = self.load_image_texture(BLOCKTEXTURE + 'dead_%s_coral_fan.png' % coral_map[data])
+        return self.build_sprite(tex)
+    elif blockid == 1249:
+        tex = self.load_image_texture(BLOCKTEXTURE + '%s_coral.png' % coral_map[data])
+        return self.build_sprite(tex)
+    elif blockid == 1250:
+        tex = self.load_image_texture(BLOCKTEXTURE + '%s_coral_fan.png' % coral_map[data])
+        return self.build_sprite(tex)
+
+    
 
 # Bed
 @material(blockid=26, data=list(range(256)), transparent=True, nospawn=True)

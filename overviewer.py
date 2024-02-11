@@ -196,15 +196,24 @@ def main():
         print("Currently running Minecraft Overviewer %s" % util.findGitTag() +
               " (%s)" % util.findGitHash()[:7])
         try:
-            from urllib import request
+            import requests
             import json
-            latest_ver = json.loads(request.urlopen("http://overviewer.org/download.json")
-                                    .read())['src']
-            print("Latest version of Minecraft Overviewer %s (%s)" % (latest_ver['version'],
-                                                                      latest_ver['commit'][:7]))
-            print("See https://overviewer.org/downloads for more information.")
-        except Exception:
-            print("Failed to fetch latest version info.")
+    
+            response = requests.get("https://overviewer.gregoryam.com/ov_versions.json")
+            if response.status_code == 200:
+                latest_ver = response.json()['src']
+                print("Latest version of Minecraft Overviewer v%s (%s)" % (latest_ver['version'],
+                                                                          latest_ver['commit'][:7]))
+                print("See https://github.com/GregoryAM-SP/The-Minecraft-Overviewer/releases/latest for more information.")
+            else:
+                print("Failed to fetch latest version info. Status code:", response.status_code)
+                if args.verbose > 0:
+                    print(response.text)
+                else:
+                    print("Re-run with --verbose for more details.")
+                return 1
+        except Exception as e:
+            print("Failed to fetch latest version info:", str(e))
             if args.verbose > 0:
                 import traceback
                 traceback.print_exc()
