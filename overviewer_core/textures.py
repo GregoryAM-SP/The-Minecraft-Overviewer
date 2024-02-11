@@ -1364,18 +1364,6 @@ def sandstone(self, blockid, data):
 # note block
 block(blockid=25, top_image=BLOCKTEXTURE + "note_block.png")
 
-# # Dead Coral
-# @material(blockid=1237, data=list(range(5)), transparent=True)
-# def dead_coral(self, blockid, data):
-#     tex = self.load_image_texture(BLOCKTEXTURE + "dead_%s_coral.png" % coral_map[data])
-#     return self.build_sprite(tex)
-
-# # Dead Coral Fan
-# @material(blockid=1238, data=list(range(5)), transparent=True)
-# def dead_coral(self, blockid, data):
-#     tex = self.load_image_texture(BLOCKTEXTURE + "dead_%s_coral_fan.png" % coral_map[data])
-#     return self.build_sprite(tex)
-
 @material(blockid=[1237, 1238, 1249, 1250, 1251], data=list(range(5)), transparent=(1237, 1238, 1249, 1250))
 def coral(self, blockid, data):
     if blockid == 1237:
