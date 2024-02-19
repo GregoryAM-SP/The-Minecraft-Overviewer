@@ -1338,8 +1338,8 @@ class RegionSet(object):
             self._blockmap['minecraft:dead_%s_coral_fan' % coral_list[i]] = (1238, i)
             self._blockmap['minecraft:%s_coral' % coral_list[i]] = (1249, i)
             self._blockmap['minecraft:%s_coral_fan' % coral_list[i]] = (1250, i)
-            self._blockmap['minecraft:dead_%s_coral_wall_fan' % coral_list[i]] = (1251, i)
-            self._blockmap['minecraft:%s_coral_wall_fan' % coral_list[i]] = (1252, i)
+            self._blockmap['minecraft:dead_%s_coral_wall_fan' % coral_list[i]] = (1262 + i, 0)
+            self._blockmap['minecraft:%s_coral_wall_fan' % coral_list[i]] = (1268 + i, 0)
 
     # Re-initialize upon unpickling
     def __getstate__(self):
@@ -1444,6 +1444,8 @@ class RegionSet(object):
 
         colors = ['white', 'orange', 'magenta', 'light_blue', 'yellow', 'lime', 'pink', 'gray', 'light_gray', 'cyan',
                   'purple', 'blue', 'brown', 'green', 'red', 'black']
+        
+        coral_list = [ 'tube', 'brain', 'bubble', 'fire', 'horn']
 
         key = palette_entry['Name']
         (block, data) = self._blockmap[key]
@@ -1818,6 +1820,21 @@ class RegionSet(object):
                 data |= 4
             if p['vault_state'] in ['ejecting']:
                 data |= 12
+
+        elif key in ['minecraft:dead_%s_coral_wall_fan' % item for item in coral_list] or \
+             key in ['minecraft:%s_coral_wall_fan' % item for item in coral_list]:
+            p = palette_entry['Properties']
+            facing = p['facing']
+            if p['waterlogged'] == 'true':
+                block = 8
+            if facing == 'north':
+                data = 3
+            if facing == 'east':
+                data = 4
+            if facing == 'south':
+                data = 1
+            if facing == 'west':
+                data = 2
 
         elif (key.endswith('_coral') or key.endswith('fan')):
             if palette_entry['Properties']['waterlogged'] == 'true':
