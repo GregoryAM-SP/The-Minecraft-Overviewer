@@ -31,6 +31,7 @@ from . import util
 
 
 BLOCKTEXTURE = "assets/minecraft/textures/block/"
+CANDLETEXTURE = "assets/minecraft/textures/item/"
 
 # global variables to collate information in @material decorators
 blockmap_generators = {}
@@ -7125,6 +7126,47 @@ def spore_blossom(self, blockid, data):
     base_top = self.transform_image_top(base)
     alpha_over(img, base_top, (0, 0), base_top)
     return img
+
+# candle cakes
+@material(blockid=list(range(1286, 1302)) + [1259], data=list(range(16)), transparent=True, nospawn=True)
+def candle_cakes(self, blockid, data):
+    top = self.load_image_texture(BLOCKTEXTURE + "cake_top.png").copy()
+    side = self.load_image_texture(BLOCKTEXTURE + "cake_side.png").copy()
+    if blockid == 1259:
+        candle = self.load_image_texture(CANDLETEXTURE + "candle.png")
+    elif blockid in range(1286, 1302):
+        candle = self.load_image_texture(CANDLETEXTURE + "%s_candle.png" % color_map[blockid - 1286])
+
+    img = Image.new("RGBA", (24, 24), self.bgcolor)
+    if self.rotation in range(0, 3):
+        top = self.transform_image_top(top)
+        side = self.transform_image_side(side)
+        otherside = side.transpose(Image.FLIP_LEFT_RIGHT)
+
+        sidealpha = side.split()[3]
+        side = ImageEnhance.Brightness(side).enhance(0.9)
+        side.putalpha(sidealpha)
+        othersidealpha = otherside.split()[3]
+        otherside = ImageEnhance.Brightness(otherside).enhance(0.8)
+        otherside.putalpha(othersidealpha)
+
+        alpha_over(img, side, (1, 6), side)
+        alpha_over(img, otherside, (11, 5), otherside)  # workaround, fixes a hole
+        alpha_over(img, otherside, (12, 6), otherside)
+        alpha_over(img, top, (0, 6), top)
+        alpha_over(img, candle, (3, -2), candle)
+
+    return img
+
+#candles
+@material(blockid=list(range(1269, 1285)) + [1261], data=list(range(16)))
+def candles(self, blockid, data):
+    if blockid == 1261:
+        candle = self.load_image_texture(CANDLETEXTURE + "candle.png")
+    elif blockid in range(1269, 1285):
+        candle = self.load_image_texture(CANDLETEXTURE + "%s_candle.png" % color_map[blockid - 1269])
+
+    return candle
 
 @material(blockid=[12650, 12651, 12652, 12653], data=list(range(1 << 2)), transparent=False)
 def copper_bulb(self, blockid, data):

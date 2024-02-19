@@ -1329,8 +1329,8 @@ class RegionSet(object):
             self._blockmap['minecraft:%s_glazed_terracotta'  % colors[i]] = (235 + i, 0)
             self._blockmap['minecraft:%s_concrete'           % colors[i]] = (251, i)
             self._blockmap['minecraft:%s_concrete_powder'    % colors[i]] = (252, i)
-            self._blockmap['minecraft:%s_candle'             % colors[i]] = (1253, i)
-            self._blockmap['minecraft:%s_candle_cake'        % colors[i]] = (1254, i)
+            self._blockmap['minecraft:%s_candle'             % colors[i]] = (1269 + i, 0)
+            self._blockmap['minecraft:%s_candle_cake'        % colors[i]] = (1286 + i, 0)
 
         coral_list = [ 'tube', 'brain', 'bubble', 'fire', 'horn']
         for i in range(len(coral_list)):
