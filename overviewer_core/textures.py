@@ -1327,126 +1327,78 @@ def coral(self, blockid, data):
         tex = self.load_image_texture(BLOCKTEXTURE + '%s_coral_fan.png' % coral_map[data])
         return self.build_sprite(tex)
     
-@material(blockid=list(range(1262, 1267)), data=list(range(5)), transparent=True)
-def dead_wall_coral(self, blockid, data):
-    tex = self.load_image_texture(BLOCKTEXTURE + 'dead_%s_coral_fan.png' % coral_map[blockid - 1262])
-    img = Image.new('RGBA', (16, 16), self.bgcolor)
-    alpha_over(img, tex, (0, 0))
-    if self. rotation == 0: # north upper-left
-        if data == 1: # South
-            coral = img.rotate(180, Image.NEAREST)
-            img = self.build_full_block((coral, 8), None, None, None, None, None)
-        if data == 2: # West
-            coral = img.rotate(90, Image.NEAREST)
-            img = self.build_full_block((coral, 8), None, None, None, None, None)
-        if data == 3: # North
-            coral = img.rotate(0, Image.NEAREST)
-            img = self.build_full_block((coral, 8), None, None, None, None, None)
-        if data == 4: # East
-            coral = img.rotate(270, Image.NONE)
-            img = self.build_full_block((coral, 8), None, None, None, None, None)
-    if self.rotation == 1: # north upper=right
-        if data == 1: # South
-            coral = img.rotate(90, Image.NEAREST)
-            img = self.build_full_block((coral, 8), None, None, None, None, None)
-        if data == 2: # West
-            coral = img.rotate(0, Image.NEAREST)
-            img = self.build_full_block((coral, 8), None, None, None, None, None)
-        if data == 3: # North
-            coral = img.rotate(270, Image.NEAREST)
-            img = self.build_full_block((coral, 8), None, None, None, None, None)
-        if data == 4: # East
-            coral = img.rotate(180, Image.NONE)
-            img = self.build_full_block((coral, 8), None, None, None, None, None)
-    if self.rotation == 2: # north lower-right
-        if data == 1: # South
-            coral = img.rotate(0, Image.NEAREST)
-            img = self.build_full_block((coral, 8), None, None, None, None, None)
-        if data == 2: # West
-            coral = img.rotate(270, Image.NEAREST)
-            img = self.build_full_block((coral, 8), None, None, None, None, None)
-        if data == 3: # North
-            coral = img.rotate(180, Image.NEAREST)
-            img = self.build_full_block((coral, 8), None, None, None, None, None)
-        if data == 4: # East
-            coral = img.rotate(90, Image.NONE)
-            img = self.build_full_block((coral, 8), None, None, None, None, None)
-    if self.rotation == 3: # north lower-left
-        if data == 1: # South
-            coral = img.rotate(270, Image.NEAREST)
-            img = self.build_full_block((coral, 8), None, None, None, None, None)
-        if data == 2: # West
-            coral = img.rotate(180, Image.NEAREST)
-            img = self.build_full_block((coral, 8), None, None, None, None, None)
-        if data == 3: # North
-            coral = img.rotate(90, Image.NEAREST)
-            img = self.build_full_block((coral, 8), None, None, None, None, None)
-        if data == 4: # East
-            coral = img.rotate(0, Image.NONE)
-            img = self.build_full_block((coral, 8), None, None, None, None, None)
-
-    return img
-
-
-@material(blockid=list(range(1268, 1273)), data=list(range(5)), transparent=True)
+@material(blockid=[1262, 1263], data=list(range(0b111_11)), transparent=True)
 def wall_coral(self, blockid, data):
-    tex = self.load_image_texture(BLOCKTEXTURE + '%s_coral_fan.png' % coral_map[blockid - 1268])
+    # coral type is stored in bits 3, 4, and 5. Extract this and bitshift down.
+    coral_type = (data & 0b11100) >> 2
+
+    dead_prefix = "dead_" if blockid == 1262 else ""
+
+    if coral_type >= len(coral_map):
+        # oops. We've allocated 3 bits (8 values) for the 5-value array. There will be some unused data values.
+        return None
+
+    tex = self.load_image_texture(BLOCKTEXTURE + dead_prefix + '%s_coral_fan.png' % coral_map[coral_type])
     img = Image.new('RGBA', (16, 16), self.bgcolor)
     alpha_over(img, tex, (0, 0))
-    if self. rotation == 0: # north upper-left
-        if data == 1: # South
+
+    orientation = data & 0b00011
+
+    if self.rotation == 0:  # north upper-left
+        if orientation == 0:  # South
             coral = img.rotate(180, Image.NEAREST)
             img = self.build_full_block((coral, 8), None, None, None, None, None)
-        if data == 2: # West
+        if orientation == 1:  # West
             coral = img.rotate(90, Image.NEAREST)
             img = self.build_full_block((coral, 8), None, None, None, None, None)
-        if data == 3: # North
+        if orientation == 2:  # North
             coral = img.rotate(0, Image.NEAREST)
             img = self.build_full_block((coral, 8), None, None, None, None, None)
-        if data == 4: # East
+        if orientation == 3:  # East
             coral = img.rotate(270, Image.NONE)
             img = self.build_full_block((coral, 8), None, None, None, None, None)
-    if self.rotation == 1: # north upper-right
-        if data == 1: # South
+    if self.rotation == 1:  # north upper-right
+        if orientation == 0:  # South
             coral = img.rotate(90, Image.NEAREST)
             img = self.build_full_block((coral, 8), None, None, None, None, None)
-        if data == 2: # West
+        if orientation == 1:  # West
             coral = img.rotate(0, Image.NEAREST)
             img = self.build_full_block((coral, 8), None, None, None, None, None)
-        if data == 3: # North
+        if orientation == 2:  # North
             coral = img.rotate(270, Image.NEAREST)
             img = self.build_full_block((coral, 8), None, None, None, None, None)
-        if data == 4: # East
+        if orientation == 3:  # East
             coral = img.rotate(180, Image.NONE)
             img = self.build_full_block((coral, 8), None, None, None, None, None)
-    if self.rotation == 2: # north lower-right
-        if data == 1: # South
+    if self.rotation == 2:  # north lower-right
+        if orientation == 0:  # South
             coral = img.rotate(0, Image.NEAREST)
             img = self.build_full_block((coral, 8), None, None, None, None, None)
-        if data == 2: # West
+        if orientation == 1:  # West
             coral = img.rotate(270, Image.NEAREST)
             img = self.build_full_block((coral, 8), None, None, None, None, None)
-        if data == 3: # North
+        if orientation == 2:  # North
             coral = img.rotate(180, Image.NEAREST)
             img = self.build_full_block((coral, 8), None, None, None, None, None)
-        if data == 4: # East
+        if orientation == 3:  # East
             coral = img.rotate(90, Image.NONE)
             img = self.build_full_block((coral, 8), None, None, None, None, None)
-    if self.rotation == 3: # north lower-left
-        if data == 1: # South
+    if self.rotation == 3:  # north lower-left
+        if orientation == 0:  # South
             coral = img.rotate(270, Image.NEAREST)
             img = self.build_full_block((coral, 8), None, None, None, None, None)
-        if data == 2: # West
+        if orientation == 1:  # West
             coral = img.rotate(180, Image.NEAREST)
             img = self.build_full_block((coral, 8), None, None, None, None, None)
-        if data == 3: # North
+        if orientation == 2:  # North
             coral = img.rotate(90, Image.NEAREST)
             img = self.build_full_block((coral, 8), None, None, None, None, None)
-        if data == 4: # East
+        if orientation == 3:  # East
             coral = img.rotate(0, Image.NONE)
             img = self.build_full_block((coral, 8), None, None, None, None, None)
 
     return img
+
 
 # Bed
 @material(blockid=26, data=list(range(256)), transparent=True, nospawn=True)

@@ -1338,8 +1338,8 @@ class RegionSet(object):
             self._blockmap['minecraft:dead_%s_coral_fan' % coral_list[i]] = (1238, i)
             self._blockmap['minecraft:%s_coral' % coral_list[i]] = (1249, i)
             self._blockmap['minecraft:%s_coral_fan' % coral_list[i]] = (1250, i)
-            self._blockmap['minecraft:dead_%s_coral_wall_fan' % coral_list[i]] = (1262 + i, 0)
-            self._blockmap['minecraft:%s_coral_wall_fan' % coral_list[i]] = (1268 + i, 0)
+            self._blockmap['minecraft:dead_%s_coral_wall_fan' % coral_list[i]] = (1262, i)
+            self._blockmap['minecraft:%s_coral_wall_fan' % coral_list[i]] = (1263, i)
 
     # Re-initialize upon unpickling
     def __getstate__(self):
@@ -1827,14 +1827,18 @@ class RegionSet(object):
             facing = p['facing']
             if p['waterlogged'] == 'true':
                 block = 8
+
+            # shift up so we can squeeze orientation in the lowest two bits
+            data = data << 2
+
             if facing == 'north':
-                data = 3
-            if facing == 'east':
-                data = 4
-            if facing == 'south':
-                data = 1
-            if facing == 'west':
-                data = 2
+                data |= 2
+            elif facing == 'east':
+                data |= 3
+            elif facing == 'south':
+                data |= 0
+            elif facing == 'west':
+                data |= 1
 
         elif (key.endswith('_coral') or key.endswith('fan')):
             if palette_entry['Properties']['waterlogged'] == 'true':
