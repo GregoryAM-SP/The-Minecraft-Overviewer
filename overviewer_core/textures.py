@@ -1326,7 +1326,8 @@ def coral(self, blockid, data):
     elif blockid == 1250: # coral fan
         tex = self.load_image_texture(BLOCKTEXTURE + '%s_coral_fan.png' % coral_map[data])
         return self.build_sprite(tex)
-    
+
+
 @material(blockid=[1262, 1263], data=list(range(0b111_11)), transparent=True)
 def wall_coral(self, blockid, data):
     # coral type is stored in bits 3, 4, and 5. Extract this and bitshift down.
@@ -1343,59 +1344,20 @@ def wall_coral(self, blockid, data):
     alpha_over(img, tex, (0, 0))
 
     orientation = data & 0b00011
+    # orientation and self.rotation both turn the world in the same direction, so we can just add them together and
+    # make sure it wraps around via modulo.
+    orientation = (orientation + self.rotation) % 4
 
-    if self.rotation == 0:  # north upper-left
-        if orientation == 0:  # South
-            coral = img.rotate(180, Image.NEAREST)
-            img = self.build_full_block((coral, 8), None, None, None, None, None)
-        if orientation == 1:  # West
-            coral = img.rotate(90, Image.NEAREST)
-            img = self.build_full_block((coral, 8), None, None, None, None, None)
-        if orientation == 2:  # North
-            coral = img.rotate(0, Image.NEAREST)
-            img = self.build_full_block((coral, 8), None, None, None, None, None)
-        if orientation == 3:  # East
-            coral = img.rotate(270, Image.NONE)
-            img = self.build_full_block((coral, 8), None, None, None, None, None)
-    if self.rotation == 1:  # north upper-right
-        if orientation == 0:  # South
-            coral = img.rotate(90, Image.NEAREST)
-            img = self.build_full_block((coral, 8), None, None, None, None, None)
-        if orientation == 1:  # West
-            coral = img.rotate(0, Image.NEAREST)
-            img = self.build_full_block((coral, 8), None, None, None, None, None)
-        if orientation == 2:  # North
-            coral = img.rotate(270, Image.NEAREST)
-            img = self.build_full_block((coral, 8), None, None, None, None, None)
-        if orientation == 3:  # East
-            coral = img.rotate(180, Image.NONE)
-            img = self.build_full_block((coral, 8), None, None, None, None, None)
-    if self.rotation == 2:  # north lower-right
-        if orientation == 0:  # South
-            coral = img.rotate(0, Image.NEAREST)
-            img = self.build_full_block((coral, 8), None, None, None, None, None)
-        if orientation == 1:  # West
-            coral = img.rotate(270, Image.NEAREST)
-            img = self.build_full_block((coral, 8), None, None, None, None, None)
-        if orientation == 2:  # North
-            coral = img.rotate(180, Image.NEAREST)
-            img = self.build_full_block((coral, 8), None, None, None, None, None)
-        if orientation == 3:  # East
-            coral = img.rotate(90, Image.NONE)
-            img = self.build_full_block((coral, 8), None, None, None, None, None)
-    if self.rotation == 3:  # north lower-left
-        if orientation == 0:  # South
-            coral = img.rotate(270, Image.NEAREST)
-            img = self.build_full_block((coral, 8), None, None, None, None, None)
-        if orientation == 1:  # West
-            coral = img.rotate(180, Image.NEAREST)
-            img = self.build_full_block((coral, 8), None, None, None, None, None)
-        if orientation == 2:  # North
-            coral = img.rotate(90, Image.NEAREST)
-            img = self.build_full_block((coral, 8), None, None, None, None, None)
-        if orientation == 3:  # East
-            coral = img.rotate(0, Image.NONE)
-            img = self.build_full_block((coral, 8), None, None, None, None, None)
+    if orientation == 0:  # South
+        coral = img.rotate(180, Image.NEAREST)
+    if orientation == 1:  # West
+        coral = img.rotate(90, Image.NEAREST)
+    if orientation == 2:  # North
+        coral = img.rotate(0, Image.NEAREST)
+    if orientation == 3:  # East
+        coral = img.rotate(270, Image.NONE)
+
+    img = self.build_full_block((coral, 8), None, None, None, None, None)
 
     return img
 
