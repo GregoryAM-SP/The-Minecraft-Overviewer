@@ -1329,8 +1329,8 @@ class RegionSet(object):
             self._blockmap['minecraft:%s_glazed_terracotta'  % colors[i]] = (235 + i, 0)
             self._blockmap['minecraft:%s_concrete'           % colors[i]] = (251, i)
             self._blockmap['minecraft:%s_concrete_powder'    % colors[i]] = (252, i)
-            self._blockmap['minecraft:%s_candle'             % colors[i]] = (1269 + i, 0)
-            self._blockmap['minecraft:%s_candle_cake'        % colors[i]] = (1286 + i, 0)
+            self._blockmap['minecraft:%s_candle'             % colors[i]] = (1265, i)
+            self._blockmap['minecraft:%s_candle_cake'        % colors[i]] = (1264, i)
 
         coral_list = [ 'tube', 'brain', 'bubble', 'fire', 'horn']
         for i in range(len(coral_list)):
@@ -1844,6 +1844,30 @@ class RegionSet(object):
             if palette_entry['Properties']['waterlogged'] == 'true':
                 block = 8
 
+        elif key.endswith('_candle') or key == 'minecraft:candle':
+            # intentionally excludes non-coloured candles
+            # data:
+            #   first 4 bits == colour
+            #   next 2 bits == number of candles
+            #   next 1 bit == list
+
+            p = palette_entry['Properties']
+            if p['waterlogged'] == 'true':
+                block = 8
+            else:
+                data |= (int(p['candles']) - 1) << 4
+
+                if p['lit'] == 'true':
+                    data |= 1 << 6
+        elif key.endswith('_candle_cake'):
+            # intentionally excludes non-coloured candles
+            # data:
+            #   first 4 bits == colour
+            #   next 1 bit == list
+
+            p = palette_entry['Properties']
+            if p['lit'] == 'true':
+                data |= 1 << 4
 
         return (block, data)
 
