@@ -7254,21 +7254,51 @@ def simple_wall_heads(self, blockid, data):
 
     full_tex = self.load_image("assets/minecraft/textures/entity/" + textures[blockid] + ".png").copy()
 
-    top = full_tex.crop((8, 0, 16, 8))
-    bottom = full_tex.crop((16, 0, 24, 8))
-    left = full_tex.crop((0, 8, 8, 16))
-    front = full_tex.crop((8, 8, 16, 16))
-    right = full_tex.crop((16, 8, 24, 16))
-    back = full_tex.crop((24, 8, 32, 16))
+    top = Image.new("RGBA", (16, 16), self.bgcolor)
+    alpha_over(top, full_tex.crop((8, 0, 16, 8)), (4, 0))
+
+    left = Image.new("RGBA", (16, 16), self.bgcolor)
+    alpha_over(left, full_tex.crop((0, 8, 8, 16)), (0, 4))
+
+    front = Image.new("RGBA", (16, 16), self.bgcolor)
+    alpha_over(front, full_tex.crop((8, 8, 16, 16)), (4, 4))
+
+    right = Image.new("RGBA", (16, 16), self.bgcolor)
+    alpha_over(right, full_tex.crop((16, 8, 24, 16)), (8, 4))
+
+    back = Image.new("RGBA", (16, 16), self.bgcolor)
+    alpha_over(back, full_tex.crop((24, 8, 32, 16)), (4, 4))
 
     sides = [left, front, right, back]
 
-    direction = data + self.rotation
+    direction = (data + self.rotation) % 4
     for i in range(direction):
         sides = sides[1:] + sides[:1]
         top = top.rotate(270)
 
-    return self.build_full_block(top, sides[2], sides[3], sides[0], sides[1].transpose(Image.FLIP_LEFT_RIGHT), bottom)
+    # visible is sides[0] (bottom left) and sides[1] (bottom right)
+    top = self.transform_image_top(top)
+    left_side = self.transform_image_side(sides[0])
+    right_side = self.transform_image_side(sides[1].transpose(Image.FLIP_LEFT_RIGHT)).transpose(Image.FLIP_LEFT_RIGHT)
+
+    img = Image.new("RGBA", (24, 24), self.bgcolor)
+
+    alpha_over(img, top, (0, 3))
+
+    if direction == 0:
+        alpha_over(img, left_side, (3, 4))
+        alpha_over(img, right_side, (6, 3))
+    if direction == 1:
+        alpha_over(img, left_side, (6, 3))
+        alpha_over(img, right_side, (9, 4))
+    if direction == 2:
+        alpha_over(img, left_side, (3, 4))
+        alpha_over(img, right_side, (12, 6))
+    if direction == 3:
+        alpha_over(img, left_side, (0, 6))
+        alpha_over(img, right_side, (9, 4))
+
+    return img
 
 
 @material(blockid=[1270, 1271, 1272, 1273, 1282], data=list(range(16)), transparent=True)
@@ -7299,10 +7329,12 @@ def simple_heads(self, blockid, data):
 
     return self.build_full_block(top, sides[2], sides[3], sides[0], sides[1].transpose(Image.FLIP_LEFT_RIGHT), bottom)
 
+
 @material(blockid=[], data=[0], transparent=True)
 def difficult_heads(self, blockid, data):
     # Non-rendering
     return None
+
 
 sprite(blockid=11385, imagename=BLOCKTEXTURE + "oak_sapling.png")
 sprite(blockid=11386, imagename=BLOCKTEXTURE + "spruce_sapling.png")
