@@ -666,20 +666,7 @@ class RegionSet(object):
             'minecraft:carrots': (141, 0),
             'minecraft:potatoes': (142, 0),
             'minecraft:oak_button': (143, 0),
-            'minecraft:skeleton_skull': (144, 0),  # not rendering
-            'minecraft:wither_skeleton_skull': (144, 1),   # not rendering
-            'minecraft:zombie_head': (144, 2),     # not rendering
-            'minecraft:player_head': (144, 3),     # not rendering
-            'minecraft:creeper_head': (144, 4),    # not rendering
-            'minecraft:dragon_head': (144, 5),     # not rendering
-            'minecraft:creeper_wall_head': (144, 6),
-            'minecraft:dragon_wall_head': (144, 7),
-            'minecraft:piglin_head': (144, 8),
-            'minecraft:piglin_wall_head': (144, 9),
-            'minecraft:zombie_wall_head': (144, 10),
-            'minecraft:player_wall_head': (144, 11),
-            'minecraft:skeleton_wall_skull': (144, 12),
-            'minecraft:wither_skeleton_wall_skull': (144, 13),
+
             'minecraft:anvil': (145, 0),
             'minecraft:chipped_anvil': (145, 4),
             'minecraft:damaged_anvil': (145, 8),
@@ -1303,6 +1290,22 @@ class RegionSet(object):
             'minecraft:bubble_column': (1260, 0),
             'minecraft:candle': (1261, 0),
 
+            # Heads
+            'minecraft:skeleton_skull': (1270, 0),
+            'minecraft:wither_skeleton_skull': (1271, 0),
+            'minecraft:zombie_head': (1272, 0),
+            'minecraft:creeper_head': (1273, 0),
+            'minecraft:piglin_head': (1274, 0),
+            'minecraft:dragon_head': (1275, 0),
+            'minecraft:skeleton_wall_skull': (1276, 0),
+            'minecraft:wither_skeleton_wall_skull': (1277, 0),
+            'minecraft:zombie_wall_head': (1278, 0),
+            'minecraft:creeper_wall_head': (1279, 0),
+            'minecraft:piglin_wall_head': (1280, 0),
+            'minecraft:dragon_wall_head': (1281, 0),
+            'minecraft:player_head': (1282, 0),
+            'minecraft:player_wall_head': (1283, 0),
+
             # Including these blocks ensures that no namespaces are omitted.
             # Add the following to the end of this block map; they serve no purpose.
             'minecraft:barrier': (99999, 0),
@@ -1868,6 +1871,13 @@ class RegionSet(object):
             p = palette_entry['Properties']
             if p['lit'] == 'true':
                 data |= 1 << 4
+
+        elif key.endswith('_wall_head') or key.endswith('_wall_skull'):
+            facing = palette_entry['Properties']['facing']
+            data = {'south': 0, 'west': 1, 'north': 2, 'east': 3}[facing]
+
+        elif key.endswith('_head') or key.endswith('_skull'):
+            data = int(palette_entry['Properties']['rotation'])
 
         return (block, data)
 

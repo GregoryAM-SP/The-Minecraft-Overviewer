@@ -7241,6 +7241,69 @@ def vault(self, blockid, data):
     # Placeholder for when this is included in a released version of Minecraft
     return None
 
+
+@material(blockid=[1276, 1277, 1278, 1279, 1283], data=list(range(4)), transparent=True)
+def simple_wall_heads(self, blockid, data):
+    textures = {
+        1276: "skeleton/skeleton",
+        1277: "skeleton/wither_skeleton",
+        1278: "zombie/zombie",
+        1279: "creeper/creeper",
+        1283: "player/wide/steve",
+    }
+
+    full_tex = self.load_image("assets/minecraft/textures/entity/" + textures[blockid] + ".png").copy()
+
+    top = full_tex.crop((8, 0, 16, 8))
+    bottom = full_tex.crop((16, 0, 24, 8))
+    left = full_tex.crop((0, 8, 8, 16))
+    front = full_tex.crop((8, 8, 16, 16))
+    right = full_tex.crop((16, 8, 24, 16))
+    back = full_tex.crop((24, 8, 32, 16))
+
+    sides = [left, front, right, back]
+
+    direction = data + self.rotation
+    for i in range(direction):
+        sides = sides[1:] + sides[:1]
+        top = top.rotate(270)
+
+    return self.build_full_block(top, sides[2], sides[3], sides[0], sides[1].transpose(Image.FLIP_LEFT_RIGHT), bottom)
+
+
+@material(blockid=[1270, 1271, 1272, 1273, 1282], data=list(range(16)), transparent=True)
+def simple_heads(self, blockid, data):
+    textures = {
+        1270: "skeleton/skeleton",
+        1271: "skeleton/wither_skeleton",
+        1272: "zombie/zombie",
+        1273: "creeper/creeper",
+        1282: "player/wide/steve",
+    }
+
+    full_tex = self.load_image("assets/minecraft/textures/entity/" + textures[blockid] + ".png").copy()
+
+    top = full_tex.crop((8, 0, 16, 8))
+    bottom = full_tex.crop((16, 0, 24, 8))
+    left = full_tex.crop((0, 8, 8, 16))
+    front = full_tex.crop((8, 8, 16, 16))
+    right = full_tex.crop((16, 8, 24, 16))
+    back = full_tex.crop((24, 8, 32, 16))
+
+    sides = [left, front, right, back]
+
+    direction = (round(data / 4) + self.rotation + 2) % 4
+    for i in range(direction):
+        sides = sides[1:] + sides[:1]
+        top = top.rotate(270)
+
+    return self.build_full_block(top, sides[2], sides[3], sides[0], sides[1].transpose(Image.FLIP_LEFT_RIGHT), bottom)
+
+@material(blockid=[], data=[0], transparent=True)
+def difficult_heads(self, blockid, data):
+    # Non-rendering
+    return None
+
 sprite(blockid=11385, imagename=BLOCKTEXTURE + "oak_sapling.png")
 sprite(blockid=11386, imagename=BLOCKTEXTURE + "spruce_sapling.png")
 sprite(blockid=11387, imagename=BLOCKTEXTURE + "birch_sapling.png")
