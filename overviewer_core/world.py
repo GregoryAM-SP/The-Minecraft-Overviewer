@@ -777,6 +777,7 @@ class RegionSet(object):
             'minecraft:beetroots': (207, 0),
             'minecraft:dirt_path': (208, 0),
             'minecraft:grass_path': (208, 0),   # compatibility
+            'minecraft:end_gateway': (209, 0),
             'minecraft:repeating_command_block': (210, 0),
             'minecraft:chain_command_block': (211, 0),
             'minecraft:frosted_ice': (212, 0),
@@ -1311,7 +1312,6 @@ class RegionSet(object):
             'minecraft:barrier': (99999, 0),
             'minecraft:light': (99999, 1),
             'minecraft:moving_piston': (99999, 2),
-            'minecraft:end_gateway': (99999, 3),
             'minecraft:structure_void': (99999, 4),
             
         }
