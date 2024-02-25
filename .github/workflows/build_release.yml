@@ -10,7 +10,7 @@ env:
 
 jobs:
   build_and_release_windows:
-    runs-on: windows-latest
+    runs-on: windows-2022
     if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.START_BUILD == 'True'
 
     steps:
@@ -74,7 +74,7 @@ jobs:
         upload_url: ${{ steps.create_release_windows.outputs.upload_url }}
 
   build_and_release_linux:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: build_and_release_windows
     if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.START_BUILD == 'True'
         

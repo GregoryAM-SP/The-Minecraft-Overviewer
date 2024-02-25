@@ -31,7 +31,6 @@ from . import util
 
 
 BLOCKTEXTURE = "assets/minecraft/textures/block/"
-CANDLETEXTURE = "assets/minecraft/textures/item/"
 
 # global variables to collate information in @material decorators
 blockmap_generators = {}
@@ -7046,14 +7045,22 @@ def spore_blossom(self, blockid, data):
     return img
 
 # candle cakes
-@material(blockid=list(range(1286, 1302)) + [1259], data=list(range(16)), transparent=True, nospawn=True)
+@material(blockid=[1259, 1264], data=list(range(0b1_1111)), transparent=True, nospawn=True)
 def candle_cakes(self, blockid, data):
     top = self.load_image_texture(BLOCKTEXTURE + "cake_top.png").copy()
     side = self.load_image_texture(BLOCKTEXTURE + "cake_side.png").copy()
-    if blockid == 1259:
-        candle = self.load_image_texture(CANDLETEXTURE + "candle.png")
-    elif blockid in range(1286, 1302):
-        candle = self.load_image_texture(CANDLETEXTURE + "%s_candle.png" % color_map[blockid - 1286])
+
+    candle_texture_name = "candle"
+
+    if blockid == 1264:
+        candle_texture_name = ("%s_" % color_map[data & 0b01111]) + candle_texture_name
+
+    if data & 0b10000 > 0:
+        # candle is lit. This gives a different texture... might as well use it.
+        candle_texture_name = candle_texture_name + "_lit"
+
+    candle_texture = self.load_image_texture(BLOCKTEXTURE + candle_texture_name + ".png").copy()
+    single_candle = generate_single_candle(candle_texture, self)
 
     img = Image.new("RGBA", (24, 24), self.bgcolor)
     if self.rotation in range(0, 3):
@@ -7072,19 +7079,70 @@ def candle_cakes(self, blockid, data):
         alpha_over(img, otherside, (11, 5), otherside)  # workaround, fixes a hole
         alpha_over(img, otherside, (12, 6), otherside)
         alpha_over(img, top, (0, 6), top)
-        alpha_over(img, candle, (3, -2), candle)
+        alpha_over(img, single_candle, (11, 7))
 
     return img
 
 #candles
-@material(blockid=list(range(1269, 1285)) + [1261], data=list(range(16)))
+@material(blockid=[1261, 1265], data=list(range(128)), transparent=True)
 def candles(self, blockid, data):
-    if blockid == 1261:
-        candle = self.load_image_texture(CANDLETEXTURE + "candle.png")
-    elif blockid in range(1269, 1285):
-        candle = self.load_image_texture(CANDLETEXTURE + "%s_candle.png" % color_map[blockid - 1269])
+    texture_name = "candle"
 
-    return candle
+    if blockid == 1265:
+        texture_name = ("%s_" % color_map[data & 0b0001111]) + texture_name
+
+    if data & 0b1000000 > 0:
+        # candle is lit. This gives a different texture... might as well use it.
+        texture_name = texture_name + "_lit"
+
+    candle_texture = self.load_image_texture(BLOCKTEXTURE + texture_name + ".png").copy()
+
+    single_candle = generate_single_candle(candle_texture, self)
+
+    render = Image.new("RGBA", (24, 24), self.bgcolor)
+
+    fork_handles = (data & 0b0110000) >> 4
+    if fork_handles == 0:
+        alpha_over(render, single_candle, (11, 13))
+    elif fork_handles == 1:
+        alpha_over(render, single_candle, (8, 14))
+        alpha_over(render, single_candle, (12, 12))
+    elif fork_handles == 2:
+        alpha_over(render, single_candle, (7, 13))
+        alpha_over(render, single_candle, (11, 11))
+        alpha_over(render, single_candle, (12, 15))
+    elif fork_handles == 3:
+        alpha_over(render, single_candle, (7, 13))
+        alpha_over(render, single_candle, (11, 11))
+        alpha_over(render, single_candle, (10, 15))
+        alpha_over(render, single_candle, (14, 13))
+
+    return render
+
+
+def generate_single_candle(candle_texture, self):
+    candle_wick = candle_texture.crop((0, 5, 1, 6))
+    candle_top = candle_texture.crop((0, 6, 2, 8))
+    candle_side = candle_texture.crop((0, 9, 2, 14))
+
+    candle_side_img = Image.new("RGBA", (16, 16), self.bgcolor)
+    alpha_over(candle_side_img, candle_side)
+    candle_side_img = self.transform_image_side(candle_side_img)
+    candle_other_side = candle_side_img.copy().transpose(Image.FLIP_LEFT_RIGHT)
+
+    candle_top_img = Image.new("RGBA", (16, 16), self.bgcolor)
+    alpha_over(candle_top_img, candle_top)
+    candle_top_img = self.transform_image_top(candle_top_img)
+
+    single_candle = Image.new("RGBA", (3, 7), self.bgcolor)
+
+    alpha_over(single_candle, candle_side_img, (0, 1))
+    alpha_over(single_candle, candle_other_side, (-9, 1))
+    alpha_over(single_candle, candle_top_img, (0, -5))
+    alpha_over(single_candle, candle_wick, (1, 0))
+
+    return single_candle
+
 
 @material(blockid=[12650, 12651, 12652, 12653], data=list(range(1 << 2)), transparent=False)
 def copper_bulb(self, blockid, data):
@@ -7186,6 +7244,101 @@ def trial_spawner(self, blockid, data):
 def vault(self, blockid, data):
     # Placeholder for when this is included in a released version of Minecraft
     return None
+
+
+@material(blockid=[1276, 1277, 1278, 1279, 1283], data=list(range(4)), transparent=True)
+def simple_wall_heads(self, blockid, data):
+    textures = {
+        1276: "skeleton/skeleton",
+        1277: "skeleton/wither_skeleton",
+        1278: "zombie/zombie",
+        1279: "creeper/creeper",
+        1283: "player/wide/steve",
+    }
+
+    full_tex = self.load_image("assets/minecraft/textures/entity/" + textures[blockid] + ".png").copy()
+
+    top = Image.new("RGBA", (16, 16), self.bgcolor)
+    alpha_over(top, full_tex.crop((8, 0, 16, 8)), (4, 0))
+
+    left = Image.new("RGBA", (16, 16), self.bgcolor)
+    alpha_over(left, full_tex.crop((0, 8, 8, 16)), (0, 4))
+
+    front = Image.new("RGBA", (16, 16), self.bgcolor)
+    alpha_over(front, full_tex.crop((8, 8, 16, 16)), (4, 4))
+
+    right = Image.new("RGBA", (16, 16), self.bgcolor)
+    alpha_over(right, full_tex.crop((16, 8, 24, 16)), (8, 4))
+
+    back = Image.new("RGBA", (16, 16), self.bgcolor)
+    alpha_over(back, full_tex.crop((24, 8, 32, 16)), (4, 4))
+
+    sides = [left, front, right, back]
+
+    direction = (data + self.rotation) % 4
+    for i in range(direction):
+        sides = sides[1:] + sides[:1]
+        top = top.rotate(270)
+
+    # visible is sides[0] (bottom left) and sides[1] (bottom right)
+    top = self.transform_image_top(top)
+    left_side = self.transform_image_side(sides[0])
+    right_side = self.transform_image_side(sides[1].transpose(Image.FLIP_LEFT_RIGHT)).transpose(Image.FLIP_LEFT_RIGHT)
+
+    img = Image.new("RGBA", (24, 24), self.bgcolor)
+
+    alpha_over(img, top, (0, 3))
+
+    if direction == 0:
+        alpha_over(img, left_side, (3, 4))
+        alpha_over(img, right_side, (6, 3))
+    if direction == 1:
+        alpha_over(img, left_side, (6, 3))
+        alpha_over(img, right_side, (9, 4))
+    if direction == 2:
+        alpha_over(img, left_side, (3, 4))
+        alpha_over(img, right_side, (12, 6))
+    if direction == 3:
+        alpha_over(img, left_side, (0, 6))
+        alpha_over(img, right_side, (9, 4))
+
+    return img
+
+
+@material(blockid=[1270, 1271, 1272, 1273, 1282], data=list(range(16)), transparent=True)
+def simple_heads(self, blockid, data):
+    textures = {
+        1270: "skeleton/skeleton",
+        1271: "skeleton/wither_skeleton",
+        1272: "zombie/zombie",
+        1273: "creeper/creeper",
+        1282: "player/wide/steve",
+    }
+
+    full_tex = self.load_image("assets/minecraft/textures/entity/" + textures[blockid] + ".png").copy()
+
+    top = full_tex.crop((8, 0, 16, 8))
+    bottom = full_tex.crop((16, 0, 24, 8))
+    left = full_tex.crop((0, 8, 8, 16))
+    front = full_tex.crop((8, 8, 16, 16))
+    right = full_tex.crop((16, 8, 24, 16))
+    back = full_tex.crop((24, 8, 32, 16))
+
+    sides = [left, front, right, back]
+
+    direction = (round(data / 4) + self.rotation + 2) % 4
+    for i in range(direction):
+        sides = sides[1:] + sides[:1]
+        top = top.rotate(270)
+
+    return self.build_full_block(top, sides[2], sides[3], sides[0], sides[1].transpose(Image.FLIP_LEFT_RIGHT), bottom)
+
+
+@material(blockid=[], data=[0], transparent=True)
+def difficult_heads(self, blockid, data):
+    # Non-rendering
+    return None
+
 
 sprite(blockid=11385, imagename=BLOCKTEXTURE + "oak_sapling.png")
 sprite(blockid=11386, imagename=BLOCKTEXTURE + "spruce_sapling.png")

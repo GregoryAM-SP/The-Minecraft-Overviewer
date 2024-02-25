@@ -666,20 +666,7 @@ class RegionSet(object):
             'minecraft:carrots': (141, 0),
             'minecraft:potatoes': (142, 0),
             'minecraft:oak_button': (143, 0),
-            'minecraft:skeleton_skull': (144, 0),  # not rendering
-            'minecraft:wither_skeleton_skull': (144, 1),   # not rendering
-            'minecraft:zombie_head': (144, 2),     # not rendering
-            'minecraft:player_head': (144, 3),     # not rendering
-            'minecraft:creeper_head': (144, 4),    # not rendering
-            'minecraft:dragon_head': (144, 5),     # not rendering
-            'minecraft:creeper_wall_head': (144, 6),
-            'minecraft:dragon_wall_head': (144, 7),
-            'minecraft:piglin_head': (144, 8),
-            'minecraft:piglin_wall_head': (144, 9),
-            'minecraft:zombie_wall_head': (144, 10),
-            'minecraft:player_wall_head': (144, 11),
-            'minecraft:skeleton_wall_skull': (144, 12),
-            'minecraft:wither_skeleton_wall_skull': (144, 13),
+
             'minecraft:anvil': (145, 0),
             'minecraft:chipped_anvil': (145, 4),
             'minecraft:damaged_anvil': (145, 8),
@@ -790,6 +777,7 @@ class RegionSet(object):
             'minecraft:beetroots': (207, 0),
             'minecraft:dirt_path': (208, 0),
             'minecraft:grass_path': (208, 0),   # compatibility
+            'minecraft:end_gateway': (209, 0),
             'minecraft:repeating_command_block': (210, 0),
             'minecraft:chain_command_block': (211, 0),
             'minecraft:frosted_ice': (212, 0),
@@ -1303,12 +1291,27 @@ class RegionSet(object):
             'minecraft:bubble_column': (1260, 0),
             'minecraft:candle': (1261, 0),
 
+            # Heads
+            'minecraft:skeleton_skull': (1270, 0),
+            'minecraft:wither_skeleton_skull': (1271, 0),
+            'minecraft:zombie_head': (1272, 0),
+            'minecraft:creeper_head': (1273, 0),
+            'minecraft:piglin_head': (1274, 0),
+            'minecraft:dragon_head': (1275, 0),
+            'minecraft:skeleton_wall_skull': (1276, 0),
+            'minecraft:wither_skeleton_wall_skull': (1277, 0),
+            'minecraft:zombie_wall_head': (1278, 0),
+            'minecraft:creeper_wall_head': (1279, 0),
+            'minecraft:piglin_wall_head': (1280, 0),
+            'minecraft:dragon_wall_head': (1281, 0),
+            'minecraft:player_head': (1282, 0),
+            'minecraft:player_wall_head': (1283, 0),
+
             # Including these blocks ensures that no namespaces are omitted.
             # Add the following to the end of this block map; they serve no purpose.
             'minecraft:barrier': (99999, 0),
             'minecraft:light': (99999, 1),
             'minecraft:moving_piston': (99999, 2),
-            'minecraft:end_gateway': (99999, 3),
             'minecraft:structure_void': (99999, 4),
             
         }
@@ -1329,8 +1332,8 @@ class RegionSet(object):
             self._blockmap['minecraft:%s_glazed_terracotta'  % colors[i]] = (235 + i, 0)
             self._blockmap['minecraft:%s_concrete'           % colors[i]] = (251, i)
             self._blockmap['minecraft:%s_concrete_powder'    % colors[i]] = (252, i)
-            self._blockmap['minecraft:%s_candle'             % colors[i]] = (1269 + i, 0)
-            self._blockmap['minecraft:%s_candle_cake'        % colors[i]] = (1286 + i, 0)
+            self._blockmap['minecraft:%s_candle'             % colors[i]] = (1265, i)
+            self._blockmap['minecraft:%s_candle_cake'        % colors[i]] = (1264, i)
 
         coral_list = [ 'tube', 'brain', 'bubble', 'fire', 'horn']
         for i in range(len(coral_list)):
@@ -1844,6 +1847,7 @@ class RegionSet(object):
             if palette_entry['Properties']['waterlogged'] == 'true':
                 block = 8
 
+<<<<<<< HEAD
         elif key == "minecraft:sniffer_egg":
             p = palette_entry['Properties']
             if p['hatch'] == '0':
@@ -1853,6 +1857,39 @@ class RegionSet(object):
             if p['hatch'] == '2':
                 data = 2
 
+=======
+        elif key.endswith('_candle') or key == 'minecraft:candle':
+            # intentionally excludes non-coloured candles
+            # data:
+            #   first 4 bits == colour
+            #   next 2 bits == number of candles
+            #   next 1 bit == list
+
+            p = palette_entry['Properties']
+            if p['waterlogged'] == 'true':
+                block = 8
+            else:
+                data |= (int(p['candles']) - 1) << 4
+
+                if p['lit'] == 'true':
+                    data |= 1 << 6
+        elif key.endswith('_candle_cake'):
+            # intentionally excludes non-coloured candles
+            # data:
+            #   first 4 bits == colour
+            #   next 1 bit == list
+
+            p = palette_entry['Properties']
+            if p['lit'] == 'true':
+                data |= 1 << 4
+
+        elif key.endswith('_wall_head') or key.endswith('_wall_skull'):
+            facing = palette_entry['Properties']['facing']
+            data = {'south': 0, 'west': 1, 'north': 2, 'east': 3}[facing]
+
+        elif key.endswith('_head') or key.endswith('_skull'):
+            data = int(palette_entry['Properties']['rotation'])
+>>>>>>> 6055bd17eb112df46a9e5bbb609345c1e73d675e
 
         return (block, data)
 
