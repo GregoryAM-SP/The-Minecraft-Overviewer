@@ -1844,6 +1844,15 @@ class RegionSet(object):
             if palette_entry['Properties']['waterlogged'] == 'true':
                 block = 8
 
+        elif key == "minecraft:sniffer_egg":
+            p = palette_entry['Properties']
+            if p['hatch'] == '0':
+                data = 0
+            if p['hatch'] == '1':
+                data = 1
+            if p['hatch'] == '2':
+                data = 2
+
 
         return (block, data)
 

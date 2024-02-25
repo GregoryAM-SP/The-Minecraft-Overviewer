@@ -729,10 +729,6 @@ class Textures(object):
 
             alpha_over(img, side2, (12,0), side2)
 
-        if bottom is not None :
-            bottom = self.transform_image_top(bottom)
-            alpha_over(img, bottom, (0,12), bottom)
-
         # front sides
         if side3 is not None :
             side3 = self.transform_image_side(side3)
@@ -754,6 +750,10 @@ class Textures(object):
             side4.putalpha(sidealpha)
 
             alpha_over(img, side4, (12,6), side4)
+
+        if bottom is not None :
+            bottom = self.transform_image_top(bottom)
+            alpha_over(img, bottom, (0,12), bottom)
 
         if top is not None :
             top = self.transform_image_top(top)
@@ -6256,12 +6256,11 @@ def jigsaw_block(self, blockid, data):
     return img
 
 # beetroots(207), berry bushes (11505)
-@material(blockid=[207, 11505], data=list(range(4)), transparent=True, nospawn=True)
+@material(blockid=207, data=list(range(4)), transparent=True, nospawn=True)
 def crops(self, blockid, data):
 
     crops_id_to_tex = {
-        207: BLOCKTEXTURE + "beetroots_stage%d.png",
-      11505: BLOCKTEXTURE + "sweet_berry_bush_stage%d.png",
+        207: BLOCKTEXTURE + "beetroots_stage%d.png"
     }
 
     raw_crop = self.load_image_texture(crops_id_to_tex[blockid] % data)
@@ -6274,6 +6273,11 @@ def crops(self, blockid, data):
     alpha_over(img, crop2, (6,3), crop2)
     alpha_over(img, crop3, (6,3), crop3)
     return img
+
+@material(blockid=11505, data=list(range(4)), transparent=True, nospawn=True)
+def sweet_berry_bush(self, blockid, data):
+    bush = self.load_image_texture(BLOCKTEXTURE + "sweet_berry_bush_stage%d.png" % data)
+    return self.build_sprite(bush)
 
 # Concrete
 @material(blockid=251, data=list(range(16)), solid=True)
