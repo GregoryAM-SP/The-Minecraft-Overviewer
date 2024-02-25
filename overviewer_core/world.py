@@ -1847,17 +1847,6 @@ class RegionSet(object):
             if palette_entry['Properties']['waterlogged'] == 'true':
                 block = 8
 
-<<<<<<< HEAD
-        elif key == "minecraft:sniffer_egg":
-            p = palette_entry['Properties']
-            if p['hatch'] == '0':
-                data = 0
-            if p['hatch'] == '1':
-                data = 1
-            if p['hatch'] == '2':
-                data = 2
-
-=======
         elif key.endswith('_candle') or key == 'minecraft:candle':
             # intentionally excludes non-coloured candles
             # data:
@@ -1889,7 +1878,16 @@ class RegionSet(object):
 
         elif key.endswith('_head') or key.endswith('_skull'):
             data = int(palette_entry['Properties']['rotation'])
->>>>>>> 6055bd17eb112df46a9e5bbb609345c1e73d675e
+
+        elif key == "minecraft:sniffer_egg":
+            p = palette_entry['Properties']
+            if p['hatch'] == 0:
+                data = 0
+            if p['hatch'] == 1:
+                data = 1
+            if p['hatch'] == 2:
+                data = 2
+
 
         return (block, data)
 
