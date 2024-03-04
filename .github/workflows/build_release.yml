@@ -106,9 +106,9 @@ jobs:
       - name: Create tar.xz archive for Linux
         run: |
             cd dist
-            tar -cf overviewer-${{ env.VERSION }}-linux.tar overviewer
-            xz -z overviewer-${{ env.VERSION }}-linux.tar
-            mv overviewer-${{ env.VERSION }}-linux.tar.xz ../overviewer-${{ env.VERSION }}-linux.tar.xz
+            tar -cf overviewer-${{ env.VERSION }}-LINUX.tar overviewer
+            xz -z overviewer-${{ env.VERSION }}-LINUX.tar
+            mv overviewer-${{ env.VERSION }}-LINUX.tar.xz ../overviewer-${{ env.VERSION }}-LINUX.tar.xz
 
       - name: Get upload URL
         run: 'echo "Upload URL: ${{ needs.build_and_release_windows.outputs.upload_url }}"'
@@ -120,7 +120,7 @@ jobs:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
             upload_url: ${{ needs.build_and_release_windows.outputs.upload_url }}
-            asset_path: ./overviewer-${{ env.VERSION }}-linux.tar.xz
-            asset_name: overviewer-${{ env.VERSION }}-linux.tar.xz
+            asset_path: ./overviewer-${{ env.VERSION }}-LINUX.tar.xz
+            asset_name: overviewer-${{ env.VERSION }}-LINUX.tar.xz
             asset_content_type: application/x-xz
       
