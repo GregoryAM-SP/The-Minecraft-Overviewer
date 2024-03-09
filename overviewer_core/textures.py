@@ -7317,12 +7317,20 @@ def simple_heads(self, blockid, data):
 
     full_tex = self.load_image("assets/minecraft/textures/entity/" + textures[blockid] + ".png").copy()
 
-    top = full_tex.crop((8, 0, 16, 8))
-    bottom = full_tex.crop((16, 0, 24, 8))
-    left = full_tex.crop((0, 8, 8, 16))
-    front = full_tex.crop((8, 8, 16, 16))
-    right = full_tex.crop((16, 8, 24, 16))
-    back = full_tex.crop((24, 8, 32, 16))
+    top = Image.new("RGBA", (16, 16), self.bgcolor)
+    alpha_over(top, full_tex.crop((8, 0, 16, 8)), (4, 4))
+
+    left = Image.new("RGBA", (16, 16), self.bgcolor)
+    alpha_over(left, full_tex.crop((0, 8, 8, 16)), (4, 8))
+
+    front = Image.new("RGBA", (16, 16), self.bgcolor)
+    alpha_over(front, full_tex.crop((8, 8, 16, 16)), (4, 8))
+
+    right = Image.new("RGBA", (16, 16), self.bgcolor)
+    alpha_over(right, full_tex.crop((16, 8, 24, 16)), (4, 8))
+
+    back = Image.new("RGBA", (16, 16), self.bgcolor)
+    alpha_over(back, full_tex.crop((24, 8, 32, 16)), (4, 8))
 
     sides = [left, front, right, back]
 
@@ -7331,7 +7339,13 @@ def simple_heads(self, blockid, data):
         sides = sides[1:] + sides[:1]
         top = top.rotate(270)
 
-    return self.build_full_block(top, sides[2], sides[3], sides[0], sides[1].transpose(Image.FLIP_LEFT_RIGHT), bottom)
+    block_left = self.transform_image_side(sides[0])
+    block_right = self.transform_image_side(sides[1].transpose(Image.FLIP_LEFT_RIGHT)).transpose(Image.FLIP_LEFT_RIGHT)
+
+    block = self.build_full_block((top, 8), None, None, None, None, None)
+    alpha_over(block, block_left, (3, 4))
+    alpha_over(block, block_right, (9, 4))
+    return block
 
 
 @material(blockid=[], data=[0], transparent=True)
