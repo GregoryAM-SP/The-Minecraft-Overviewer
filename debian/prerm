@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -e  # Exit immediately if a command exits with a non-zero status
+
+# Step 1: Remove symbolic link if it exists
+if [ -L "/usr/bin/overviewer" ]; then
+    sudo rm /usr/bin/overviewer || { echo "Error: Failed to remove symbolic link." >&2; exit 1; }
+fi
+
+echo "Uninstallation completed. The 'overviewer' command has been removed."
+
+exit 0  # Exit successfully

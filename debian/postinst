@@ -1,0 +1,35 @@
+#!/bin/bash
+
+set -e  # Exit immediately if a command exits with a non-zero status
+
+# Step 1: Add /usr/bin to PATH if not already present
+if [[ ":$PATH:" != *":/usr/bin:"* ]]; then
+    echo 'export PATH=$PATH:/usr/bin' >> ~/.bashrc
+fi
+
+# Step 2: Create symbolic link if not already exists
+if [ ! -f "/usr/bin/overviewer" ]; then
+    sudo ln -s /usr/bin/overviewer /usr/bin/overviewer || true  # Ignore errors but check later
+fi
+
+# Step 3: Make sure the symbolic link is executable
+sudo chmod +x /usr/bin/overviewer || true  # Ignore errors but check later
+
+# Check if errors occurred
+if [ $? -ne 0 ]; then
+    echo "Error: Failed to make symbolic link or set permissions." >&2
+    exit 1  # Exit with error code
+fi
+
+# Step 4: Source the .bashrc file
+source ~/.bashrc || true  # Ignore errors but check later
+
+# Check if errors occurred
+if [ $? -ne 0 ]; then
+    echo "Error: Failed to source .bashrc." >&2
+    exit 1  # Exit with error code
+fi
+
+echo "Installation completed. You can now use 'overviewer' command."
+
+exit 0  # Exit successfully

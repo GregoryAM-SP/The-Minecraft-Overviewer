@@ -1,0 +1,24 @@
+Source: the-minecraft-overviewer
+Maintainer: GregoryAM and Contributors <the.minecraft.overviewer@gmail.com>
+Section: contrib/python
+Priority: optional
+Build-Depends: python3-all-dev (>= 3.4), debhelper (>= 7.4.3), python3-pil, python3-numpy, dh-python
+Standards-Version: 3.9.1
+
+Package: the-minecraft-overviewer
+Architecture: any
+Homepage: https://github.com/GregoryAM-SP/The-Minecraft-Overviewer
+X-Python3-Version: >= 3.4 
+Depends: ${misc:Depends}, ${python3:Depends}, python3-pil, python3-numpy, ${shlibs:Depends}
+Description: Command-line Interface (CLI)
+  Rendering high-resolution maps of Minecraft Java Edition worlds.
+  Generates a set of static HTML and image files and uses LeafletJS to display a nice interactive map.
+ .
+ .
+  Usages:
+    1.) overviewer "Minecraft World Directory" "Output Directory"
+    2.) overviewer [--rendermodes=...] [options] "Minecraft World Directory" "Output Directory"
+    3.) overviewer --config="config_file" [options]
+ .
+  Documentation:
+    Latest: https://docs.overviewer.org/en/latest/
