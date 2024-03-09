@@ -120,6 +120,9 @@ jobs:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
             upload_url: ${{ needs.build_and_release_windows.outputs.upload_url }}
+            asset_path: ./overviewer-${{ env.VERSION }}-LINUX.tar.xz
+            asset_name: overviewer-${{ env.VERSION }}-LINUX.tar.xz
+            asset_content_type: application/x-xz
             
   build_and_release_debian:
     strategy:
@@ -178,7 +181,4 @@ jobs:
             asset_path: ../the-minecraft-overviewer_${{ env.VERSION }}-0_amd64.deb
             asset_name: overviewer-v${{ env.VERSION }}-x86_64-${{ matrix.os }}.deb
             asset_content_type: application/x-deb
-            asset_path: ./overviewer-${{ env.VERSION }}-LINUX.tar.xz
-            asset_name: overviewer-${{ env.VERSION }}-LINUX.tar.xz
-            asset_content_type: application/x-xz
       
