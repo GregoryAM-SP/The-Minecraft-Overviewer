@@ -728,6 +728,10 @@ class Textures(object):
 
             alpha_over(img, side2, (12,0), side2)
 
+        if bottom is not None :
+            bottom = self.transform_image_top(bottom)
+            alpha_over(img, bottom, (0,12), bottom)
+
         # front sides
         if side3 is not None :
             side3 = self.transform_image_side(side3)
@@ -749,10 +753,6 @@ class Textures(object):
             side4.putalpha(sidealpha)
 
             alpha_over(img, side4, (12,6), side4)
-
-        if bottom is not None :
-            bottom = self.transform_image_top(bottom)
-            alpha_over(img, bottom, (0,12), bottom)
 
         if top is not None :
             top = self.transform_image_top(top)
