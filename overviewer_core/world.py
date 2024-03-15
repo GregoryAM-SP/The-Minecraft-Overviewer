@@ -1046,6 +1046,7 @@ class RegionSet(object):
             "minecraft:grindstone": (11369, 0),
             "minecraft:mossy_stone_brick_stairs": (11370, 0),
             "minecraft:mossy_cobblestone_stairs": (11371, 0),
+            "minecraft:heavy_core": (11372, 0),
             "minecraft:lantern": (11373, 0),
             "minecraft:smooth_sandstone_stairs": (11374, 0),
             'minecraft:smooth_quartz_stairs': (11375, 0),

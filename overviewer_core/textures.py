@@ -7240,8 +7240,15 @@ def trial_spawner(self, blockid, data):
     elif data == 2:
         return self.build_block(top_ejecting, side_active)
 
+
 @material(blockid=[12662], data=list(range(1 << 4)))
 def vault(self, blockid, data):
+    # Placeholder for when this is included in a released version of Minecraft
+    return None
+
+
+@material(blockid=[11372], data=[0])
+def heavy_core(self, blockid, data):
     # Placeholder for when this is included in a released version of Minecraft
     return None
 
