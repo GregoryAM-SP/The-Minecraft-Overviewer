@@ -7272,10 +7272,28 @@ def vault(self, blockid, data):
         return None
 
 
-@material(blockid=[11372], data=[0])
+@material(blockid=[11372], data=[0], transparent=True)
 def heavy_core(self, blockid, data):
-    # Placeholder for when this is included in a released version of Minecraft
-    return None
+    # As of 24w11a, this has an orientation attribute which matches the crafter.
+    # However, there are no rendering differences between the options. Thus, we're going to ignore it for now.
+
+    full_tex = self.load_image(BLOCKTEXTURE + "heavy_core.png").copy()
+
+    top = Image.new("RGBA", (16, 16), self.bgcolor)
+    alpha_over(top, full_tex.crop((0, 0, 8, 8)), (4, 4))
+
+    side = Image.new("RGBA", (16, 16), self.bgcolor)
+    alpha_over(side, full_tex.crop((0, 8, 8, 16)), (4, 8))
+
+    bottom = Image.new("RGBA", (16, 16), self.bgcolor)
+    alpha_over(bottom, full_tex.crop((8, 0, 16, 8)), (4, 4))
+
+    block_side = self.transform_image_side(side)
+
+    block = self.build_full_block((top, 8), None, None, None, None, bottom)
+    alpha_over(block, block_side, (3, 4))
+    alpha_over(block, block_side.transpose(Image.FLIP_LEFT_RIGHT), (9, 4))
+    return block
 
 
 @material(blockid=[1276, 1277, 1278, 1279, 1283], data=list(range(4)), transparent=True)
