@@ -4,9 +4,11 @@ on:
   push:
     branches:
       - main
+      - snapshot
   pull_request:
     branches:
       - main
+      - snapshot
 
 jobs:
   pytest:
