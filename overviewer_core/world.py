@@ -1801,6 +1801,13 @@ class RegionSet(object):
 
         elif key == 'minecraft:trial_spawner':
             p = palette_entry['Properties']
+
+            # 3 bits of data.
+            #   ┌─── ominous
+            #   │┌┬─ vault_state
+            #   │││
+            # 0b111
+
             if p['trial_spawner_state'] in ['cooldown', 'inactive']:
                 data = 0
             if p['trial_spawner_state'] in ['active', 'waiting_for_players', 'waiting_for_reward_ejection']:
@@ -1808,8 +1815,15 @@ class RegionSet(object):
             if p['trial_spawner_state'] in ['ejecting_reward']:
                 data = 2
 
+            data |= (p['ominous'] == 'true') << 2
+
         elif key == 'minecraft:vault':
             p = palette_entry['Properties']
+            # 5 bits of data.
+            #   ┌───── ominous
+            #   │┌┬─── vault_state
+            #   │││┌┬─ facing
+            # 0b11111
 
             if p['facing'] == 'south':
                 data |= 0
@@ -1820,10 +1834,8 @@ class RegionSet(object):
             if p['facing'] == 'east':
                 data |= 3
 
-            if p['vault_state'] in ['active', 'unlocking']:
-                data |= 4
-            if p['vault_state'] in ['ejecting']:
-                data |= 12
+            data |= (['inactive', 'active', 'unlocking', 'ejecting'].index(p['vault_state']) << 2)
+            data |= (p['ominous'] == 'true') << 4
 
         elif key in ['minecraft:dead_%s_coral_wall_fan' % item for item in coral_list] or \
              key in ['minecraft:%s_coral_wall_fan' % item for item in coral_list]:

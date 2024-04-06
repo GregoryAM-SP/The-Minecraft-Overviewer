@@ -573,6 +573,7 @@ class Textures(object):
         """From a top texture and a side texture, build a block image.
         top and side should be 16x16 image objects. Returns a 24x24 image
 
+        Not suitable for rendering transparent blocks with a bottom, eg spawners.
         """
         img = Image.new("RGBA", (24,24), self.bgcolor)
 
@@ -7225,37 +7226,50 @@ def crafter(self, blockid, data):
 
     return self.build_full_block(top, sides[3], sides[2], sides[0], sides[1].transpose(Image.FLIP_LEFT_RIGHT), bottom)
 
-@material(blockid=[12641], data=[0, 1, 2])
+@material(blockid=[12641], data=[0, 1, 2, 4, 5, 6])
 def trial_spawner(self, blockid, data):
-    side = self.load_image_texture(BLOCKTEXTURE + "trial_spawner_side_inactive.png").copy()
-    side_active = self.load_image_texture(BLOCKTEXTURE + "trial_spawner_side_active.png").copy()
-    top = self.load_image_texture(BLOCKTEXTURE + "trial_spawner_top_inactive.png").copy()
-    top_active = self.load_image_texture(BLOCKTEXTURE + "trial_spawner_top_active.png").copy()
-    top_ejecting = self.load_image_texture(BLOCKTEXTURE + "trial_spawner_top_ejecting_reward.png").copy()
+    ominous = ''
+    if data & 0b100 == 0b100:
+        ominous = '_ominous'
+        data = data & 0b011
+
+    bottom = self.load_image_texture(BLOCKTEXTURE + "trial_spawner_bottom.png").copy()
+    side = self.load_image_texture(BLOCKTEXTURE + "trial_spawner_side_inactive" + ominous + ".png").copy()
+    side_active = self.load_image_texture(BLOCKTEXTURE + "trial_spawner_side_active" + ominous + ".png").copy()
+    top = self.load_image_texture(BLOCKTEXTURE + "trial_spawner_top_inactive" + ominous + ".png").copy()
+    top_active = self.load_image_texture(BLOCKTEXTURE + "trial_spawner_top_active" + ominous + ".png").copy()
+    top_ejecting = self.load_image_texture(BLOCKTEXTURE + "trial_spawner_top_ejecting_reward" + ominous + ".png").copy()
 
     if data == 0:
-        return self.build_block(top, side)
+        return self.build_full_block(top, side, side, side, side, bottom)
     elif data == 1:
-        return self.build_block(top_active, side_active)
+        return self.build_full_block(top_active, side_active, side_active, side_active, side_active, bottom)
     elif data == 2:
-        return self.build_block(top_ejecting, side_active)
+        return self.build_full_block(top_ejecting, side_active, side_active, side_active, side_active, bottom)
 
 
-@material(blockid=[12662], data=list(range(1 << 4)))
+@material(blockid=[12662], data=list(range(1 << 5)))
 def vault(self, blockid, data):
     try:
-        side = self.load_image_texture(BLOCKTEXTURE + "vault_side_off.png").copy()
-        front = self.load_image_texture(BLOCKTEXTURE + "vault_front_off.png").copy()
-        top = self.load_image_texture(BLOCKTEXTURE + "vault_top.png").copy()
-        bottom = self.load_image_texture(BLOCKTEXTURE + "vault_bottom.png").copy()
+        ominous = '_ominous' if (data & 0b10000 == 0b10000) else ''
 
-        if data & 4 == 4:
-            side = self.load_image_texture(BLOCKTEXTURE + "vault_side_on.png").copy()
-            front = self.load_image_texture(BLOCKTEXTURE + "vault_front_on.png").copy()
-        if data & 8 == 8:
-            side = self.load_image_texture(BLOCKTEXTURE + "vault_side_on.png").copy()
-            top = self.load_image_texture(BLOCKTEXTURE + "vault_top_ejecting.png").copy()
-            front = self.load_image_texture(BLOCKTEXTURE + "vault_front_ejecting.png").copy()
+        side = self.load_image_texture(BLOCKTEXTURE + 'vault_side_off' + ominous + '.png').copy()
+        front = self.load_image_texture(BLOCKTEXTURE + 'vault_front_off' + ominous + '.png').copy()
+        top = self.load_image_texture(BLOCKTEXTURE + 'vault_top' + ominous + '.png').copy()
+        bottom = self.load_image_texture(BLOCKTEXTURE + 'vault_bottom' + ominous + '.png').copy()
+
+        state = ['inactive', 'active', 'unlocking', 'ejecting'][(data & 0b1100) >> 2]
+
+        if state == 'active':
+            side = self.load_image_texture(BLOCKTEXTURE + 'vault_side_on' + ominous + '.png').copy()
+            front = self.load_image_texture(BLOCKTEXTURE + 'vault_front_on' + ominous + '.png').copy()
+        if state == 'unlocking':
+            side = self.load_image_texture(BLOCKTEXTURE + 'vault_side_on' + ominous + '.png').copy()
+            front = self.load_image_texture(BLOCKTEXTURE + 'vault_front_ejecting' + ominous + '.png').copy()
+        if state == 'ejecting':
+            side = self.load_image_texture(BLOCKTEXTURE + 'vault_side_on' + ominous + '.png').copy()
+            front = self.load_image_texture(BLOCKTEXTURE + 'vault_front_ejecting' + ominous + '.png').copy()
+            top = self.load_image_texture(BLOCKTEXTURE + 'vault_top_ejecting' + ominous + '.png').copy()
 
         direction = data & 3
         direction = (direction + self.rotation) % 4
@@ -7274,9 +7288,6 @@ def vault(self, blockid, data):
 
 @material(blockid=[11372], data=[0], transparent=True)
 def heavy_core(self, blockid, data):
-    # As of 24w11a, this has an orientation attribute which matches the crafter.
-    # However, there are no rendering differences between the options. Thus, we're going to ignore it for now.
-
     full_tex = self.load_image(BLOCKTEXTURE + "heavy_core.png").copy()
 
     top = Image.new("RGBA", (16, 16), self.bgcolor)
