@@ -56,10 +56,10 @@ body {
     line-height: 160%;
     text-align: center;
     padding: 0px 6px;
-    
+
     background-image: url('control-bg.png');
     background-repeat: repeat-x;
-    
+
     border: 1px solid #A9BBDF;
     border-radius: 2px 2px;
     box-shadow: rgba(0, 0, 0, 0.347656) 2px 2px 3px;
@@ -81,11 +81,11 @@ body {
 .customControl > div.dropDown {
     font-size: 12px;
     background-color: white;
-    
+
     border: 1px solid #A9BBDF;
     border-radius: 2px 2px;
     box-shadow: rgba(0, 0, 0, 0.347656) 2px 2px 3px;
-    
+
     display: none;
 }
 
@@ -143,7 +143,7 @@ div#searchDropDown {
 
 div.searchResultItem  {
     overflow: hidden;
-    text-overflow: ellipsis;    
+    text-overflow: ellipsis;
 }
 
 div.searchResultItem img {
