@@ -215,6 +215,10 @@ overviewer.util = {
         overviewer.map.attributionControl.setPrefix(
             '<a href="https://overviewer.gregoryam.com/" target="blank">Overviewer</a> | <a href="https://leafletjs.com/">Leaflet</a>');
 
+        if (overviewerConfig['map']['attribution'] != null) {
+            overviewer.map.attributionControl.addAttribution(overviewerConfig['map']['attribution']);
+        }
+
         overviewer.map.on('baselayerchange', function(ev) {
             
             // when changing the layer, ensure coordinates remain correct
