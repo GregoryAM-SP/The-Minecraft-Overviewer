@@ -625,8 +625,7 @@ def main():
             handleEntities(rset, config, args.config, rset_filters, markers)
 
     # post-process any marker groups that need it
-    for postprocess_group_name in marker_groups_postprocess_functions:
-        postprocess_func = marker_groups_postprocess_functions[postprocess_group_name]
+    for postprocess_group_name, postprocess_func in marker_groups_postprocess_functions.items():
         markers[postprocess_group_name]["raw"] = postprocess_func(markers[postprocess_group_name]["raw"])
 
     # apply filters to players
