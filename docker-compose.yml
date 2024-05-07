@@ -38,12 +38,6 @@ services:
       - /home/minecraft/minecraft:/usr/overviewer/server:ro
       - minecraft-jars:/mnt/minecraft:rw
       - ./config.py:/usr/overviewer/config.py:ro
-  nginx:
-    image: nginx
-    volumes:
-      - overviewer-output:/usr/share/nginx/html:ro
-    ports:
-      - "8080:80"
 
 volumes:
   minecraft-jars:
