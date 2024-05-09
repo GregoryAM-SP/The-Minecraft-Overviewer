@@ -132,6 +132,10 @@ jobs:
     needs: build_and_release_windows
     if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.START_BUILD == 'True'
 
+    permissions:
+      id-token: write
+      contents: read
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -181,4 +185,23 @@ jobs:
             asset_path: ../the-minecraft-overviewer_${{ env.VERSION }}-0_amd64.deb
             asset_name: overviewer-v${{ env.VERSION }}-x86_64-${{ matrix.os }}.deb
             asset_content_type: application/x-deb
-      
+
+      - name: Authenticate for apt repo upload
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: eu-west-1
+          role-to-assume: arn:aws:iam::098014529583:role/apt-repo/apt-repo-overviewer
+
+      - name: Upload package to apt repo
+        run: |
+          source /etc/os-release
+          sudo gem install deb-s3
+          deb-s3 upload \
+              --arch=amd64 \
+              --bucket=stwalkerster-098014529583-apt \
+              --codename=$VERSION_CODENAME \
+              --prefix="overviewer/" \
+              --visibility=private \
+              --preserve-versions \
+              ../the-minecraft-overviewer_${{ env.VERSION }}-0_amd64.deb
+
