@@ -452,7 +452,7 @@ def main():
     # Now we start the actual processing, now that all the configuration has
     # been gathered and validated
     # create our asset manager... ASSMAN
-    assetMrg = assetmanager.AssetManager(destdir, config.get('customwebassets', None))
+    assetMrg = assetmanager.AssetManager(destdir, config.get('customwebassets', None), config.get('attribution', None))
 
     # If we've been asked to update web assets, do that and then exit
     if args.update_web_assets:

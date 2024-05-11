@@ -213,7 +213,11 @@ overviewer.util = {
         overviewer.map = L.map('mcmap', {crs: L.CRS.Simple});
 
         overviewer.map.attributionControl.setPrefix(
-            '<a href="https://github.com/GregoryAM-SP/The-Minecraft-Overviewer" target="blank">Overviewer / LeafletJS</a>');
+            '<a href="https://overviewer.gregoryam.com/" target="blank">Overviewer</a> | <a href="https://leafletjs.com/">Leaflet</a>');
+
+        if (overviewerConfig['map']['attribution'] != null) {
+            overviewer.map.attributionControl.addAttribution(overviewerConfig['map']['attribution']);
+        }
 
         overviewer.map.on('baselayerchange', function(ev) {
             

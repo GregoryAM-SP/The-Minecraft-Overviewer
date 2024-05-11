@@ -431,6 +431,8 @@ def create_marker_from_filter_result(poi, result):
         d["icon"] = poi['icon']
     if "createInfoWindow" in poi:
         d["createInfoWindow"] = poi['createInfoWindow']
+
+    # deprecated, return a dict from your filter func instead.
     if "cssClass" in poi:
         d["cssClass"] = poi['cssClass']
 
@@ -454,6 +456,13 @@ def create_marker_from_filter_result(poi, result):
             d["icon"] = result['icon']
         if "createInfoWindow" in result:
             d["createInfoWindow"] = result['createInfoWindow']
+
+        if "cssClass" in result:
+            d["cssClass"] = result['cssClass']
+
+        # additional data for post-process jobs
+        if "extra" in result:
+            d["extra"] = result['extra']
 
         # Polylines and polygons
         if (('polyline' in result and hasattr(result['polyline'], '__iter__')) or
@@ -535,6 +544,8 @@ def main():
 
     logging.info("Searching renders: %s", list(config['renders']))
 
+    marker_groups_postprocess_functions = dict()
+
     # collect all filters and get regionsets
     for rname, render in config['renders'].items():
         # Convert render['world'] to the world path, and store the original
@@ -592,6 +603,11 @@ def main():
                 createInfoWindow=f.get('createInfoWindow', True),
                 checked=f.get('checked', False),
                 showIconInLegend=f.get('showIconInLegend', False))
+
+            postprocess_func = f.get('postProcessFunction', None)
+            if postprocess_func is not None:
+                marker_groups_postprocess_functions[name] = postprocess_func
+
             marker_groups[rname].append(group)
 
     # initialize the structure for the markers
@@ -607,6 +623,10 @@ def main():
             rset_filters = list(filter(lambda f: f[3] == rset, filters))
             logging.info("Calling handleEntities for %s with %s filters", rset, len(rset_filters))
             handleEntities(rset, config, args.config, rset_filters, markers)
+
+    # post-process any marker groups that need it
+    for postprocess_group_name, postprocess_func in marker_groups_postprocess_functions.items():
+        markers[postprocess_group_name]["raw"] = postprocess_func(markers[postprocess_group_name]["raw"])
 
     # apply filters to players
     if not args.skipplayers:

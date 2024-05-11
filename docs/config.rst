@@ -430,7 +430,12 @@ Custom web assets
 
     * ``{version}``
       Will be replaced by the version of Overviewer used
-      e.g. '0.9.276 (5ff9c50)' 
+      e.g. '0.9.276 (5ff9c50)'
+
+``attribution = "<custom attribution info>"``
+    This option allows you to specify additional attribution text on the
+    map. This could be used to comply with marker image licences, or just
+    give a link back to a different page.
 
 .. _renderdict:
 

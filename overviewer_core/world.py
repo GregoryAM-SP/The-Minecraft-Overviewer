@@ -1920,11 +1920,16 @@ class RegionSet(object):
 
         for i in range(num_palette_entries):
             key = palette[i]
+
+            if not key.startswith("minecraft:"):
+                translated_biomes[i] = 1
+                logging.debug("Unknown custom biome %s; assuming it's %s" % (key, self._biomemap[translated_biomes[i]]))
+                continue
+
             try:
                 translated_biomes[i] = self._biomemap.index(key)
             except KeyError:
-                raise Exception("Unknown biome wanted, investigate!")
-                #translated_biomes[i] = self._biomemap.index(1)
+                raise Exception("Unknown biome `%s` wanted, investigate!" % key)
 
         if not biome_data:
             #no biome-dataarray, means entire biome is palette[0]

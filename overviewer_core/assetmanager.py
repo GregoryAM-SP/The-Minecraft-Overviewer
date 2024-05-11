@@ -34,7 +34,7 @@ same time, controls the generated javascript files in the output directory.
 There should only be one instances of these per execution.
     """
 
-    def __init__(self, outputdir, custom_assets_dir=None):
+    def __init__(self, outputdir, custom_assets_dir=None, attribution=None):
         """\
 Initializes the AssetManager with the top-level output directory.
 It can read/parse and write/dump the overviewerConfig.js file into this
@@ -42,6 +42,7 @@ top-level directory.
         """
         self.outputdir = outputdir
         self.custom_assets_dir = custom_assets_dir
+        self.attribution = attribution
         self.renders = dict()
 
         self.fs_caps = get_fs_caps(self.outputdir)
@@ -136,6 +137,7 @@ top-level directory.
             'overlays': True,
             'coordsBox': True,
         }
+        dump['map']['attribution'] = self.attribution
 
         dump['tilesets'] = []
 
