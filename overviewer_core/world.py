@@ -2596,6 +2596,9 @@ class CroppedRegionSet(RegionSetWrapper):
         self.zmin = (zmin // 16) + self.MARGIN
         self.zmax = (zmax // 16) - self.MARGIN
 
+    def __repr__(self):
+        return "<CroppedRegionSet regiondir=%r>" % self.regiondir
+
     def get_chunk(self,x,z):
         if (
                 self.xmin <= x <= self.xmax and

@@ -509,17 +509,24 @@ def main():
     parser.add_argument("-p", "--processes", dest="procs", action="store", type=int,
                         help="The number of local worker processes to spawn. Defaults to the "
                         "number of CPU cores your computer has.")
-    parser.add_argument("-q", "--quiet", dest="quiet", action="count",
-                        help="Reduce logging output")
     parser.add_argument("--skip-scan", dest="skipscan", action="store_true",
                         help="Skip scanning for entities when using GenPOI")
     parser.add_argument("--skip-players", dest="skipplayers", action="store_true",
                         help="Skip getting player data when using GenPOI")
 
+    # Log level options:
+    parser.add_argument("-q", "--quiet", dest="quiet", action="count", default=0,
+                        help="Print less output. You can specify this option multiple times.")
+    parser.add_argument("-v", "--verbose", dest="verbose", action="count", default=0,
+                        help="Print more output. You can specify this option multiple times.")
+    parser.add_argument("--simple-output", dest="simple", action="store_true", default=False,
+                        help="Use a simple output format, with no colors or progress bars.")
+
     args = parser.parse_args()
 
-    if args.quiet and args.quiet > 0:
-        logger.configure(logging.WARN, False)
+    # re-configure the logger now that we've processed the command line options
+    logger.configure(logging.INFO + 10 * args.quiet - 10 * args.verbose,
+                     verbose=args.verbose > 0, simple=args.simple)
 
     # Parse the config file
     mw_parser = config_parser.MultiWorldParser()
@@ -548,6 +555,7 @@ def main():
 
     # collect all filters and get regionsets
     for rname, render in config['renders'].items():
+        logging.debug('Render %s processing...', rname)
         # Convert render['world'] to the world path, and store the original
         # in render['worldname_orig']
         try:
@@ -591,8 +599,11 @@ def main():
             name = (replaceBads(f['name']) + hex(hash(f['filterFunction']))[-4:] + "_"
                     + hex(hash(rname))[-4:])
 
+            logging.debug('Render %s ff %s has name %s', rname, f["filterFunction"].__name__, name)
+
             # add it to the list of filters
             for rset in rsets:
+                logging.debug('Adding %s to %s', name, rset)
                 filters.add((name, f['name'], f['filterFunction'], rset, worldpath, rname))
 
             # add an entry in the menu to show markers found by this filter
@@ -606,6 +617,7 @@ def main():
 
             postprocess_func = f.get('postProcessFunction', None)
             if postprocess_func is not None:
+                logging.debug('Registering postprocess func %s for %s', postprocess_func.__name__, name)
                 marker_groups_postprocess_functions[name] = postprocess_func
 
             marker_groups[rname].append(group)
@@ -624,9 +636,14 @@ def main():
             logging.info("Calling handleEntities for %s with %s filters", rset, len(rset_filters))
             handleEntities(rset, config, args.config, rset_filters, markers)
 
+    for k in markers.keys():
+        logging.debug("Marker group %s: %r", k, json.dumps(markers[k]['raw']))
+
     # post-process any marker groups that need it
+    logging.info("Running marker post-process")
     for postprocess_group_name, postprocess_func in marker_groups_postprocess_functions.items():
         markers[postprocess_group_name]["raw"] = postprocess_func(markers[postprocess_group_name]["raw"])
+        logging.debug("Marker group %s: %r", postprocess_group_name, json.dumps(markers[postprocess_group_name]['raw']))
 
     # apply filters to players
     if not args.skipplayers:
