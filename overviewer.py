@@ -112,6 +112,10 @@ def main():
                                   help="Only render tiles that come from chunks that have changed "
                                   "since the last render (the default).")
 
+    parser.add_argument("--estimate-dirty-tiles", dest="estimatedirtytiles", action="store_true",
+                                  help="Only check which tiles will be re-rendered, but skip actually performing the"
+                                       "render.")
+
     # Useful one-time debugging options:
     parser.add_argument("--check-terrain", dest="check_terrain", action="store_true",
                         help="Try to locate the texture files. Useful for debugging texture"
@@ -510,9 +514,11 @@ def main():
         texopts_key = tuple(texopts.items())
         if texopts_key not in texcache:
             tex = textures.Textures(**texopts)
-            logging.info("Generating textures...")
-            tex.generate()
-            logging.debug("Finished generating textures.")
+            if not args.estimatedirtytiles:
+                # If we're not going to do a render, no point in doing a time-consuming texture generation.
+                logging.info("Generating textures...")
+                tex.generate()
+                logging.debug("Finished generating textures.")
             texcache[texopts_key] = tex
         else:
             tex = texcache[texopts_key]
@@ -582,6 +588,11 @@ def main():
     logging.info("Preprocessing...")
     for ts in tilesets:
         ts.do_preprocessing()
+
+    if args.estimatedirtytiles:
+        work_queue_length = sum([sum([x.get_phase_length(p) for p in range(x.get_num_phases())]) for x in tilesets])
+        logging.info("There is an estimated %d tiles to render", work_queue_length)
+        return 0
 
     # Output initial static data and configuration
     assetMrg.initialize(tilesets)
