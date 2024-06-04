@@ -333,7 +333,7 @@ class Textures(object):
             if verbose: logging.info("Did not find file {0} in jar {1}".format(filename, jarpath))
             
 
-        raise TextureException("Could not find the textures while searching for '{0}'. Try specifying the 'texturepath' option in your config file.\nSet it to the path to a Minecraft Resource pack.\nAlternately, install the Minecraft client (which includes textures)\nAlso see <http://docs.overviewer.org/en/latest/running/#installing-the-textures>\n(Remember, this version of Overviewer requires a 1.20-compatible resource pack)\n(Also note that I won't automatically use snapshots; you'll have to use the texturepath option to use a snapshot jar)".format(filename))
+        raise TextureException("Could not find the textures while searching for '{0}'. Try specifying the 'texturepath' option in your config file.\nSet it to the path to a Minecraft Resource pack.\nAlternately, install the Minecraft client (which includes textures)\nAlso see <http://docs.overviewer.org/en/latest/running/#installing-the-textures>\n(Remember, this version of Overviewer requires a 1.21-compatible resource pack)\n(Also note that I won't automatically use snapshots; you'll have to use the texturepath option to use a snapshot jar)".format(filename))
 
     def load_image_texture(self, filename):
         # Textures may be animated or in a different resolution than 16x16.  
@@ -7250,40 +7250,36 @@ def trial_spawner(self, blockid, data):
 
 @material(blockid=[12662], data=list(range(1 << 5)))
 def vault(self, blockid, data):
-    try:
-        ominous = '_ominous' if (data & 0b10000 == 0b10000) else ''
+    ominous = '_ominous' if (data & 0b10000 == 0b10000) else ''
 
-        side = self.load_image_texture(BLOCKTEXTURE + 'vault_side_off' + ominous + '.png').copy()
-        front = self.load_image_texture(BLOCKTEXTURE + 'vault_front_off' + ominous + '.png').copy()
-        top = self.load_image_texture(BLOCKTEXTURE + 'vault_top' + ominous + '.png').copy()
-        bottom = self.load_image_texture(BLOCKTEXTURE + 'vault_bottom' + ominous + '.png').copy()
+    side = self.load_image_texture(BLOCKTEXTURE + 'vault_side_off' + ominous + '.png').copy()
+    front = self.load_image_texture(BLOCKTEXTURE + 'vault_front_off' + ominous + '.png').copy()
+    top = self.load_image_texture(BLOCKTEXTURE + 'vault_top' + ominous + '.png').copy()
+    bottom = self.load_image_texture(BLOCKTEXTURE + 'vault_bottom' + ominous + '.png').copy()
 
-        state = ['inactive', 'active', 'unlocking', 'ejecting'][(data & 0b1100) >> 2]
+    state = ['inactive', 'active', 'unlocking', 'ejecting'][(data & 0b1100) >> 2]
 
-        if state == 'active':
-            side = self.load_image_texture(BLOCKTEXTURE + 'vault_side_on' + ominous + '.png').copy()
-            front = self.load_image_texture(BLOCKTEXTURE + 'vault_front_on' + ominous + '.png').copy()
-        if state == 'unlocking':
-            side = self.load_image_texture(BLOCKTEXTURE + 'vault_side_on' + ominous + '.png').copy()
-            front = self.load_image_texture(BLOCKTEXTURE + 'vault_front_ejecting' + ominous + '.png').copy()
-        if state == 'ejecting':
-            side = self.load_image_texture(BLOCKTEXTURE + 'vault_side_on' + ominous + '.png').copy()
-            front = self.load_image_texture(BLOCKTEXTURE + 'vault_front_ejecting' + ominous + '.png').copy()
-            top = self.load_image_texture(BLOCKTEXTURE + 'vault_top_ejecting' + ominous + '.png').copy()
+    if state == 'active':
+        side = self.load_image_texture(BLOCKTEXTURE + 'vault_side_on' + ominous + '.png').copy()
+        front = self.load_image_texture(BLOCKTEXTURE + 'vault_front_on' + ominous + '.png').copy()
+    if state == 'unlocking':
+        side = self.load_image_texture(BLOCKTEXTURE + 'vault_side_on' + ominous + '.png').copy()
+        front = self.load_image_texture(BLOCKTEXTURE + 'vault_front_ejecting' + ominous + '.png').copy()
+    if state == 'ejecting':
+        side = self.load_image_texture(BLOCKTEXTURE + 'vault_side_on' + ominous + '.png').copy()
+        front = self.load_image_texture(BLOCKTEXTURE + 'vault_front_ejecting' + ominous + '.png').copy()
+        top = self.load_image_texture(BLOCKTEXTURE + 'vault_top_ejecting' + ominous + '.png').copy()
 
-        direction = data & 3
-        direction = (direction + self.rotation) % 4
+    direction = data & 3
+    direction = (direction + self.rotation) % 4
 
-        sides = [side, front, side, side]
-        for i in range(direction):
-            sides = sides[1:] + sides[:1]
-            top = top.rotate(270)
+    sides = [side, front, side, side]
+    for i in range(direction):
+        sides = sides[1:] + sides[:1]
+        top = top.rotate(270)
 
-        return self.build_full_block(top, sides[3], sides[2], sides[0], sides[1], bottom)
-    except TextureException:
-        # This isn't included in 1.20.4; if we happen to be using a snapshot jar, then great. Otherwise just don't
-        # render for now.
-        return None
+    return self.build_full_block(top, sides[3], sides[2], sides[0], sides[1], bottom)
+
 
 
 @material(blockid=[11372], data=[0], transparent=True)
