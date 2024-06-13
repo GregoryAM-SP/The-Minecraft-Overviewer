@@ -9,29 +9,9 @@ env:
   VERSION: 1.21.0
 
 jobs:
-  create_release:
-    runs-on: ubuntu-latest
-    outputs:
-      upload_url: ${{ steps.create_release.outputs.upload_url }}
-
-    steps:
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ env.VERSION }}
-          release_name: Release v${{ env.VERSION }}
-          body: |
-            Created using [The Minecraft Overviewer v1.20.4](https://github.com/GregoryAM-SP/The-Minecraft-Overviewer/releases/tag/v1.20.4)
-          draft: false
-          prerelease: false
-
   build_and_release_windows:
     runs-on: windows-2022
-    needs: create_release
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.START_BUILD == 'True'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
     steps:
       - name: Checkout code
@@ -65,21 +45,42 @@ jobs:
       - name: Create ZIP file for Windows
         run: |
           Compress-Archive -Path .\dist\overviewer -DestinationPath overviewer-${{ env.VERSION }}-windows.zip
-
-      - name: Upload Windows Release Asset
-        uses: softprops/action-gh-release@v1
+      - name: Create Release Notes
+        uses: johnyherangi/create-release-notes@main
+        id: create-release-notes
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Create Release for Windows
+        id: create_release_windows
+        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          files: overviewer-${{ env.VERSION }}-windows.zip
           tag_name: ${{ env.VERSION }}
+          release_name: Release v${{ env.VERSION }}
+          body: ${{ steps.create-release-notes.outputs.release-notes }}
           draft: false
           prerelease: false
 
+      - name: Upload Windows Release Asset
+        id: upload_windows_asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release_windows.outputs.upload_url }}
+          asset_path: ./overviewer-${{ env.VERSION }}-windows.zip
+          asset_name: overviewer-v${{ env.VERSION }}-windows.zip
+          asset_content_type: application/zip
+
+    outputs:
+        upload_url: ${{ steps.create_release_windows.outputs.upload_url }}
+
   build_and_release_linux:
     runs-on: ubuntu-22.04
-    needs: create_release
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.START_BUILD == 'True'
+    needs: build_and_release_windows
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         
     steps:
       - name: Checkout code
@@ -103,6 +104,7 @@ jobs:
               
       - name: Build project for Linux
         run: |
+            uname -m
             python setup.py build
             pyinstaller overviewer.spec
               
@@ -112,28 +114,27 @@ jobs:
             tar -cf overviewer-${{ env.VERSION }}-LINUX.tar overviewer
             xz -z overviewer-${{ env.VERSION }}-LINUX.tar
             mv overviewer-${{ env.VERSION }}-LINUX.tar.xz ../overviewer-${{ env.VERSION }}-LINUX.tar.xz
-
+      - name: Get upload URL
+        run: 'echo "Upload URL: ${{ needs.build_and_release_windows.outputs.upload_url }}"'
+              
       - name: Upload Linux Release Asset
-        uses: softprops/action-gh-release@v1
+        id: upload_linux_asset
+        uses: actions/upload-release-asset@v1
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-            files: overviewer-${{ env.VERSION }}-LINUX.tar.xz
-            tag_name: ${{ env.VERSION }}
-            draft: false
-            prerelease: false
-            
+          upload_url: ${{ needs.build_and_release_windows.outputs.upload_url }}
+          asset_path: ./overviewer-${{ env.VERSION }}-LINUX.tar.xz
+          asset_name: overviewer-v${{ env.VERSION }}-LINUX.tar.xz
+          asset_content_type: application/x-xz
+
   build_and_release_debian:
     strategy:
       matrix:
         os: [ubuntu-22.04, ubuntu-20.04]
     runs-on: ${{ matrix.os }}
-    needs: create_release
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.START_BUILD == 'True'
-
-    permissions:
-      id-token: write
-      contents: read
+    needs: build_and_release_windows
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
     steps:
       - name: Checkout code
@@ -171,31 +172,16 @@ jobs:
       - name: List Debian Packages
         run: ls -l ../*.deb
 
+      - name: Get upload URL
+        run: 'echo "Upload URL: ${{ needs.build_and_release_windows.outputs.upload_url }}"'
+
       - name: Upload Debian Package Release Asset
-        uses: softprops/action-gh-release@v1
+        id: upload_debian_package
+        uses: actions/upload-release-asset@v1
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-            files: ../the-minecraft-overviewer_${{ env.VERSION }}-0_amd64.deb
-            tag_name: ${{ env.VERSION }}
-            draft: false
-            prerelease: false
-
-      - name: Authenticate for apt repo upload
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-region: eu-west-1
-          role-to-assume: arn:aws:iam::098014529583:role/apt-repo/apt-repo-overviewer
-
-      - name: Upload package to apt repo
-        run: |
-          source /etc/os-release
-          sudo gem install deb-s3
-          deb-s3 upload \
-              --arch=amd64 \
-              --bucket=stwalkerster-098014529583-apt \
-              --codename=$VERSION_CODENAME \
-              --prefix="overviewer/" \
-              --visibility=private \
-              --preserve-versions \
-              ../the-minecraft-overviewer_${{ env.VERSION }}-0_amd64.deb
+            upload_url: ${{ needs.build_and_release_windows.outputs.upload_url }}
+            asset_path: ../the-minecraft-overviewer_${{ env.VERSION }}-0_amd64.deb
+            asset_name: overviewer-v${{ env.VERSION }}-x86_64-${{ matrix.os }}.deb
+            asset_content_type: application/x-deb
