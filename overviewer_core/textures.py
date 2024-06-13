@@ -333,7 +333,7 @@ class Textures(object):
             if verbose: logging.info("Did not find file {0} in jar {1}".format(filename, jarpath))
             
 
-        raise TextureException("Could not find the textures while searching for '{0}'. Try specifying the 'texturepath' option in your config file.\nSet it to the path to a Minecraft Resource pack.\nAlternately, install the Minecraft client (which includes textures)\nAlso see <http://docs.overviewer.org/en/latest/running/#installing-the-textures>\n(Remember, this version of Overviewer requires a 1.20-compatible resource pack)\n(Also note that I won't automatically use snapshots; you'll have to use the texturepath option to use a snapshot jar)".format(filename))
+        raise TextureException("Could not find the textures while searching for '{0}'. Try specifying the 'texturepath' option in your config file.\nSet it to the path to a Minecraft Resource pack.\nAlternately, install the Minecraft client (which includes textures)\nAlso see <http://docs.overviewer.org/en/latest/running/#installing-the-textures>\n(Remember, this version of Overviewer requires a 1.21-compatible resource pack)\n(Also note that I won't automatically use snapshots; you'll have to use the texturepath option to use a snapshot jar)".format(filename))
 
     def load_image_texture(self, filename):
         # Textures may be animated or in a different resolution than 16x16.  
@@ -573,6 +573,7 @@ class Textures(object):
         """From a top texture and a side texture, build a block image.
         top and side should be 16x16 image objects. Returns a 24x24 image
 
+        Not suitable for rendering transparent blocks with a bottom, eg spawners.
         """
         img = Image.new("RGBA", (24,24), self.bgcolor)
 
@@ -7225,32 +7226,81 @@ def crafter(self, blockid, data):
 
     return self.build_full_block(top, sides[3], sides[2], sides[0], sides[1].transpose(Image.FLIP_LEFT_RIGHT), bottom)
 
-@material(blockid=[12641], data=[0, 1, 2])
+@material(blockid=[12641], data=[0, 1, 2, 4, 5, 6])
 def trial_spawner(self, blockid, data):
-    side = self.load_image_texture(BLOCKTEXTURE + "trial_spawner_side_inactive.png").copy()
-    side_active = self.load_image_texture(BLOCKTEXTURE + "trial_spawner_side_active.png").copy()
-    top = self.load_image_texture(BLOCKTEXTURE + "trial_spawner_top_inactive.png").copy()
-    top_active = self.load_image_texture(BLOCKTEXTURE + "trial_spawner_top_active.png").copy()
-    top_ejecting = self.load_image_texture(BLOCKTEXTURE + "trial_spawner_top_ejecting_reward.png").copy()
+    ominous = ''
+    if data & 0b100 == 0b100:
+        ominous = '_ominous'
+        data = data & 0b011
+
+    bottom = self.load_image_texture(BLOCKTEXTURE + "trial_spawner_bottom.png").copy()
+    side = self.load_image_texture(BLOCKTEXTURE + "trial_spawner_side_inactive" + ominous + ".png").copy()
+    side_active = self.load_image_texture(BLOCKTEXTURE + "trial_spawner_side_active" + ominous + ".png").copy()
+    top = self.load_image_texture(BLOCKTEXTURE + "trial_spawner_top_inactive" + ominous + ".png").copy()
+    top_active = self.load_image_texture(BLOCKTEXTURE + "trial_spawner_top_active" + ominous + ".png").copy()
+    top_ejecting = self.load_image_texture(BLOCKTEXTURE + "trial_spawner_top_ejecting_reward" + ominous + ".png").copy()
 
     if data == 0:
-        return self.build_block(top, side)
+        return self.build_full_block(top, side, side, side, side, bottom)
     elif data == 1:
-        return self.build_block(top_active, side_active)
+        return self.build_full_block(top_active, side_active, side_active, side_active, side_active, bottom)
     elif data == 2:
-        return self.build_block(top_ejecting, side_active)
+        return self.build_full_block(top_ejecting, side_active, side_active, side_active, side_active, bottom)
 
 
-@material(blockid=[12662], data=list(range(1 << 4)))
+@material(blockid=[12662], data=list(range(1 << 5)))
 def vault(self, blockid, data):
-    # Placeholder for when this is included in a released version of Minecraft
-    return None
+    ominous = '_ominous' if (data & 0b10000 == 0b10000) else ''
+
+    side = self.load_image_texture(BLOCKTEXTURE + 'vault_side_off' + ominous + '.png').copy()
+    front = self.load_image_texture(BLOCKTEXTURE + 'vault_front_off' + ominous + '.png').copy()
+    top = self.load_image_texture(BLOCKTEXTURE + 'vault_top' + ominous + '.png').copy()
+    bottom = self.load_image_texture(BLOCKTEXTURE + 'vault_bottom' + ominous + '.png').copy()
+
+    state = ['inactive', 'active', 'unlocking', 'ejecting'][(data & 0b1100) >> 2]
+
+    if state == 'active':
+        side = self.load_image_texture(BLOCKTEXTURE + 'vault_side_on' + ominous + '.png').copy()
+        front = self.load_image_texture(BLOCKTEXTURE + 'vault_front_on' + ominous + '.png').copy()
+    if state == 'unlocking':
+        side = self.load_image_texture(BLOCKTEXTURE + 'vault_side_on' + ominous + '.png').copy()
+        front = self.load_image_texture(BLOCKTEXTURE + 'vault_front_ejecting' + ominous + '.png').copy()
+    if state == 'ejecting':
+        side = self.load_image_texture(BLOCKTEXTURE + 'vault_side_on' + ominous + '.png').copy()
+        front = self.load_image_texture(BLOCKTEXTURE + 'vault_front_ejecting' + ominous + '.png').copy()
+        top = self.load_image_texture(BLOCKTEXTURE + 'vault_top_ejecting' + ominous + '.png').copy()
+
+    direction = data & 3
+    direction = (direction + self.rotation) % 4
+
+    sides = [side, front, side, side]
+    for i in range(direction):
+        sides = sides[1:] + sides[:1]
+        top = top.rotate(270)
+
+    return self.build_full_block(top, sides[3], sides[2], sides[0], sides[1], bottom)
 
 
-@material(blockid=[11372], data=[0])
+
+@material(blockid=[11372], data=[0], transparent=True)
 def heavy_core(self, blockid, data):
-    # Placeholder for when this is included in a released version of Minecraft
-    return None
+    full_tex = self.load_image(BLOCKTEXTURE + "heavy_core.png").copy()
+
+    top = Image.new("RGBA", (16, 16), self.bgcolor)
+    alpha_over(top, full_tex.crop((0, 0, 8, 8)), (4, 4))
+
+    side = Image.new("RGBA", (16, 16), self.bgcolor)
+    alpha_over(side, full_tex.crop((0, 8, 8, 16)), (4, 8))
+
+    bottom = Image.new("RGBA", (16, 16), self.bgcolor)
+    alpha_over(bottom, full_tex.crop((8, 0, 16, 8)), (4, 4))
+
+    block_side = self.transform_image_side(side)
+
+    block = self.build_full_block((top, 8), None, None, None, None, bottom)
+    alpha_over(block, block_side, (3, 4))
+    alpha_over(block, block_side.transpose(Image.FLIP_LEFT_RIGHT), (9, 4))
+    return block
 
 
 @material(blockid=[1276, 1277, 1278, 1279, 1283], data=list(range(4)), transparent=True)
