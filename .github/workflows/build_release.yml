@@ -67,14 +67,14 @@ jobs:
           Compress-Archive -Path .\dist\overviewer -DestinationPath overviewer-${{ env.VERSION }}-windows.zip
 
       - name: Upload Windows Release Asset
-        uses: actions/upload-release-asset@v1
+        uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ needs.create_release.outputs.upload_url }}
-          asset_path: ./overviewer-${{ env.VERSION }}-windows.zip
-          asset_name: overviewer-${{ env.VERSION }}-windows.zip
-          asset_content_type: application/zip
+          files: overviewer-${{ env.VERSION }}-windows.zip
+          tag_name: ${{ env.VERSION }}
+          draft: false
+          prerelease: false
 
   build_and_release_linux:
     runs-on: ubuntu-22.04
@@ -114,14 +114,14 @@ jobs:
             mv overviewer-${{ env.VERSION }}-LINUX.tar.xz ../overviewer-${{ env.VERSION }}-LINUX.tar.xz
 
       - name: Upload Linux Release Asset
-        uses: actions/upload-release-asset@v1
+        uses: softprops/action-gh-release@v1
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-            upload_url: ${{ needs.create_release.outputs.upload_url }}
-            asset_path: ./overviewer-${{ env.VERSION }}-LINUX.tar.xz
-            asset_name: overviewer-${{ env.VERSION }}-LINUX.tar.xz
-            asset_content_type: application/x-xz
+            files: overviewer-${{ env.VERSION }}-LINUX.tar.xz
+            tag_name: ${{ env.VERSION }}
+            draft: false
+            prerelease: false
             
   build_and_release_debian:
     strategy:
@@ -172,14 +172,14 @@ jobs:
         run: ls -l ../*.deb
 
       - name: Upload Debian Package Release Asset
-        uses: actions/upload-release-asset@v1
+        uses: softprops/action-gh-release@v1
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-            upload_url: ${{ needs.create_release.outputs.upload_url }}
-            asset_path: ../the-minecraft-overviewer_${{ env.VERSION }}-0_amd64.deb
-            asset_name: overviewer-v${{ env.VERSION }}-x86_64-${{ matrix.os }}.deb
-            asset_content_type: application/x-deb
+            files: ../the-minecraft-overviewer_${{ env.VERSION }}-0_amd64.deb
+            tag_name: ${{ env.VERSION }}
+            draft: false
+            prerelease: false
 
       - name: Authenticate for apt repo upload
         uses: aws-actions/configure-aws-credentials@v4
