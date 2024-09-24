@@ -793,11 +793,13 @@ class RegionSet(object):
 
             'minecraft:armor_stand': (416, 0),  # not rendering
 
+            # Underwater things that we currently render as water
             'minecraft:kelp': (8, 0),
             'minecraft:kelp_plant': (8, 0),
             'minecraft:sea_pickle': (8, 0),
             'minecraft:seagrass': (8, 0),
             'minecraft:tall_seagrass': (8, 0),
+            'minecraft:bubble_column': (8, 0),
 
             # Some 1.16 stuff that I'll arbitrarily shove in here due to ID bloat
             'minecraft:ancient_debris': (1000, 0),
@@ -1289,7 +1291,6 @@ class RegionSet(object):
 
             'minecraft:small_dripleaf': (1258, 0),
             'minecraft:candle_cake': (1259, 0),
-            'minecraft:bubble_column': (1260, 0),
             'minecraft:candle': (1261, 0),
 
             # Heads
