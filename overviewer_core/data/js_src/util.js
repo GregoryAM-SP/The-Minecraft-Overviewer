@@ -426,14 +426,12 @@ overviewer.util = {
                             marker_group.addLayer(layerObj);
                         }
                         // Save marker group
-                        var layer_name_html;
+                        var layer_name_html = marker_entry.displayName + '<div class="ov-marker-legend">';
                         if (marker_entry.showIconInLegend) {
-                            layer_name_html = marker_entry.displayName +
-                                '<img class="ov-marker-legend" src="' + marker_entry.icon + '"></img>';
+                            layer_name_html += '<img src="' + marker_entry.icon + '" />';
                         }
-                        else {
-                            layer_name_html = marker_entry.displayName;
-                        }
+                        layer_name_html += '</div>';
+
                         obj.marker_groups[layer_name_html] = marker_group;
                     }
                 }
