@@ -14,19 +14,18 @@
 #    with the Overviewer.  If not, see <http://www.gnu.org/licenses/>.
 
 import functools
+import locale
+import logging
+import math
 import os
 import os.path
-import logging
-import time
 import random
 import re
-import locale
+import time
 
 import numpy
-import math
 
-from . import nbt
-from . import cache
+from . import cache, nbt
 from .biome import reshape_biome_data
 
 """
@@ -1307,6 +1306,30 @@ class RegionSet(object):
             'minecraft:dragon_wall_head': (1281, 0),
             'minecraft:player_head': (1282, 0),
             'minecraft:player_wall_head': (1283, 0),
+
+            # Pale Garden (20w40a snapshot)
+            'minecraft:pale_oak_log': (13000, 0),
+            'minecraft:pale_oak_wood': (13001, 0),
+            'minecraft:stripped_pale_oak_log': (13002, 0),
+            'minecraft:stripped_pale_oak_wood': (13003, 0),
+            'minecraft:pale_oak_planks': (5, 11),
+            'minecraft:pale_oak_stairs': (13005, 0),
+            'minecraft:pale_oak_slab': (13006, 0),
+            'minecraft:pale_oak_fence': (13007, 0),
+            'minecraft:pale_oak_fence_gate': (13008, 0),
+            'minecraft:pale_oak_door': (13009, 0),
+            'minecraft:pale_oak_trapdoor': (13010, 0),
+            'minecraft:pale_oak_pressure_plate': (13011, 0),
+            'minecraft:pale_oak_button': (13012, 0),
+            'minecraft:pale_moss_block': (13013, 0),
+            'minecraft:pale_moss_carpet': (13014, 0),
+            'minecraft:pale_oak_leaves': (13015, 0),
+            'minecraft:pale_oak_sapling': (13016, 0),
+            'minecraft:pale_oak_sign': (13017, 0),
+            'minecraft:pale_oak_wall_hanging_sign': (13018, 0),
+            'minecraft:pale_hanging_moss': (13019, 0),
+            'minecraft:creaking_heart': (13020, 0),
+
 
             # Including these blocks ensures that no namespaces are omitted.
             # Add the following to the end of this block map; they serve no purpose.
