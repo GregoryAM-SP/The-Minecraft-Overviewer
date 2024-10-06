@@ -430,6 +430,7 @@ class RegionSet(object):
             'minecraft:azalea_leaves': (161, 7),
             'minecraft:mangrove_leaves': (18, 8),
             'minecraft:cherry_leaves': (161, 9),
+            'minecraft:pale_oak_leaves': (161, 10),
             # end of leaves
             'minecraft:sponge': (19, 0),
             'minecraft:wet_sponge': (19, 1),
@@ -664,6 +665,7 @@ class RegionSet(object):
             'minecraft:potted_warped_roots': (140, 32),
             'minecraft:potted_azalea_bush': (140, 33),
             'minecraft:potted_flowering_azalea_bush': (140, 34),
+            'minecraft:potted_pale_oak_sapling': (140, 35),
             'minecraft:carrots': (141, 0),
             'minecraft:potatoes': (142, 0),
             'minecraft:oak_button': (143, 0),
@@ -704,6 +706,7 @@ class RegionSet(object):
             'minecraft:black_terracotta': (159, 15),
             'minecraft:acacia_log': (162, 0),
             'minecraft:dark_oak_log': (162, 1),
+            'minecraft:pale_oak_log': (162, 2),
             'minecraft:acacia_stairs': (163, 0),
             'minecraft:dark_oak_stairs': (164, 0),
             'minecraft:slime_block': (165,0),
@@ -974,18 +977,21 @@ class RegionSet(object):
             'minecraft:stripped_jungle_log': (11306, 3),
             'minecraft:stripped_acacia_log': (11307, 0),
             'minecraft:stripped_dark_oak_log': (11307, 1),
+            'minecraft:stripped_pale_oak_log': (11307, 2),
             'minecraft:oak_wood': (11308, 0),
             'minecraft:spruce_wood': (11308, 1),
             'minecraft:birch_wood': (11308, 2),
             'minecraft:jungle_wood': (11308, 3),
             'minecraft:acacia_wood': (11309, 0),
             'minecraft:dark_oak_wood': (11309, 1),
+            'minecraft:pale_oak_wood': (11309, 2),
             'minecraft:stripped_oak_wood': (11310, 0),
             'minecraft:stripped_spruce_wood': (11310, 1),
             'minecraft:stripped_birch_wood': (11310, 2),
             'minecraft:stripped_jungle_wood': (11310, 3),
             'minecraft:stripped_acacia_wood': (11311, 0),
             'minecraft:stripped_dark_oak_wood': (11311, 1),
+            'minecraft:stripped_pale_oak_wood': (11311, 2),
             'minecraft:blue_ice': (11312, 0),
             'minecraft:smooth_stone': (11313, 0),
             'minecraft:smooth_sandstone': (11314, 0),
@@ -1211,6 +1217,7 @@ class RegionSet(object):
             'minecraft:mangrove_wall_hanging_sign': (12608, 0),
             'minecraft:cherry_wall_hanging_sign': (12609, 0),
             'minecraft:bamboo_wall_hanging_sign': (12610, 0),
+            'minecraft:pale_oak_wall_hanging_sign': (12611, 0),
             # Hanging signs
             'minecraft:oak_hanging_sign': (12620, 0),
             'minecraft:spruce_hanging_sign': (12621, 0),
@@ -1223,6 +1230,7 @@ class RegionSet(object):
             'minecraft:mangrove_hanging_sign': (12628, 0),
             'minecraft:cherry_hanging_sign': (12629, 0),
             'minecraft:bamboo_hanging_sign': (12630, 0),
+            'minecraft:pale_oak_hanging_sign': (12631, 0),
 
             # 1.20 experimental stuff
             'minecraft:crafter': (12640, 0),
@@ -1310,6 +1318,19 @@ class RegionSet(object):
             'minecraft:player_head': (1282, 0),
             'minecraft:player_wall_head': (1283, 0),
 
+            'minecraft:pale_oak_planks': (5, 11),
+            'minecraft:pale_oak_slab': (1130, 0),
+            'minecraft:pale_oak_stairs': (1131, 0),
+            'minecraft:pale_oak_pressure_plate': (1132, 0),
+            'minecraft:pale_oak_button': (1133, 0),
+            'minecraft:pale_oak_fence': (1134, 0),
+            'minecraft:pale_oak_fence_gate': (1135, 0),
+            'minecraft:pale_oak_door': (1136, 0),
+            'minecraft:pale_oak_trapdoor': (1137, 0),
+            'minecraft:pale_oak_wall_sign': (1138, 0),
+            'minecraft:pale_oak_sign': (1139, 0),
+            'minecraft:pale_oak_sapling': (1140, 0),
+
             # Including these blocks ensures that no namespaces are omitted.
             # Add the following to the end of this block map; they serve no purpose.
             'minecraft:barrier': (99999, 0),
@@ -1360,7 +1381,8 @@ class RegionSet(object):
         wood_slabs = ('minecraft:oak_slab', 'minecraft:spruce_slab', 'minecraft:birch_slab', 'minecraft:jungle_slab',
                       'minecraft:acacia_slab', 'minecraft:dark_oak_slab', 'minecraft:petrified_oak_slab',
                       'minecraft:crimson_slab', 'minecraft:warped_slab', 'minecraft:mangrove_slab',
-                      'minecraft:cherry_slab', 'minecraft:bamboo_slab', 'minecraft:bamboo_mosaic_slab')
+                      'minecraft:cherry_slab', 'minecraft:bamboo_slab', 'minecraft:bamboo_mosaic_slab',
+                      'minecraft:pale_oak_slab')
         stone_slabs = ('minecraft:stone_slab', 'minecraft:sandstone_slab','minecraft:red_sandstone_slab',
                         'minecraft:cobblestone_slab', 'minecraft:brick_slab','minecraft:purpur_slab',
                         'minecraft:stone_brick_slab', 'minecraft:nether_brick_slab',
@@ -1446,6 +1468,7 @@ class RegionSet(object):
             'minecraft:cherry_slab': 'minecraft:cherry_planks',
             'minecraft:bamboo_slab': 'minecraft:bamboo_planks',
             'minecraft:bamboo_mosaic_slab': 'minecraft:bamboo_mosaic',
+            'minecraft:pale_oak_slab': 'minecraft:pale_oak_planks',
         }
 
         colors = ['white', 'orange', 'magenta', 'light_blue', 'yellow', 'lime', 'pink', 'gray', 'light_gray', 'cyan',
