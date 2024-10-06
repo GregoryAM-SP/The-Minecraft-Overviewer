@@ -1330,6 +1330,7 @@ class RegionSet(object):
             'minecraft:pale_oak_wall_sign': (1138, 0),
             'minecraft:pale_oak_sign': (1139, 0),
             'minecraft:pale_oak_sapling': (1140, 0),
+            'minecraft:pale_moss_block': (1141, 0),
 
             # Including these blocks ensures that no namespaces are omitted.
             # Add the following to the end of this block map; they serve no purpose.
