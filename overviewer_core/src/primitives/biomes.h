@@ -118,6 +118,8 @@ static Biome biome_table[] = {
     {"Small End Islands",           0.5,  0.5, 255, 255, 255,  64, 118, 228},
     {"End Barrens",                 0.5,  0.5, 255, 255, 255,  64, 118, 228},
     {"Cherry Grove",                0.5,  0.8, 353, 297, 225,  93, 183, 239},
+    {"Pale Garden",                 0.7,  0.8, 119, 130, 114,  63, 118, 228},
+    /* 65 */
 };
 
 #define NUM_BIOMES (sizeof(biome_table) / sizeof(Biome))

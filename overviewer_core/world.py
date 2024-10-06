@@ -376,7 +376,8 @@ class RegionSet(object):
             'minecraft:end_midlands',
             'minecraft:small_end_islands',
             'minecraft:end_barrens',
-            'minecraft:cherry_grove'
+            'minecraft:cherry_grove',
+            'minecraft:pale_garden'
         ]
 
         self._blockmap = {
