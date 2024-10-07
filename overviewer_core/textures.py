@@ -7467,6 +7467,36 @@ def difficult_heads(self, blockid, data):
     return None
 
 
+@material(blockid=[1142], data=[0,1,2,4,5,6])
+def creaking_heart(self, blockid, data):
+    # bits
+    #   active
+    #   | axis
+    #   | |
+    # 0b000
+
+    orientation = data & 3
+
+    if self.rotation in [1, 3] and orientation != 0:
+        if orientation == 1:
+            orientation = 2
+        elif orientation == 2:
+            orientation = 1
+
+    active = "_active" if data & 4 else ""
+
+    top = self.load_image_texture(BLOCKTEXTURE + "creaking_heart_top" + active + ".png")
+    side = self.load_image_texture(BLOCKTEXTURE + "creaking_heart" + active + ".png")
+
+    # choose orientation and paste textures
+    if orientation == 0:
+        return self.build_block(top, side)
+    elif orientation == 1: # x axis
+        return self.build_full_block(side.rotate(90), None, None, top, side.rotate(90))
+    elif orientation == 2: # z axis
+        return self.build_full_block(side, None, None, side.rotate(270), top)
+
+
 sprite(blockid=11385, imagename=BLOCKTEXTURE + "oak_sapling.png")
 sprite(blockid=11386, imagename=BLOCKTEXTURE + "spruce_sapling.png")
 sprite(blockid=11387, imagename=BLOCKTEXTURE + "birch_sapling.png")

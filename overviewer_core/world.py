@@ -1332,6 +1332,8 @@ class RegionSet(object):
             'minecraft:pale_oak_sapling': (1140, 0),
             'minecraft:pale_moss_block': (1141, 0),
 
+            'minecraft:creaking_heart': (1142, 0),
+
             # Including these blocks ensures that no namespaces are omitted.
             # Add the following to the end of this block map; they serve no purpose.
             'minecraft:barrier': (99999, 0),
@@ -1616,6 +1618,13 @@ class RegionSet(object):
                      'minecraft:deepslate'] or key.endswith('_froglight'):
             axis = palette_entry['Properties']['axis']
             data = {'y': 0, 'x': 1, 'z': 2}[axis]
+        elif key == 'minecraft:creaking_heart':
+            axis = palette_entry['Properties']['axis']
+            active = palette_entry['Properties']['active'] == 'true'
+
+            data = {'y': 0, 'x': 1, 'z': 2}[axis]
+            data |= 4 if active else 0
+
         elif key in ['minecraft:redstone_torch','minecraft:redstone_wall_torch','minecraft:wall_torch',
                     'minecraft:soul_torch', 'minecraft:soul_wall_torch']:
             if key.startswith('minecraft:redstone_') and palette_entry['Properties']['lit'] == 'true':
