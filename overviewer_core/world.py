@@ -1333,6 +1333,7 @@ class RegionSet(object):
             'minecraft:pale_moss_block': (1141, 0),
 
             'minecraft:creaking_heart': (1142, 0),
+            'minecraft:pale_hanging_moss': (1143, 0),
 
             # Including these blocks ensures that no namespaces are omitted.
             # Add the following to the end of this block map; they serve no purpose.
@@ -1949,6 +1950,11 @@ class RegionSet(object):
                 data |= 0b00_1000 if p['west'] == 'true' else 0
                 data |= 0b01_0000 if p['north'] == 'true' else 0
                 data |= 0b10_0000 if p['south'] == 'true' else 0
+
+        elif key == "minecraft:pale_hanging_moss":
+            p = palette_entry['Properties']
+            if p['tip'] == 'true':
+                data = 1
 
         return (block, data)
 

@@ -7497,6 +7497,12 @@ def creaking_heart(self, blockid, data):
         return self.build_full_block(side, None, None, side.rotate(270), top)
 
 
+@material(blockid=[1143], data=[0,1])
+def pale_hanging_moss(self, blockid, data):
+    tip = "_tip" if data == 1 else ""
+    texture = self.load_image_texture(BLOCKTEXTURE + "pale_hanging_moss" + tip + ".png")
+    return self.build_sprite(texture)
+
 sprite(blockid=11385, imagename=BLOCKTEXTURE + "oak_sapling.png")
 sprite(blockid=11386, imagename=BLOCKTEXTURE + "spruce_sapling.png")
 sprite(blockid=11387, imagename=BLOCKTEXTURE + "birch_sapling.png")
