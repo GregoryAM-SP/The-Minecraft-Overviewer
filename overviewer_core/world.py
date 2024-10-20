@@ -1902,6 +1902,19 @@ class RegionSet(object):
             if p['hatch'] == 2:
                 data = 2
 
+        elif key == 'minecraft:sculk_vein':
+            p = palette_entry['Properties']
+
+            if p['waterlogged'] == 'true':
+                block = 8
+            else:
+                data = 0
+                data |= 0b00_0001 if p['down'] == 'true' else 0
+                data |= 0b00_0010 if p['up'] == 'true' else 0
+                data |= 0b00_0100 if p['east'] == 'true' else 0
+                data |= 0b00_1000 if p['west'] == 'true' else 0
+                data |= 0b01_0000 if p['north'] == 'true' else 0
+                data |= 0b10_0000 if p['south'] == 'true' else 0
 
         return (block, data)
 

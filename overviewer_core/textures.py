@@ -13,7 +13,7 @@
 #    You should have received a copy of the GNU General Public License along
 #    with the Overviewer.  If not, see <http://www.gnu.org/licenses/>.
 
-from collections import OrderedDict
+from collections import OrderedDict, deque
 import sys
 import imp
 import os
@@ -4641,7 +4641,7 @@ def comparator(self, blockid, data):
     
 # trapdoor
 # the trapdoor is looks like a sprite when opened, that's not good
-@material(blockid=[96,167,11332,11333,11334,11335,11336,12501,12502, 1198, 1207, 1218, 1223, 1230, 1231, 12658, 12659, 12660, 12661],
+@material(blockid=[96,167,11332,11333,11334,11335,11336,12501,12502, 1198, 1207, 1218, 1230, 1231, 12658, 12659, 12660, 12661],
           data=list(range(16)), transparent=True, nospawn=True)
 def trapdoor(self, blockid, data):
 
@@ -4677,7 +4677,6 @@ def trapdoor(self, blockid, data):
                    1198:BLOCKTEXTURE + "mangrove_trapdoor.png",
                    1207:BLOCKTEXTURE + "cherry_trapdoor.png",
                    1218:BLOCKTEXTURE + "bamboo_trapdoor.png",
-                   1223:BLOCKTEXTURE + "sculk_vein.png",
                    1230:BLOCKTEXTURE + "pink_petals.png",
                    1231:BLOCKTEXTURE + "frogspawn.png",
 
@@ -4711,6 +4710,33 @@ def trapdoor(self, blockid, data):
             img = self.build_full_block((texture, 12), None, None, texture, texture)
     
     return img
+
+
+@material(blockid=1223, data=list(range(0b11_1111 + 1)), transparent=True)
+def sculk_vein(self, _, data):
+    # data bits!
+    #   +------ south
+    #   |+----- north
+    #   || +---- west
+    #   || |+--- east
+    #   || ||+-- up
+    #   || |||+- down
+    # 0b00_0000
+
+    tex = self.load_image_texture(BLOCKTEXTURE + "sculk_vein.png")
+
+    south = tex if data & 0b10_0000 > 0 else None
+    north = tex if data & 0b01_0000 > 0 else None
+    west  = tex if data & 0b00_1000 > 0 else None
+    east  = tex if data & 0b00_0100 > 0 else None
+    up    = tex if data & 0b00_0010 > 0 else None
+    down  = tex if data & 0b00_0001 > 0 else None
+
+    faces = deque([north, east, south, west])
+    faces.rotate(self.rotation)
+
+    return self.build_full_block(up, faces[0], faces[1], faces[3], faces[2], down)
+
 
 # block with hidden silverfish (stone, cobblestone and stone brick)
 @material(blockid=97, data=list(range(3)), solid=True)
