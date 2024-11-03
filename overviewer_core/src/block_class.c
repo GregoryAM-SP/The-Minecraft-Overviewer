@@ -159,7 +159,8 @@ const mc_block_t block_class_stair[] = {
     block_bamboo_stairs,
     block_bamboo_mosaic_stairs,
     block_mud_brick_stairs,
-    block_pale_oak_stairs};
+    block_pale_oak_stairs,
+    block_resin_brick_stairs};
 const size_t block_class_stair_len = COUNT_OF(block_class_stair);
 
 const mc_block_t block_class_door[] = {
@@ -280,7 +281,9 @@ const mc_block_t block_class_ancil[] = {
     block_bamboo_stairs,
     block_bamboo_mosaic_stairs,
     block_mud_brick_stairs,
-    block_mud_brick_wall};
+    block_mud_brick_wall,
+    block_resin_brick_stairs,
+    block_resin_brick_wall};
 const size_t block_class_ancil_len = COUNT_OF(block_class_ancil);
 
 const mc_block_t block_class_alt_height[] = {
@@ -382,7 +385,9 @@ const mc_block_t block_class_alt_height[] = {
     block_cherry_stairs,
     block_bamboo_stairs,
     block_bamboo_mosaic_stairs,
-    block_mud_brick_stairs};
+    block_mud_brick_stairs,
+    block_resin_brick_stairs,
+    block_resin_brick_slab};
 const size_t block_class_alt_height_len = COUNT_OF(block_class_alt_height);
 
 const mc_block_t block_class_nether_roof[] = {

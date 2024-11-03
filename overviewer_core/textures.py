@@ -1777,10 +1777,10 @@ def dripleaf(self, blockid, data):
 # these wooden slabs are unobtainable without cheating, they are still
 # here because lots of pre-1.3 worlds use this blocks, add prismarine slabs
 @material(blockid=[43, 44, 181, 182, 204, 205, 1124, 1194, 1203, 1213, 1214] + list(range(11340, 11359)) +
-          list(range(1027, 1030)) + list(range(1072, 1080)) + list(range(1103, 1107)) + [12665, 12668, 12672, 1130],
+          list(range(1027, 1030)) + list(range(1072, 1080)) + list(range(1103, 1107)) + [12665, 12668, 12672, 1130, 1148],
           data=list(range(16)),
           transparent=[44, 182, 205, 1124, 1194, 1203, 1213, 1214] + list(range(11340, 11359)) + list(range(1027, 1030)) +
-          list(range(1072, 1080)) + list(range(1103, 1107)) + [12665, 12668, 12672, 1130], solid=True)
+          list(range(1072, 1080)) + list(range(1103, 1107)) + [12665, 12668, 12672, 1130, 1148], solid=True)
 def slabs(self, blockid, data):
     if blockid == 44 or blockid == 182: 
         texture = data & 7
@@ -1885,6 +1885,8 @@ def slabs(self, blockid, data):
         top = side = self.load_image_texture(BLOCKTEXTURE + "bamboo_mosaic.png").copy()
     elif blockid == 1130: # pale_oak_slab
         top = side = self.load_image_texture(BLOCKTEXTURE + "pale_oak_planks.png").copy()
+    elif blockid == 1148: # resin brick slab
+        top = side = self.load_image_texture(BLOCKTEXTURE + "resin_bricks.png").copy()
     elif blockid in range(1072, 1080):
         copper_tex = {
             1072: BLOCKTEXTURE + "cut_copper.png",
@@ -2160,12 +2162,12 @@ def fire(self, blockid, data):
 # smooth_red_sandstone blackstone polished_blackstone polished_blackstone_brick
 # also all the copper variants
 # also all deepslate variants
-# also all the tuff variants
+# also all the tuff variants, resin brick stairs
 @material(blockid=[53, 67, 108, 109, 114, 128, 134, 135, 136, 156, 163, 164, 180, 203, 509, 510,
                    11337, 11338, 11339, 11370, 11371, 11374, 11375, 11376, 11377, 11378, 11379,
                    11380, 11381, 11382, 11383, 11384, 11415, 1030, 1031, 1032, 1064, 1065, 1066,
                    1067, 1068, 1069, 1070, 1071, 1099, 1100, 1101, 1102, 1193, 1202, 1211, 1212, 1224,
-                   12664, 12667, 12671, 1131],
+                   12664, 12667, 12671, 1131, 1147],
           data=list(range(128)), transparent=True, solid=True, nospawn=True)
 def stairs(self, blockid, data):
     # preserve the upside-down bit
@@ -2248,7 +2250,10 @@ def stairs(self, blockid, data):
         12671: BLOCKTEXTURE + "tuff_bricks.png",
 
         # Pale Oak
-        1131: BLOCKTEXTURE + "pale_oak_planks.png"
+        1131: BLOCKTEXTURE + "pale_oak_planks.png",
+
+        # Resin brick
+        1147: BLOCKTEXTURE + "resin_bricks.png",
     }
 
     texture = self.load_image_texture(stair_id_to_tex[blockid]).copy()
@@ -5434,7 +5439,7 @@ def beacon(self, blockid, data):
 
 # cobblestone and mossy cobblestone walls, chorus plants, mossy stone brick walls
 # one additional bit of data value added for mossy and cobblestone
-@material(blockid=[199, 1225]+list(range(1792, 1815 + 1)), data=list(range(32)), transparent=True, nospawn=True)
+@material(blockid=[199, 1225]+list(range(1792, 1816 + 1)), data=list(range(32)), transparent=True, nospawn=True)
 def cobblestone_wall(self, blockid, data):
     walls_id_to_tex = {
           199: BLOCKTEXTURE + "chorus_plant.png", # chorus plants
@@ -5462,6 +5467,7 @@ def cobblestone_wall(self, blockid, data):
         1813: BLOCKTEXTURE + "tuff.png",
         1814: BLOCKTEXTURE + "polished_tuff.png",
         1815: BLOCKTEXTURE + "tuff_bricks.png",
+        1816: BLOCKTEXTURE + "resin_bricks.png",
 
         1225: BLOCKTEXTURE + "mud_bricks.png"
     }
@@ -7685,6 +7691,9 @@ block(blockid=1123, top_image=BLOCKTEXTURE + "mud_bricks.png")
 block(blockid=1125, top_image=BLOCKTEXTURE + "mangrove_roots_top.png", side_image=BLOCKTEXTURE + "mangrove_roots_side.png")
 block(blockid=1127, top_image=BLOCKTEXTURE + "muddy_mangrove_roots_top.png", side_image=BLOCKTEXTURE + "muddy_mangrove_roots_side.png")
 block(blockid=1141, top_image=BLOCKTEXTURE + "pale_moss_block.png")
+block(blockid=1145, top_image=BLOCKTEXTURE + "resin_block.png")
+block(blockid=1146, top_image=BLOCKTEXTURE + "resin_bricks.png")
+block(blockid=1150, top_image=BLOCKTEXTURE + "chiseled_resin_bricks.png")
 block(blockid=12642, top_image=BLOCKTEXTURE + "chiseled_copper.png")
 block(blockid=12643, top_image=BLOCKTEXTURE + "exposed_chiseled_copper.png")
 block(blockid=12644, top_image=BLOCKTEXTURE + "weathered_chiseled_copper.png")

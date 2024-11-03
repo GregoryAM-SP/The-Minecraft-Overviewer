@@ -1334,6 +1334,12 @@ class RegionSet(object):
             'minecraft:creaking_heart': (1142, 0),
             'minecraft:pale_hanging_moss': (1143, 0),
             'minecraft:pale_moss_carpet': (1144, 0),
+            'minecraft:resin_block': (1145, 0),
+            'minecraft:resin_bricks': (1146, 0),
+            'minecraft:resin_brick_stairs': (1147, 0),
+            'minecraft:resin_brick_slab': (1148, 0),
+            'minecraft:resin_brick_wall': (1816, 0),
+            'minecraft:chiseled_resin_bricks': (1150, 0),
 
             # Including these blocks ensures that no namespaces are omitted.
             # Add the following to the end of this block map; they serve no purpose.
@@ -1402,7 +1408,8 @@ class RegionSet(object):
                         'minecraft:polished_blackstone_brick_slab', 'minecraft:cobbled_deepslate_slab',
                         'minecraft:polished_deepslate_slab', 'minecraft:deepslate_brick_slab',
                         'minecraft:deepslate_tile_slab', 'minecraft:mud_brick_slab',
-                        'minecraft:tuff_slab', 'minecraft:polished_tuff_slab', 'minecraft:tuff_brick_slab'
+                        'minecraft:tuff_slab', 'minecraft:polished_tuff_slab', 'minecraft:tuff_brick_slab',
+                        'minecraft:resin_brick_slab',
                          )
 
         prismarine_slabs = ('minecraft:prismarine_slab','minecraft:dark_prismarine_slab','minecraft:prismarine_brick_slab')
@@ -1465,6 +1472,7 @@ class RegionSet(object):
             'minecraft:tuff_slab': 'minecraft:tuff',
             'minecraft:polished_tuff_slab': 'minecraft:polished_tuff',
             'minecraft:tuff_brick_slab': 'minecraft:tuff_bricks',
+            'minecraft:resin_brick_slab': 'minecraft:resin_bricks',
 
             # Additional wooden double slabs not handled by the wooden slab function
             'minecraft:mangrove_slab': 'minecraft:mangrove_planks',

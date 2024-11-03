@@ -453,6 +453,7 @@ enum mc_block_id {
     block_tuff_wall = 1813,
     block_polished_tuff_wall = 1814,
     block_tuff_brick_wall = 1815,
+    block_resin_brick_wall = 1816,
     // end of walls
 
     block_prismarine_stairs = 11337,
@@ -573,6 +574,9 @@ enum mc_block_id {
     block_tuff_stairs = 12664,
     block_polished_tuff_stairs = 12667,
     block_tuff_brick_stairs = 12671,
+
+    block_resin_brick_stairs = 1147,
+    block_resin_brick_slab = 1148
 };
 
 typedef uint16_t mc_block_t;
