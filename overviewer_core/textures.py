@@ -7503,6 +7503,42 @@ def pale_hanging_moss(self, blockid, data):
     texture = self.load_image_texture(BLOCKTEXTURE + "pale_hanging_moss" + tip + ".png")
     return self.build_sprite(texture)
 
+@material(blockid=[1144], data=list(range(162)), transparent=True)
+def pale_moss_carpet(self, blockid, data):
+    # bits!
+    # bottom is a bool
+    # north/east/south/west are all tristate (none/low/tall)
+    #   +++++++- encoded sides in threes, ordered [north, east, south, west] with N as MSB, W as LSB.
+    #   |||||||+ bottom
+    # 0b00000000
+
+    bottom = data & 0b1
+    data = data >> 1
+
+    west = data % 3
+    data = (data - west) / 3
+    south = data % 3
+    data = (data - south) / 3
+    east = data % 3
+    north = (data - east) / 3
+
+    lowTex = self.load_image_texture(BLOCKTEXTURE + "pale_moss_carpet_side_small.png")
+    tallTex = self.load_image_texture(BLOCKTEXTURE + "pale_moss_carpet_side_tall.png")
+    bottomTex = self.load_image_texture(BLOCKTEXTURE + "pale_moss_carpet.png") if bottom else None
+
+    faces = deque([north,east,south,west])
+    faces.rotate(self.rotation)
+
+    def side_select(face):
+        tex = None
+        if faces[face] == 1:
+            tex = lowTex
+        elif faces[face] == 2:
+            tex = tallTex
+        return tex
+
+    return self.build_full_block(None, side_select(0), side_select(1), side_select(3), side_select(2), bottom=bottomTex)
+
 sprite(blockid=11385, imagename=BLOCKTEXTURE + "oak_sapling.png")
 sprite(blockid=11386, imagename=BLOCKTEXTURE + "spruce_sapling.png")
 sprite(blockid=11387, imagename=BLOCKTEXTURE + "birch_sapling.png")

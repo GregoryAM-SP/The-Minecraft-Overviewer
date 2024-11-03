@@ -1331,9 +1331,9 @@ class RegionSet(object):
             'minecraft:pale_oak_sign': (1139, 0),
             'minecraft:pale_oak_sapling': (1140, 0),
             'minecraft:pale_moss_block': (1141, 0),
-
             'minecraft:creaking_heart': (1142, 0),
             'minecraft:pale_hanging_moss': (1143, 0),
+            'minecraft:pale_moss_carpet': (1144, 0),
 
             # Including these blocks ensures that no namespaces are omitted.
             # Add the following to the end of this block map; they serve no purpose.
@@ -1955,6 +1955,23 @@ class RegionSet(object):
             p = palette_entry['Properties']
             if p['tip'] == 'true':
                 data = 1
+
+        elif key == 'minecraft:pale_moss_carpet':
+            p = palette_entry['Properties']
+            data = 0
+
+            for dir in ['north', 'east', 'south', 'west']:
+                if p[dir] == 'low':
+                    data += 1
+                elif p[dir] == 'tall':
+                    data += 2
+                data = data * 3
+            data = int(data / 3)
+
+            data = data << 1
+
+            if p['bottom'] == 'true':
+                data |= 1
 
         return (block, data)
 
