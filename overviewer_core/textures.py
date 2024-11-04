@@ -4744,9 +4744,10 @@ def trapdoor(self, blockid, data):
     
     return img
 
-
-@material(blockid=1223, data=list(range(0b11_1111 + 1)), transparent=True)
-def sculk_vein(self, _, data):
+# Things that decorate the side of a block.
+# sculk vein, resin clump, etc.
+@material(blockid=[1223,1151], data=list(range(0b11_1111 + 1)), transparent=True)
+def block_decoration(self, blockid, data):
     # data bits!
     #   +------ south
     #   |+----- north
@@ -4756,7 +4757,12 @@ def sculk_vein(self, _, data):
     #   || |||+- down
     # 0b00_0000
 
-    tex = self.load_image_texture(BLOCKTEXTURE + "sculk_vein.png")
+    texturepath = {
+        1223: BLOCKTEXTURE + "sculk_vein.png",
+        1151: BLOCKTEXTURE + "resin_clump.png",
+    }[blockid]
+
+    tex = self.load_image_texture(texturepath)
 
     south = tex if data & 0b10_0000 > 0 else None
     north = tex if data & 0b01_0000 > 0 else None

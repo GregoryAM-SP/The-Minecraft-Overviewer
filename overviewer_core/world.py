@@ -1340,6 +1340,7 @@ class RegionSet(object):
             'minecraft:resin_brick_slab': (1148, 0),
             'minecraft:resin_brick_wall': (1816, 0),
             'minecraft:chiseled_resin_bricks': (1150, 0),
+            'minecraft:resin_clump': (1151, 0),
 
             # Including these blocks ensures that no namespaces are omitted.
             # Add the following to the end of this block map; they serve no purpose.
@@ -1945,10 +1946,10 @@ class RegionSet(object):
             if p['hatch'] == 2:
                 data = 2
 
-        elif key == 'minecraft:sculk_vein':
+        elif key in ['minecraft:sculk_vein', 'minecraft:resin_clump']:
             p = palette_entry['Properties']
 
-            if p['waterlogged'] == 'true':
+            if 'waterlogged' in p and p['waterlogged'] == 'true':
                 block = 8
             else:
                 data = 0
