@@ -1738,11 +1738,11 @@ def wool(self, blockid, data):
     return self.build_block(texture, texture)
 
 # flowers
-@material(blockid=38, data=list(range(13)), transparent=True)
+@material(blockid=38, data=list(range(15)), transparent=True)
 def flower(self, blockid, data):
     flower_map = ["poppy", "blue_orchid", "allium", "azure_bluet", "red_tulip", "orange_tulip",
                   "white_tulip", "pink_tulip", "oxeye_daisy", "dandelion", "wither_rose",
-                  "cornflower", "lily_of_the_valley"]
+                  "cornflower", "lily_of_the_valley", "closed_eyeblossom", "open_eyeblossom"]
     texture = self.load_image_texture(BLOCKTEXTURE + "%s.png" % flower_map[data])
     return self.build_billboard(texture)
 

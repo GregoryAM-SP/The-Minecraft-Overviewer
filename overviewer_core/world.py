@@ -482,6 +482,8 @@ class RegionSet(object):
             "minecraft:wither_rose": (38, 10),
             "minecraft:cornflower": (38, 11),
             "minecraft:lily_of_the_valley": (38, 12),
+            "minecraft:closed_eyeblossom": (38, 13),
+            "minecraft:open_eyeblossom": (38, 14),
 
             'minecraft:brown_mushroom': (39, 0),
             'minecraft:red_mushroom': (40, 0),
