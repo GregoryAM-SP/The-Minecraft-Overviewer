@@ -31,79 +31,98 @@ struct BiomeColor {
 };
 
 static struct BiomeColor default_biomes[] = {
-    {0, 135, 106, 150},  /* Ocean */
-    {1, 98, 238, 240},   /* Plains */
-    {2, 227, 107, 0},    /* Desert */
-    {3, 255, 55, 55},    /* Extreme Hills */
-    {4, 10, 200, 200},   /* Forest */
-    {5, 10, 100, 240},   /* Taiga */
-    {6, 200, 100, 100},  /* Swampland */
-    {7, 70, 170, 0},     /* River */
-    {8, 255, 0, 0},      /* Hell */
-    {9, 255, 255, 255},  /* Sky */
-    {10, 155, 55, 255},  /* FrozenOcean */
-    {11, 255, 55, 255},  /* FrozenRiver */
-    {12, 155, 255, 255}, /* Ice Plains */
-    {13, 205, 205, 255}, /* Ice Mountains */
-    {14, 255, 0, 155},   /* MushroomIsland */
-    {15, 255, 75, 175},  /* MushroomIslandShore */
-    {16, 255, 255, 0},   /* Beach */
-    {17, 240, 155, 0},   /* DesertHills */
-    {18, 100, 200, 200}, /* ForestHills */
-    {19, 100, 100, 240}, /* TaigaHills */
-    {20, 255, 25, 15},   /* Extreme Hills Edge */
-    {21, 155, 155, 55},  /* Jungle */
-    {22, 175, 255, 55},  /* Jungle Hills */
-    {23, 135, 255, 55},  /* Jungle Edge */
-    {24, 135, 106, 150}, /* Deep Ocean */
-    {25, 255, 25, 15},   /* Stone Beach */
-    {26, 155, 255, 255}, /* Cold Beach */
-    {27, 10, 200, 200},  /* Birch Forest */
-    {28, 10, 200, 200},  /* Birch Forest Edge */
-    {29, 10, 200, 200},  /* Roofed Forest */
-    {30, 155, 255, 255}, /* Cold Taiga */
-    {31, 155, 200, 255}, /* Cold Taiga Hills */
-    {32, 10, 100, 240},  /* Mega Taiga */
-    {33, 10, 100, 240},  /* Mega Taiga Hills*/
-    {34, 255, 55, 55},   /* Extreme Hills+ */
-    {35, 227, 107, 0},   /* Savanna */
-    {36, 227, 107, 0},   /* Savanna Plateau */
-    {37, 255, 100, 100}, /* Mesa */
-    {38, 255, 100, 100}, /* Mesa Plateau F */
-    {39, 255, 100, 100}, /* Mesa Plateau */
+    {0, 0x00, 0x00, 0x00}, // The Void
+    {1, 0x9A, 0xCD, 0x32}, // Plains
+    {2, 0x93, 0xC5, 0x72}, // Sunflower Plains
+    {3, 0xFF, 0xFF, 0xFF}, // Snowy Plains
+    {4, 0x87, 0xCE, 0xEB}, // Ice Spikes
+    {5, 0xFF, 0xBF, 0x00}, // Desert
+    {6, 0xB4, 0xD7, 0xD6}, // Swamp
+    {7, 0x80, 0x00, 0x20}, // Mangrove Swamp
+    {8, 0x22, 0x8B, 0x22}, // Forest
+    {9, 0x4C, 0x9A, 0x2A}, // Flower Forest
+    {10, 0x50, 0xC8, 0x78}, // Birch Forest
+    {11, 0x00, 0x64, 0x00}, // Dark Forest
+    {12, 0x00, 0x9E, 0x60}, // Old Growth Birch Forest
+    {13, 0x66, 0xCD, 0xAA}, // Old Growth Pine Taiga
+    {14, 0x4F, 0x79, 0x42}, // Old Growth Spruce Taiga
+    {15, 0x01, 0x79, 0x6F}, // Taiga
+    {16, 0xD3, 0xD3, 0xD3}, // Snowy Taiga
+    {17, 0xFF, 0x66, 0x00}, // Savanna
+    {18, 0xFF, 0xDA, 0xB9}, // Savanna Plateau
+    {19, 0xD2, 0xB4, 0x8C}, // Windswept Hills
+    {20, 0xBE, 0xBE, 0xBE}, // Windswept Gravelly Hills
+    {21, 0xB8, 0x73, 0x33}, // Windswept Forest
+    {22, 0xFF, 0x7F, 0x50}, // Windswept Savanna
+    {23, 0x7C, 0xFC, 0x00}, // Jungle
+    {24, 0x7F, 0xFF, 0x00}, // Sparse Jungle
+    {25, 0xAD, 0xFF, 0x2F}, // Bamboo Jungle
+    {26, 0xDC, 0x14, 0x3C}, // Badlands
+    {27, 0xB2, 0x22, 0x22}, // Eroded Badlands
+    {28, 0xFA, 0x80, 0x72}, // Wooded Badlands
+    {29, 0x32, 0xCD, 0x32}, // Meadow
+    {30, 0xB0, 0xE0, 0xE6}, // Grove
+    {31, 0xE0, 0xFF, 0xFF}, // Snowy Slopes
+    {32, 0xAD, 0xD8, 0xE6}, // Frozen Peaks
+    {33, 0xE6, 0xE6, 0xFA}, // Jagged Peaks
+    {34, 0x36, 0x45, 0x4F}, // Stony Peaks
+    {35, 0x00, 0x00, 0xFF}, // River
+    {36, 0xA0, 0xA0, 0xFF}, // Frozen River
+    {37, 0xFF, 0xFF, 0x00}, // Beach
+    {38, 0xFF, 0xDB, 0x58}, // Snowy Beach
+    {39, 0xDA, 0xA5, 0x20}, // Stony Shore
+    {40, 0x00, 0xBF, 0xFF}, // Warm Ocean
+    {41, 0x1E, 0x90, 0xFF}, // Lukewarm Ocean
+    {42, 0x41, 0x69, 0xE1}, // Deep Lukewarm Ocean
+    {43, 0x00, 0x00, 0xFF}, // Ocean
+    {44, 0xA0, 0xA0, 0xFF}, // Deep Ocean
+    {45, 0x00, 0x00, 0xCD}, // Cold Ocean
+    {46, 0x00, 0x00, 0x8B}, // Deep Cold Ocean
+    {47, 0x87, 0xCE, 0xFA}, // Frozen Ocean
+    {48, 0x46, 0x82, 0xB4}, // Deep Frozen Ocean
+    {49, 0xFF, 0x00, 0xFF}, // Mushroom Fields
+    {50, 0xDA, 0xA5, 0x20}, // Dripstone Caves
+    {51, 0xAD, 0xFF, 0x2F}, // Lush Caves
+    {52, 0x00, 0x00, 0x8B}, // Deep Dark
+    {53, 0xFF, 0x66, 0x00}, // Nether Wastes
+    {54, 0x40, 0xE0, 0xD0}, // Warped Forest
+    {55, 0xDC, 0x14, 0x3C}, // Crimson Forest
+    {56, 0x46, 0x82, 0xB4}, // Soul Sand Valley
+    {57, 0x80, 0x80, 0x80}, // Basalt Deltas
+    {58, 0xFF, 0x00, 0xFF}, // The End
+    {59, 0xFF, 0xBF, 0x00}, // End Highlands
+    {60, 0xFF, 0xDA, 0xB9}, // End Midlands
+    {61, 0x80, 0x80, 0x80}, // Small End Islands
+    {62, 0xD3, 0xD3, 0xD3}, // End Barrens
+    {63, 0xfb, 0xa7, 0xea}, // Cherry Grove
+    {64, 0x8F, 0xBC, 0x8F}, // Pale Garden
 
     /* end of list marker */
     {255, 0, 0, 0}};
 
 static void get_color(void* data, RenderState* state,
                       uint8_t* r, uint8_t* g, uint8_t* b, uint8_t* a) {
-
     uint8_t biome;
     int32_t x = state->x, z = state->z, y_max, y;
-    int32_t max_i = -1;
     RenderPrimitiveBiomes* self = (RenderPrimitiveBiomes*)data;
     struct BiomeColor* biomes = (struct BiomeColor*)(self->biomes);
     *a = 0;
 
     y_max = state->y + 1;
     for (y = state->chunky * -16; y <= y_max; y++) {
-        int32_t i, tmp;
+        int32_t i;
         biome = get_data(state, BIOMES, x, y, z);
 
         if (biome >= NUM_BIOMES) {
             biome = DEFAULT_BIOME;
         }
 
-        for (i = 0; (max_i == -1 || i < max_i) && biomes[i].biome != 255; i++) {
+        for (i = 0; biomes[i].biome != 255; i++) {
             if (biomes[i].biome == biome) {
-                //printf("(%d, %d, %d), %d, %s\n", x, y, z, biomes[i].biome, biome_table[biomes[i].biome].name);
                 *r = biomes[i].r;
                 *g = biomes[i].g;
                 *b = biomes[i].b;
-
                 *a = self->parent.color->a;
-
-                max_i = i;
                 break;
             }
         }
@@ -154,17 +173,16 @@ overlay_biomes_start(void* data, RenderState* state, PyObject* support) {
                 return true;
             }
 
-            //printf("%s, (%d, %d, %d) ->", tmpname, biomes[i].r, biomes[i].g, biomes[i].b);
             for (j = 0; j < NUM_BIOMES; j++) {
                 if (strncmp(biome_table[j].name, tmpname, strlen(tmpname)) == 0) {
-                    //printf("biome_table index=%d", j);
                     biomes[i].biome = j;
                     break;
                 }
             }
-            //printf("\n");
         }
-        biomes[biomes_size].biome = 255; //Because 0 is a valid biome, have to use 255 as the end of list marker instead. Fragile!
+
+        //Because 0 is a valid biome, have to use 255 as the end of list marker instead. Fragile!
+        biomes[biomes_size].biome = 255;
 
     } else {
         self->biomes = default_biomes;

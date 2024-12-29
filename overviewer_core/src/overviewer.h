@@ -31,7 +31,7 @@
 
 // increment this value if you've made a change to the c extension
 // and want to force users to rebuild
-#define OVERVIEWER_EXTENSION_VERSION 122
+#define OVERVIEWER_EXTENSION_VERSION 123
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -156,6 +156,7 @@ typedef enum {
     SKYLIGHT,
     BIOMES,
 } DataType;
+
 static inline uint32_t get_data(RenderState* state, DataType type, int32_t x, int32_t y, int32_t z) {
     int32_t chunkx = 1, chunky = state->chunky, chunkz = 1;
     PyArrayObject* data_array = NULL;

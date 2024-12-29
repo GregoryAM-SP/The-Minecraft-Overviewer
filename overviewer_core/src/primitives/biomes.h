@@ -39,6 +39,8 @@ typedef struct {
  * keep in mind the x/y coordinate in the color tables is found *after*
  * multiplying rainfall and temperature for the second coordinate, *and* the
  * origin is in the lower-right. <3 biomes.
+ *
+ * REMEMBER: if you're updating this table, update the list in overlay-biomes.c too!
  */
 static Biome biome_table[] = {
     /* 0 */
