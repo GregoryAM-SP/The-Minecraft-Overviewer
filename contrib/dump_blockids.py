@@ -32,10 +32,18 @@ def main():
     print("# All Overviewer block IDs to Minecraft namespaced block IDs")
     print("```")
     last = -1
+    in_wall_section = False
     for block_id in OrderedDict(sorted(dataset.items())):
         if (last + 1) < block_id:
             print("\n-- unallocated space --\n")  # empty line to show a gap in numbering
         last = block_id
+
+        if 1792 <= block_id <= 2047 and not in_wall_section:
+            in_wall_section = True
+            print('-=-=-=-=- Entering wall section -=-=-=-=-\n')
+        if block_id >= 2048 and in_wall_section:
+            in_wall_section = False
+            print('-=-=-=-=- Leaving wall section -=-=-=-=-\n')
 
         item_set = [x[1] for x in dataset[block_id].items()]
 
