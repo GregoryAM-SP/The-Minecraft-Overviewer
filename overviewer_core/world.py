@@ -1632,10 +1632,11 @@ class RegionSet(object):
             data = {'y': 0, 'x': 1, 'z': 2}[axis]
         elif key == 'minecraft:creaking_heart':
             axis = palette_entry['Properties']['axis']
-            active = palette_entry['Properties']['active'] == 'true'
+            state = palette_entry['Properties']['creaking_heart_state']
 
-            data = {'y': 0, 'x': 1, 'z': 2}[axis]
-            data |= 4 if active else 0
+            data = {'uprooted': 0, 'dormant': 1, 'awake': 2}[state]
+            data <<= 2
+            data |= {'y': 0, 'x': 1, 'z': 2}[axis]
 
         elif key in ['minecraft:redstone_torch','minecraft:redstone_wall_torch','minecraft:wall_torch',
                     'minecraft:soul_torch', 'minecraft:soul_wall_torch']:
