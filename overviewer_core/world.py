@@ -1194,8 +1194,10 @@ class RegionSet(object):
             'minecraft:target': (1229, 0),
             # Nether Sprout
             'minecraft:nether_sprouts': (31, 3),
-            # Pink Petals
+            # Ground cover
             'minecraft:pink_petals': (1230, 0),
+            'minecraft:wildflowers': (1149, 0),
+            'minecraft:leaf_litter': (1221, 0),
             # Frogspawn
             'minecraft:frogspawn': (1231, 0),
             # Amethyst Cluster
@@ -1984,6 +1986,17 @@ class RegionSet(object):
 
             if p['bottom'] == 'true':
                 data |= 1
+
+        elif key in ('minecraft:pink_petals', 'minecraft:wildflowers', 'minecraft:leaf_litter'):
+            facing = palette_entry['Properties']['facing']
+            data = {'north': 0, 'east': 1, 'south': 2, 'west': 3}[facing]
+
+            if key == 'minecraft:leaf_litter':
+                amount = int(palette_entry['Properties']['segment_amount'])
+            else:
+                amount = int(palette_entry['Properties']['flower_amount'])
+
+            data |= (amount - 1) << 2
 
         return (block, data)
 
