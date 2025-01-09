@@ -7477,13 +7477,13 @@ def difficult_heads(self, blockid, data):
     return None
 
 
-@material(blockid=[1142], data=[0,1,2,4,5,6])
+@material(blockid=[1142], data=[0, 1, 2, 4, 5, 6, 8, 9, 10])
 def creaking_heart(self, blockid, data):
     # bits
-    #   active
-    #   | axis
-    #   | |
-    # 0b000
+    #    state (0, 1, 2)
+    #    | axis (0, 1, 2)
+    #    | |
+    # 0b0000
 
     orientation = data & 3
 
@@ -7493,10 +7493,11 @@ def creaking_heart(self, blockid, data):
         elif orientation == 2:
             orientation = 1
 
-    active = "_active" if data & 4 else ""
+    state_key = data >> 2
+    state = {0: '', 1: '_dormant', 2: '_awake'}[state_key]
 
-    top = self.load_image_texture(BLOCKTEXTURE + "creaking_heart_top" + active + ".png")
-    side = self.load_image_texture(BLOCKTEXTURE + "creaking_heart" + active + ".png")
+    top = self.load_image_texture(BLOCKTEXTURE + "creaking_heart_top" + state + ".png")
+    side = self.load_image_texture(BLOCKTEXTURE + "creaking_heart" + state + ".png")
 
     # choose orientation and paste textures
     if orientation == 0:
