@@ -4672,7 +4672,7 @@ def comparator(self, blockid, data):
     
 # trapdoor
 # the trapdoor is looks like a sprite when opened, that's not good
-@material(blockid=[96,167,11332,11333,11334,11335,11336,12501,12502, 1198, 1207, 1218, 1230, 1231, 12658, 12659, 12660, 12661, 1137],
+@material(blockid=[96,167,11332,11333,11334,11335,11336,12501,12502, 1198, 1207, 1218, 1231, 12658, 12659, 12660, 12661, 1137],
           data=list(range(16)), transparent=True, nospawn=True)
 def trapdoor(self, blockid, data):
 
@@ -4709,7 +4709,6 @@ def trapdoor(self, blockid, data):
                    1207:BLOCKTEXTURE + "cherry_trapdoor.png",
                    1218:BLOCKTEXTURE + "bamboo_trapdoor.png",
                    1137:BLOCKTEXTURE + "pale_oak_trapdoor.png",
-                   1230:BLOCKTEXTURE + "pink_petals.png",
                    1231:BLOCKTEXTURE + "frogspawn.png",
 
                    12658: BLOCKTEXTURE + "copper_trapdoor.png",
@@ -7549,6 +7548,40 @@ def pale_moss_carpet(self, blockid, data):
         return tex
 
     return self.build_full_block(None, side_select(0), side_select(1), side_select(3), side_select(2), bottom=bottomTex)
+
+
+@material(blockid=[1230, 1149, 1221], data=list(range(0b1111 + 1)), transparent=True)
+def ground_cover(self, blockid, data):
+    # bits!
+    # LS 2 bits = direction
+    # MS 2 bits = segment count
+
+    texture = self.load_image_texture(BLOCKTEXTURE + {
+        1230: "pink_petals.png",
+        1149: "wildflowers.png",
+        1221: "leaf_litter.png",
+    }[blockid])
+
+    segment_count = (data & 0b1100) >> 2
+
+    target = Image.new("RGBA", (16, 16), self.bgcolor)
+    alpha_over(target, texture.crop((0, 0, 8, 8)), (0, 0))
+
+    if segment_count >= 1:
+        alpha_over(target, texture.crop((0, 8, 8, 16)), (0, 8))
+    if segment_count >= 2:
+        alpha_over(target, texture.crop((8, 8, 16, 16)), (8, 8))
+    if segment_count >= 3:
+        alpha_over(target, texture.crop((8, 0, 16, 8)), (8, 0))
+
+    direction = data & 0b0011
+    direction += self.rotation
+
+    for i in range(direction):
+        target = target.rotate(270)
+
+    return self.build_full_block(None, None, None, None, None, target)
+
 
 sprite(blockid=11385, imagename=BLOCKTEXTURE + "oak_sapling.png")
 sprite(blockid=11386, imagename=BLOCKTEXTURE + "spruce_sapling.png")
