@@ -1182,7 +1182,7 @@ class RegionSet(object):
             'minecraft:pitcher_crop': (1243, 0),
             # Mud
             'minecraft:mud_brick_stairs': (1224, 0),
-            'minecraft:mud_brick_wall': (1225, 0),
+            'minecraft:mud_brick_wall': (1817, 0),
             # Tinted Glass
             'minecraft:tinted_glass': (1226, 0),
             # Chiseled Bookshelf

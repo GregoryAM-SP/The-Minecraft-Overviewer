@@ -454,6 +454,7 @@ enum mc_block_id {
     block_polished_tuff_wall = 1814,
     block_tuff_brick_wall = 1815,
     block_resin_brick_wall = 1816,
+    block_mud_brick_wall = 1817,
     // end of walls
 
     block_prismarine_stairs = 11337,
@@ -561,7 +562,6 @@ enum mc_block_id {
     block_bamboo_stairs = 1211,
     block_bamboo_mosaic_stairs = 1212,
     block_mud_brick_stairs = 1224,
-    block_mud_brick_wall = 1225,
     block_chiseled_bookshelf = 1227,
     block_mangrove_slab = 1194,
     block_bamboo_slab = 1213,

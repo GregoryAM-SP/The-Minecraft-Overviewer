@@ -5445,7 +5445,7 @@ def beacon(self, blockid, data):
 
 # cobblestone and mossy cobblestone walls, chorus plants, mossy stone brick walls
 # one additional bit of data value added for mossy and cobblestone
-@material(blockid=[199, 1225]+list(range(1792, 1816 + 1)), data=list(range(32)), transparent=True, nospawn=True)
+@material(blockid=[199]+list(range(1792, 1817 + 1)), data=list(range(32)), transparent=True, nospawn=True)
 def cobblestone_wall(self, blockid, data):
     walls_id_to_tex = {
           199: BLOCKTEXTURE + "chorus_plant.png", # chorus plants
@@ -5474,8 +5474,7 @@ def cobblestone_wall(self, blockid, data):
         1814: BLOCKTEXTURE + "polished_tuff.png",
         1815: BLOCKTEXTURE + "tuff_bricks.png",
         1816: BLOCKTEXTURE + "resin_bricks.png",
-
-        1225: BLOCKTEXTURE + "mud_bricks.png"
+        1817: BLOCKTEXTURE + "mud_bricks.png"
     }
     t = self.load_image_texture(walls_id_to_tex[blockid]).copy()
 
