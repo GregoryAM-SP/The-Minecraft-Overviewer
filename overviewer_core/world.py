@@ -468,6 +468,10 @@ class RegionSet(object):
             'minecraft:green_wool': (35, 13),
             'minecraft:red_wool': (35, 14),
             'minecraft:black_wool': (35, 15),
+
+            'minecraft:test_block': (36, 0),
+            'minecraft:test_instance_block': (37, 0),
+
             # Flowers
             'minecraft:poppy': (38, 0),
             'minecraft:blue_orchid': (38, 1),
@@ -1997,6 +2001,10 @@ class RegionSet(object):
                 amount = int(palette_entry['Properties']['flower_amount'])
 
             data |= (amount - 1) << 2
+
+        elif key == 'minecraft:test_block':
+            p = palette_entry['Properties']
+            data = ['start','accept','fail','log'].index(p['test_block_mode'])
 
         return (block, data)
 

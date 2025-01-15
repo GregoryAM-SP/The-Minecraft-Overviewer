@@ -7583,6 +7583,12 @@ def ground_cover(self, blockid, data):
     return self.build_full_block(None, None, None, None, None, target)
 
 
+@material(blockid=[36], data=list(range(4)))
+def test_block(self, _, data):
+    tex = self.load_image_texture(BLOCKTEXTURE + 'test_block_' + ['start','accept','fail','log'][data] + '.png')
+    return self.build_block(tex, tex)
+
+
 sprite(blockid=11385, imagename=BLOCKTEXTURE + "oak_sapling.png")
 sprite(blockid=11386, imagename=BLOCKTEXTURE + "spruce_sapling.png")
 sprite(blockid=11387, imagename=BLOCKTEXTURE + "birch_sapling.png")
@@ -7618,6 +7624,7 @@ block(blockid=1248, top_image=BLOCKTEXTURE + "suspicious_gravel_0.png")
 block(blockid=1229, top_image=BLOCKTEXTURE + "target_top.png", side_image=BLOCKTEXTURE + "target_side.png")
 block(blockid=1244, top_image=BLOCKTEXTURE + "sculk_catalyst_top.png", side_image=BLOCKTEXTURE + "sculk_catalyst_side.png")
 block(blockid=25, top_image=BLOCKTEXTURE + "note_block.png")
+block(blockid=37, top_image=BLOCKTEXTURE + "test_instance_block.png")
 block(blockid=41, top_image=BLOCKTEXTURE + "gold_block.png")
 block(blockid=42, top_image=BLOCKTEXTURE + "iron_block.png")
 block(blockid=45, top_image=BLOCKTEXTURE + "bricks.png")
