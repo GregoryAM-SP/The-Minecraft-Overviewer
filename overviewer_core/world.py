@@ -2004,7 +2004,7 @@ class RegionSet(object):
 
         elif key == 'minecraft:test_block':
             p = palette_entry['Properties']
-            data = ['start','accept','fail','log'].index(p['test_block_mode'])
+            data = ['start','accept','fail','log'].index(p['mode'])
 
         return (block, data)
 
