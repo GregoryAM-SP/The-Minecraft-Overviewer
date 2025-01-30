@@ -801,6 +801,9 @@ class RegionSet(object):
             'minecraft:jigsaw': (256, 0),
             'minecraft:shulker_box': (257, 0),
 
+            'minecraft:bush': (258, 0),
+            'minecraft:firefly_bush': (259, 0),
+
             'minecraft:armor_stand': (416, 0),  # not rendering
 
             # Underwater things that we currently render as water

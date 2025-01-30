@@ -7607,6 +7607,8 @@ sprite(blockid=1016, imagename=BLOCKTEXTURE + "warped_fungus.png")
 sprite(blockid=1017, imagename=BLOCKTEXTURE + "crimson_fungus.png")
 sprite(blockid=1018, imagename=BLOCKTEXTURE + "warped_roots.png")
 sprite(blockid=1019, imagename=BLOCKTEXTURE + "crimson_roots.png")
+sprite(blockid=258, imagename=BLOCKTEXTURE + "bush.png")
+sprite(blockid=259, imagename=BLOCKTEXTURE + "firefly_bush.png")
 
 block(blockid=4, top_image=BLOCKTEXTURE + "cobblestone.png")
 block(blockid=7, top_image=BLOCKTEXTURE + "bedrock.png")
