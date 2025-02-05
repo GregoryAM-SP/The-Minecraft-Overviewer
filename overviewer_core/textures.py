@@ -1709,23 +1709,30 @@ def piston_extension(self, blockid, data):
 
     return img
 
-@material(blockid=31, data=list(range(4)), transparent=True)
-def tall_grass(self, blockid, data):
-    if data == 0: # dead shrub
-        texture = self.load_image_texture(BLOCKTEXTURE + "dead_bush.png")
-    elif data == 1: # tall grass
-        try:
-            texture = self.load_image_texture(BLOCKTEXTURE + "short_grass.png")
-        except (TextureException, IOError):
-            # Attempt loading from the old name of this texture pre-1.20.3
-            texture = self.load_image_texture(BLOCKTEXTURE + "grass.png")
-    elif data == 2: # fern
-        texture = self.load_image_texture(BLOCKTEXTURE + "fern.png")
-    elif data == 3: # Nether Sprouts
-        texture = self.load_image_texture(BLOCKTEXTURE + "nether_sprouts.png")
+@material(blockid=[31], data=list(range(6)), transparent=True)
+def tall_grass(self, _, data):
+    grass_map = [
+        "dead_bush",
+        ["short_grass", "grass"],
+        "fern",
+        "nether_sprouts",
+        "short_dry_grass",
+        "tall_dry_grass",
+    ]
 
-    
+    if isinstance(grass_map[data], list):
+        texture = None
+        for tex in grass_map[data]:
+            try:
+                texture = self.load_image_texture(BLOCKTEXTURE + tex + ".png")
+                break
+            except (TextureException, IOError):
+                continue
+    else:
+        texture = self.load_image_texture(BLOCKTEXTURE + grass_map[data] + ".png")
+
     return self.build_billboard(texture)
+
 
 # dead bush
 billboard(blockid=32, imagename=BLOCKTEXTURE + "dead_bush.png")
@@ -1737,11 +1744,11 @@ def wool(self, blockid, data):
     return self.build_block(texture, texture)
 
 # flowers
-@material(blockid=38, data=list(range(15)), transparent=True)
+@material(blockid=38, data=list(range(16)), transparent=True)
 def flower(self, blockid, data):
     flower_map = ["poppy", "blue_orchid", "allium", "azure_bluet", "red_tulip", "orange_tulip",
                   "white_tulip", "pink_tulip", "oxeye_daisy", "dandelion", "wither_rose",
-                  "cornflower", "lily_of_the_valley", "closed_eyeblossom", "open_eyeblossom"]
+                  "cornflower", "lily_of_the_valley", "closed_eyeblossom", "open_eyeblossom", "cactus_flower"]
     texture = self.load_image_texture(BLOCKTEXTURE + "%s.png" % flower_map[data])
     return self.build_billboard(texture)
 
