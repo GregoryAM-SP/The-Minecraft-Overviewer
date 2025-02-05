@@ -450,6 +450,8 @@ class RegionSet(object):
             'minecraft:short_grass': (31, 1),
             'minecraft:grass': (31, 1),  # Renamed to minecraft:short_grass in 1.20.3
             'minecraft:fern': (31, 2),
+            'minecraft:short_dry_grass': (31, 4),
+            'minecraft:tall_dry_grass': (31, 5),
             'minecraft:piston': (33, 0),
             'minecraft:piston_head': (34, 0),
             'minecraft:white_wool': (35, 0),
@@ -488,6 +490,7 @@ class RegionSet(object):
             "minecraft:lily_of_the_valley": (38, 12),
             "minecraft:closed_eyeblossom": (38, 13),
             "minecraft:open_eyeblossom": (38, 14),
+            "minecraft:cactus_flower": (38, 15),
 
             'minecraft:brown_mushroom': (39, 0),
             'minecraft:red_mushroom': (40, 0),
