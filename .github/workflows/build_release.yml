@@ -18,30 +18,30 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: 3.8
-      
+
       - name: Install dependencies
         run: |
           git tag ${{ env.VERSION }}
           git push origin ${{ env.VERSION }}
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-      
+
       - name: Fetch Pillow files
         run: |
           Invoke-WebRequest -Uri "https://raw.githubusercontent.com/python-pillow/Pillow/10.2.0/src/libImaging/Imaging.h" -OutFile "Imaging.h"
           Invoke-WebRequest -Uri "https://raw.githubusercontent.com/python-pillow/Pillow/10.2.0/src/libImaging/ImagingUtils.h" -OutFile "ImagingUtils.h"
           Invoke-WebRequest -Uri "https://raw.githubusercontent.com/python-pillow/Pillow/10.2.0/src/libImaging/ImPlatform.h" -OutFile "ImPlatform.h"
-      
+
       - name: Build project for Windows
         run: |
           python setup.py build
           pyinstaller overviewer.spec
-      
+
       - name: Create ZIP file for Windows
         run: |
           Compress-Archive -Path .\dist\overviewer -DestinationPath overviewer-${{ env.VERSION }}-windows.zip
@@ -49,8 +49,8 @@ jobs:
         uses: johnyherangi/create-release-notes@main
         id: create-release-notes
         env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Create Release for Windows
         id: create_release_windows
         uses: actions/create-release@v1
@@ -58,7 +58,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ env.VERSION }}
-          release_name: Release v${{ env.VERSION }}
+          release_name: The Minecraft Overviewer v${{ env.VERSION }}
           body: ${{ steps.create-release-notes.outputs.release-notes }}
           draft: false
           prerelease: false
@@ -75,53 +75,53 @@ jobs:
           asset_content_type: application/zip
 
     outputs:
-        upload_url: ${{ steps.create_release_windows.outputs.upload_url }}
+      upload_url: ${{ steps.create_release_windows.outputs.upload_url }}
 
   build_and_release_linux:
     runs-on: ubuntu-22.04
     needs: build_and_release_windows
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-            fetch-depth: 0
-                  
+          fetch-depth: 0
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-            python-version: 3.8
-                  
+          python-version: 3.8
+
       - name: Install dependencies
         run: pip install -r requirements.txt
-              
+
       - name: Fetch Pillow files
         run: |
-            curl -o Imaging.h https://raw.githubusercontent.com/python-pillow/Pillow/10.2.0/src/libImaging/Imaging.h
-            curl -o ImagingUtils.h https://raw.githubusercontent.com/python-pillow/Pillow/10.2.0/src/libImaging/ImagingUtils.h
-            curl -o ImPlatform.h https://raw.githubusercontent.com/python-pillow/Pillow/10.2.0/src/libImaging/ImPlatform.h
-              
+          curl -o Imaging.h https://raw.githubusercontent.com/python-pillow/Pillow/10.2.0/src/libImaging/Imaging.h
+          curl -o ImagingUtils.h https://raw.githubusercontent.com/python-pillow/Pillow/10.2.0/src/libImaging/ImagingUtils.h
+          curl -o ImPlatform.h https://raw.githubusercontent.com/python-pillow/Pillow/10.2.0/src/libImaging/ImPlatform.h
+
       - name: Build project for Linux
         run: |
-            uname -m
-            python setup.py build
-            pyinstaller overviewer.spec
-              
+          uname -m
+          python setup.py build
+          pyinstaller overviewer.spec
+
       - name: Create tar.xz archive for Linux
         run: |
-            cd dist
-            tar -cf overviewer-${{ env.VERSION }}-LINUX.tar overviewer
-            xz -z overviewer-${{ env.VERSION }}-LINUX.tar
-            mv overviewer-${{ env.VERSION }}-LINUX.tar.xz ../overviewer-${{ env.VERSION }}-LINUX.tar.xz
+          cd dist
+          tar -cf overviewer-${{ env.VERSION }}-LINUX.tar overviewer
+          xz -z overviewer-${{ env.VERSION }}-LINUX.tar
+          mv overviewer-${{ env.VERSION }}-LINUX.tar.xz ../overviewer-${{ env.VERSION }}-LINUX.tar.xz
       - name: Get upload URL
         run: 'echo "Upload URL: ${{ needs.build_and_release_windows.outputs.upload_url }}"'
-              
+
       - name: Upload Linux Release Asset
         id: upload_linux_asset
         uses: actions/upload-release-asset@v1
         env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.build_and_release_windows.outputs.upload_url }}
           asset_path: ./overviewer-${{ env.VERSION }}-LINUX.tar.xz
@@ -140,13 +140,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-            fetch-depth: 0
+          fetch-depth: 0
 
       - name: Install Python
         uses: actions/setup-python@v5
         with:
-            python-version: 3.8
-            
+          python-version: 3.8
+
       - name: Install Dependencies (apt)
         run: |
           sudo apt-get update -y
@@ -179,9 +179,9 @@ jobs:
         id: upload_debian_package
         uses: actions/upload-release-asset@v1
         env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-            upload_url: ${{ needs.build_and_release_windows.outputs.upload_url }}
-            asset_path: ../the-minecraft-overviewer_${{ env.VERSION }}-0_amd64.deb
-            asset_name: overviewer-v${{ env.VERSION }}-x86_64-${{ matrix.os }}.deb
-            asset_content_type: application/x-deb
+          upload_url: ${{ needs.build_and_release_windows.outputs.upload_url }}
+          asset_path: ../the-minecraft-overviewer_${{ env.VERSION }}-0_amd64.deb
+          asset_name: overviewer-v${{ env.VERSION }}-x86_64-${{ matrix.os }}.deb
+          asset_content_type: application/x-deb
