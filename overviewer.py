@@ -311,7 +311,8 @@ def main():
 
     if not args.config:
         # No config file mode.
-        worldpath, destdir = map(os.path.expanduser, [args.world, args.output])
+        worldpath = resolve_world_path(args.world)
+        destdir = os.path.expanduser(args.output)
         logging.debug("Using %r as the world directory", worldpath)
         logging.debug("Using %r as the output directory", destdir)
 
@@ -665,6 +666,28 @@ def list_worlds():
         print("An error has been detected in one or more of your worlds (see the above table).")
         print("This is usually due to a corrupt level.dat file. Corrupt worlds need to be "
               "repaired before Overviewer can render them.")
+
+def resolve_world_path(world_input):
+    # Get standard Minecraft saves directory for current OS
+    if platform.system() == "Windows":
+        mc_saves = os.path.join(os.path.expanduser("~"), "AppData", "Roaming", ".minecraft", "saves")
+    elif platform.system() == "Darwin":  # MacOS
+        mc_saves = os.path.join(os.path.expanduser("~"), "Library", "Application Support", "minecraft", "saves")
+    else:  # Linux and other Unix-like systems
+        mc_saves = os.path.join(os.path.expanduser("~"), ".minecraft", "saves")
+    
+    # Check if world_input is a name in the saves directory
+    world_path = os.path.join(mc_saves, world_input)
+    if os.path.exists(world_path):
+        return world_path
+        
+    # If not found in saves, check if it's a full path
+    if os.path.exists(world_input):
+        return world_input
+        
+    # If still not found, display user-friendly error
+    logging.error(f"World '{world_input}' not found in Minecraft saves directory: {mc_saves}")
+    sys.exit(1)
 
 
 if __name__ == "__main__":
