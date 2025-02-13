@@ -46,3 +46,5 @@ ImagingUtils.h
 
 *_CONFIG.PY
 
+# Python Virtual Environment
+.venv
