@@ -11,7 +11,7 @@ env:
 jobs:
   build_and_release_windows:
     runs-on: windows-2022
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.START_BUILD == 'True'
 
     steps:
       - name: Checkout code
@@ -80,7 +80,7 @@ jobs:
   build_and_release_linux:
     runs-on: ubuntu-22.04
     needs: build_and_release_windows
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'  && vars.START_BUILD == 'True'
 
     steps:
       - name: Checkout code
@@ -134,7 +134,7 @@ jobs:
         os: [ubuntu-22.04, ubuntu-20.04]
     runs-on: ${{ matrix.os }}
     needs: build_and_release_windows
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'  && vars.START_BUILD == 'True'
 
     steps:
       - name: Checkout code
