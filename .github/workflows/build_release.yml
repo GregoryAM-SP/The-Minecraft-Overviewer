@@ -6,7 +6,7 @@ on:
       - main
 
 env:
-  VERSION: 1.21.1
+  VERSION: 1.21.13
 
 jobs:
   build_and_release_windows:
@@ -131,7 +131,7 @@ jobs:
   build_and_release_debian:
     strategy:
       matrix:
-        os: [ubuntu-22.04, ubuntu-20.04]
+        os: [ubuntu-22.04, ubuntu-20.04, ubuntu-24.04]
     runs-on: ${{ matrix.os }}
     needs: build_and_release_windows
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'  && vars.START_BUILD == 'True'
@@ -150,7 +150,7 @@ jobs:
       - name: Install Dependencies (apt)
         run: |
           sudo apt-get update -y
-          sudo DEBIAN_FRONTEND=noninteractive apt-get -y install zlib1g-dev libjpeg-dev devscripts python3-all-dev debhelper python3-pil python3-numpy dh-python
+          sudo DEBIAN_FRONTEND=noninteractive apt-get -y install zlib1g-dev libjpeg-dev devscripts python3-all-dev debhelper python3-pil python3-numpy dh-python build-essential
 
       - name: Install Dependencies (pip)
         run: pip install -r requirements.txt
