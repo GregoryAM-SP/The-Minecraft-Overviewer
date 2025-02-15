@@ -26,8 +26,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          git tag v${{ env.VERSION }}
-          git push origin v${{ env.VERSION }}
+          git tag ${{ env.VERSION }}
+          git push origin ${{ env.VERSION }}
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
@@ -44,7 +44,7 @@ jobs:
 
       - name: Create ZIP file for Windows
         run: |
-          Compress-Archive -Path .\dist\overviewer -DestinationPath overviewer-v${{ env.VERSION }}-windows.zip
+          Compress-Archive -Path .\dist\overviewer -DestinationPath overviewer-${{ env.VERSION }}-windows.zip
       - name: Create Release Notes
         uses: johnyherangi/create-release-notes@main
         id: create-release-notes
@@ -57,8 +57,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v${{ env.VERSION }}
-          release_name: The Minecraft Overviewer v${{ env.VERSION }}
+          tag_name: ${{ env.VERSION }}
+          release_name: The Minecraft Overviewer ${{ env.VERSION }}
           body: ${{ steps.create-release-notes.outputs.release-notes }}
           draft: false
           prerelease: false
@@ -70,8 +70,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release_windows.outputs.upload_url }}
-          asset_path: ./overviewer-v${{ env.VERSION }}-windows.zip
-          asset_name: overviewer-v${{ env.VERSION }}-windows.zip
+          asset_path: ./overviewer-${{ env.VERSION }}-windows.zip
+          asset_name: overviewer-${{ env.VERSION }}-windows.zip
           asset_content_type: application/zip
 
     outputs:
@@ -111,9 +111,9 @@ jobs:
       - name: Create tar.xz archive for Linux
         run: |
           cd dist
-          tar -cf overviewer-v${{ env.VERSION }}-linux.tar overviewer
-          xz -z overviewer-v${{ env.VERSION }}-linux.tar
-          mv overviewer-v${{ env.VERSION }}-linux.tar.xz ../overviewer-v${{ env.VERSION }}-linux.tar.xz
+          tar -cf overviewer-${{ env.VERSION }}-linux.tar overviewer
+          xz -z overviewer-${{ env.VERSION }}-linux.tar
+          mv overviewer-${{ env.VERSION }}-linux.tar.xz ../overviewer-${{ env.VERSION }}-linux.tar.xz
       - name: Get upload URL
         run: 'echo "Upload URL: ${{ needs.build_and_release_windows.outputs.upload_url }}"'
 
@@ -124,8 +124,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.build_and_release_windows.outputs.upload_url }}
-          asset_path: ./overviewer-v${{ env.VERSION }}-linux.tar.xz
-          asset_name: overviewer-v${{ env.VERSION }}-linux.tar.xz
+          asset_path: ./overviewer-${{ env.VERSION }}-linux.tar.xz
+          asset_name: overviewer-${{ env.VERSION }}-linux.tar.xz
           asset_content_type: application/x-xz
 
   build_and_release_debian:
@@ -182,6 +182,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.build_and_release_windows.outputs.upload_url }}
-          asset_path: ../the-minecraft-overviewer_v${{ env.VERSION }}-0_amd64.deb
-          asset_name: overviewer-v${{ env.VERSION }}-x86_64-${{ matrix.os }}.deb
+          asset_path: ../the-minecraft-overviewer_${{ env.VERSION }}-0_amd64.deb
+          asset_name: overviewer-${{ env.VERSION }}-x86_64-${{ matrix.os }}.deb
           asset_content_type: application/x-deb
