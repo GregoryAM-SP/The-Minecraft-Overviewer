@@ -6,7 +6,7 @@ on:
       - main
 
 env:
-  VERSION: v1.21.1
+  VERSION: 1.21.1
 
 jobs:
   build_and_release_windows:
@@ -26,8 +26,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          git tag ${{ env.VERSION }}
-          git push origin ${{ env.VERSION }}
+          git tag v${{ env.VERSION }}
+          git push origin v${{ env.VERSION }}
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
