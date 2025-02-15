@@ -15,7 +15,6 @@
 
 from collections import OrderedDict, deque
 import sys
-import imp
 import os
 import os.path
 import zipfile
@@ -199,7 +198,7 @@ class Textures(object):
         if os.path.isfile(path):
             if verbose: logging.info("Found %s in '%s'", filename, path)
             return open(path, mode)
-        elif hasattr(sys, "frozen") or imp.is_frozen("__main__"):
+        elif hasattr(sys, "frozen"):
             # windows special case, when the package dir doesn't exist
             path = os.path.join(programdir, "textures", filename)
             if os.path.isfile(path):
