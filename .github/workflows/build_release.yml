@@ -33,9 +33,9 @@ jobs:
 
       - name: Fetch Pillow files
         run: |
-          Invoke-WebRequest -Uri "https://raw.githubusercontent.com/python-pillow/Pillow/10.2.0/src/libImaging/Imaging.h" -OutFile "Imaging.h"
-          Invoke-WebRequest -Uri "https://raw.githubusercontent.com/python-pillow/Pillow/10.2.0/src/libImaging/ImagingUtils.h" -OutFile "ImagingUtils.h"
-          Invoke-WebRequest -Uri "https://raw.githubusercontent.com/python-pillow/Pillow/10.2.0/src/libImaging/ImPlatform.h" -OutFile "ImPlatform.h"
+          Invoke-WebRequest -Uri "https://raw.githubusercontent.com/python-pillow/Pillow/10.3.0/src/libImaging/Imaging.h" -OutFile "Imaging.h"
+          Invoke-WebRequest -Uri "https://raw.githubusercontent.com/python-pillow/Pillow/10.3.0/src/libImaging/ImagingUtils.h" -OutFile "ImagingUtils.h"
+          Invoke-WebRequest -Uri "https://raw.githubusercontent.com/python-pillow/Pillow/10.3.0/src/libImaging/ImPlatform.h" -OutFile "ImPlatform.h"
 
       - name: Build project for Windows
         run: |
@@ -98,9 +98,9 @@ jobs:
 
       - name: Fetch Pillow files
         run: |
-          curl -o Imaging.h https://raw.githubusercontent.com/python-pillow/Pillow/10.2.0/src/libImaging/Imaging.h
-          curl -o ImagingUtils.h https://raw.githubusercontent.com/python-pillow/Pillow/10.2.0/src/libImaging/ImagingUtils.h
-          curl -o ImPlatform.h https://raw.githubusercontent.com/python-pillow/Pillow/10.2.0/src/libImaging/ImPlatform.h
+          curl -o Imaging.h https://raw.githubusercontent.com/python-pillow/Pillow/10.3.0/src/libImaging/Imaging.h
+          curl -o ImagingUtils.h https://raw.githubusercontent.com/python-pillow/Pillow/10.3.0/src/libImaging/ImagingUtils.h
+          curl -o ImPlatform.h https://raw.githubusercontent.com/python-pillow/Pillow/10.3.0/src/libImaging/ImPlatform.h
 
       - name: Build project for Linux
         run: |
@@ -155,8 +155,8 @@ jobs:
       - name: Install Dependencies (pip)
         run: pip install -r requirements.txt
 
-      - name: Clone Pillow 10.2.0
-        run: git clone --branch=10.2.0 --depth=1 https://github.com/python-pillow/Pillow.git /tmp/pillow_checkout
+      - name: Clone Pillow 10.3.0
+        run: git clone --branch=10.3.0 --depth=1 https://github.com/python-pillow/Pillow.git /tmp/pillow_checkout
 
       - name: Build Extension
         run: env PIL_INCLUDE_DIR=/tmp/pillow_checkout/src/libImaging/ python setup.py build
