@@ -312,6 +312,11 @@ def main():
     if not args.config:
         # No config file mode.
         worldpath = resolve_world_path(args.world)
+
+        if not worldpath:
+            logging.error(f"World '{worldpath}' not found; does it exist in the current folder or in the Minecraft saves directory?")
+            return 1
+
         destdir = os.path.expanduser(args.output)
         logging.debug("Using %r as the world directory", worldpath)
         logging.debug("Using %r as the output directory", destdir)
@@ -668,6 +673,19 @@ def list_worlds():
               "repaired before Overviewer can render them.")
 
 def resolve_world_path(world_input):
+    """
+    Find the world save folder for the specified input
+
+    If the world save folder exists in the current directory, it will be returned.
+    Otherwise, look in the platform Minecraft saves folder for a world directory with that name.
+    """
+    # See if the provided path actually exists
+    if os.path.exists(world_input):
+        return world_input
+
+    if os.path.sep in world_input:
+        return None
+
     # Get standard Minecraft saves directory for current OS
     if platform.system() == "Windows":
         mc_saves = os.path.join(os.path.expanduser("~"), "AppData", "Roaming", ".minecraft", "saves")
@@ -680,14 +698,8 @@ def resolve_world_path(world_input):
     world_path = os.path.join(mc_saves, world_input)
     if os.path.exists(world_path):
         return world_path
-        
-    # If not found in saves, check if it's a full path
-    if os.path.exists(world_input):
-        return world_input
-        
-    # If still not found, display user-friendly error
-    logging.error(f"World '{world_input}' not found in Minecraft saves directory: {mc_saves}")
-    sys.exit(1)
+
+    return None
 
 
 if __name__ == "__main__":
