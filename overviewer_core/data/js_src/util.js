@@ -403,7 +403,9 @@ overviewer.util = {
                                 options = {
                                     color: db['strokeColor'],
                                     weight: db['strokeWeight'],
-                                    fill: db['fill']
+                                    fill: db['fill'],
+                                    dashArray: db['dashArray'],
+                                    opacity: db['opacity'],
                                 };
                                 layerObj = db['isLine'] ? L.polyline(plLatLng, options) : L.polygon(plLatLng, options);
                                 if (db['hovertext']) {
