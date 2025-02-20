@@ -24,10 +24,13 @@ jobs:
         with:
           python-version: 3.8
 
-      - name: Install dependencies
+      - name: Create Release Tag
         run: |
           git tag ${{ env.VERSION }}
           git push origin ${{ env.VERSION }}
+
+      - name: Install dependencies (pip)
+        run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
@@ -37,12 +40,12 @@ jobs:
           Invoke-WebRequest -Uri "https://raw.githubusercontent.com/python-pillow/Pillow/10.3.0/src/libImaging/ImagingUtils.h" -OutFile "ImagingUtils.h"
           Invoke-WebRequest -Uri "https://raw.githubusercontent.com/python-pillow/Pillow/10.3.0/src/libImaging/ImPlatform.h" -OutFile "ImPlatform.h"
 
-      - name: Build project for Windows
+      - name: Build Overviewer for Windows
         run: |
           python setup.py build
           pyinstaller overviewer.spec
 
-      - name: Create ZIP file for Windows
+      - name: Create ZIP archive for Windows
         run: |
           Compress-Archive -Path .\dist\overviewer -DestinationPath overviewer-${{ env.VERSION }}-windows.zip
       - name: Create Release Notes
@@ -51,7 +54,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Create Release for Windows
+      - name: Create release for Windows
         id: create_release_windows
         uses: actions/create-release@v1
         env:
@@ -63,7 +66,7 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: Upload Windows Release Asset
+      - name: Upload Windows release asset
         id: upload_windows_asset
         uses: actions/upload-release-asset@v1
         env:
@@ -93,7 +96,7 @@ jobs:
         with:
           python-version: 3.8
 
-      - name: Install dependencies
+      - name: Install dependencies (pip)
         run: pip install -r requirements.txt
 
       - name: Fetch Pillow files
@@ -102,7 +105,7 @@ jobs:
           curl -o ImagingUtils.h https://raw.githubusercontent.com/python-pillow/Pillow/10.3.0/src/libImaging/ImagingUtils.h
           curl -o ImPlatform.h https://raw.githubusercontent.com/python-pillow/Pillow/10.3.0/src/libImaging/ImPlatform.h
 
-      - name: Build project for Linux
+      - name: Build Overviewer for Linux
         run: |
           uname -m
           python setup.py build
@@ -117,7 +120,7 @@ jobs:
       - name: Get upload URL
         run: 'echo "Upload URL: ${{ needs.build_and_release_windows.outputs.upload_url }}"'
 
-      - name: Upload Linux Release Asset
+      - name: Upload Linux release asset
         id: upload_linux_asset
         uses: actions/upload-release-asset@v1
         env:
@@ -166,16 +169,11 @@ jobs:
           export VERSION=$(python3 setup.py --version)
           export DATE=$(date -u +'%a, %d %b %Y %H:%M:%S %z')
           envsubst < debian/changelog.in > debian/changelog
+
       - name: Build .deb package
         run: env DEB_BUILD_OPTIONS=nocheck debuild -i -us -uc -b -Zxz
 
-      - name: List Debian Packages
-        run: ls -l ../*.deb
-
-      - name: Get upload URL
-        run: 'echo "Upload URL: ${{ needs.build_and_release_windows.outputs.upload_url }}"'
-
-      - name: Upload Debian Package Release Asset
+      - name: Upload Debian Package release asset
         id: upload_debian_package
         uses: actions/upload-release-asset@v1
         env:
@@ -185,3 +183,64 @@ jobs:
           asset_path: ../the-minecraft-overviewer_${{ env.VERSION }}-0_amd64.deb
           asset_name: overviewer-${{ env.VERSION }}-x86_64-${{ matrix.os }}.deb
           asset_content_type: application/x-deb
+
+  build_and_release_appimage:
+    runs-on: ubuntu-22.04
+    needs: build_and_release_windows
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'  && vars.START_BUILD == 'True'
+
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.8
+  
+      - name: Install dependencies (pip)
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          sudo apt-get -y install appstream
+          sudo apt install zsync
+
+      - name: Install AppImageTool
+        run: |
+          wget https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage
+          chmod +x appimagetool-x86_64.AppImage
+          sudo mv appimagetool-x86_64.AppImage /usr/local/bin/appimagetool
+  
+      - name: Fetch Pillow files
+        run: |
+          curl -o Imaging.h https://raw.githubusercontent.com/python-pillow/Pillow/10.3.0/src/libImaging/Imaging.h
+          curl -o ImagingUtils.h https://raw.githubusercontent.com/python-pillow/Pillow/10.3.0/src/libImaging/ImagingUtils.h
+          curl -o ImPlatform.h https://raw.githubusercontent.com/python-pillow/Pillow/10.3.0/src/libImaging/ImPlatform.h
+  
+      - name: Build project for Linux
+        run: |
+          python setup.py build
+          pyinstaller overviewer.spec
+
+      - name: Move Overviewer build to AppImage directory
+        run: |
+          sudo mv ./dist/overviewer ./Overviewer.AppDir
+  
+      - name: Build AppImage for Linux
+        run: |
+          ARCH=x86_64 appimagetool Overviewer.AppDir overviewer-${{ env.VERSION }}-x86_64-linux.AppImage
+        
+      - name: Upload AppImage release asset
+        id: upload_appimage_asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.build_and_release_windows.outputs.upload_url }}
+          asset_path: ./overviewer-${{ env.VERSION }}-x86_64-linux.AppImage
+          asset_name: overviewer-${{ env.VERSION }}-x86_64-linux.AppImage
+          asset_content_type: application/x-appimage
+  
