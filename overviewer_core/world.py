@@ -450,6 +450,8 @@ class RegionSet(object):
             'minecraft:short_grass': (31, 1),
             'minecraft:grass': (31, 1),  # Renamed to minecraft:short_grass in 1.20.3
             'minecraft:fern': (31, 2),
+            'minecraft:short_dry_grass': (31, 4),
+            'minecraft:tall_dry_grass': (31, 5),
             'minecraft:piston': (33, 0),
             'minecraft:piston_head': (34, 0),
             'minecraft:white_wool': (35, 0),
@@ -468,6 +470,10 @@ class RegionSet(object):
             'minecraft:green_wool': (35, 13),
             'minecraft:red_wool': (35, 14),
             'minecraft:black_wool': (35, 15),
+
+            'minecraft:test_block': (36, 0),
+            'minecraft:test_instance_block': (37, 0),
+
             # Flowers
             'minecraft:poppy': (38, 0),
             'minecraft:blue_orchid': (38, 1),
@@ -484,6 +490,7 @@ class RegionSet(object):
             "minecraft:lily_of_the_valley": (38, 12),
             "minecraft:closed_eyeblossom": (38, 13),
             "minecraft:open_eyeblossom": (38, 14),
+            "minecraft:cactus_flower": (38, 15),
 
             'minecraft:brown_mushroom': (39, 0),
             'minecraft:red_mushroom': (40, 0),
@@ -796,6 +803,9 @@ class RegionSet(object):
             'minecraft:structure_block': (255, 0),
             'minecraft:jigsaw': (256, 0),
             'minecraft:shulker_box': (257, 0),
+
+            'minecraft:bush': (258, 0),
+            'minecraft:firefly_bush': (259, 0),
 
             'minecraft:armor_stand': (416, 0),  # not rendering
 
@@ -1194,8 +1204,10 @@ class RegionSet(object):
             'minecraft:target': (1229, 0),
             # Nether Sprout
             'minecraft:nether_sprouts': (31, 3),
-            # Pink Petals
+            # Ground cover
             'minecraft:pink_petals': (1230, 0),
+            'minecraft:wildflowers': (1149, 0),
+            'minecraft:leaf_litter': (1221, 0),
             # Frogspawn
             'minecraft:frogspawn': (1231, 0),
             # Amethyst Cluster
@@ -1632,10 +1644,11 @@ class RegionSet(object):
             data = {'y': 0, 'x': 1, 'z': 2}[axis]
         elif key == 'minecraft:creaking_heart':
             axis = palette_entry['Properties']['axis']
-            active = palette_entry['Properties']['active'] == 'true'
+            state = palette_entry['Properties']['creaking_heart_state']
 
-            data = {'y': 0, 'x': 1, 'z': 2}[axis]
-            data |= 4 if active else 0
+            data = {'uprooted': 0, 'dormant': 1, 'awake': 2}[state]
+            data <<= 2
+            data |= {'y': 0, 'x': 1, 'z': 2}[axis]
 
         elif key in ['minecraft:redstone_torch','minecraft:redstone_wall_torch','minecraft:wall_torch',
                     'minecraft:soul_torch', 'minecraft:soul_wall_torch']:
@@ -1983,6 +1996,21 @@ class RegionSet(object):
 
             if p['bottom'] == 'true':
                 data |= 1
+
+        elif key in ('minecraft:pink_petals', 'minecraft:wildflowers', 'minecraft:leaf_litter'):
+            facing = palette_entry['Properties']['facing']
+            data = {'north': 0, 'east': 1, 'south': 2, 'west': 3}[facing]
+
+            if key == 'minecraft:leaf_litter':
+                amount = int(palette_entry['Properties']['segment_amount'])
+            else:
+                amount = int(palette_entry['Properties']['flower_amount'])
+
+            data |= (amount - 1) << 2
+
+        elif key == 'minecraft:test_block':
+            p = palette_entry['Properties']
+            data = ['start','accept','fail','log'].index(p['mode'])
 
         return (block, data)
 
