@@ -6,7 +6,7 @@ on:
       - main
 
 env:
-  VERSION: 1.21.1
+  VERSION: 1.21.1-rc.1
 
 jobs:
   build_and_release_windows:
@@ -64,7 +64,7 @@ jobs:
           release_name: The Minecraft Overviewer ${{ env.VERSION }}
           body: ${{ steps.create-release-notes.outputs.release-notes }}
           draft: false
-          prerelease: false
+          prerelease: true
 
       - name: Upload Windows release asset
         id: upload_windows_asset
@@ -189,7 +189,6 @@ jobs:
     needs: build_and_release_windows
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'  && vars.START_BUILD == 'True'
 
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -200,7 +199,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: 3.8
-  
+
       - name: Install dependencies (pip)
         run: |
           python -m pip install --upgrade pip
@@ -213,13 +212,13 @@ jobs:
           wget https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage
           chmod +x appimagetool-x86_64.AppImage
           sudo mv appimagetool-x86_64.AppImage /usr/local/bin/appimagetool
-  
+
       - name: Fetch Pillow files
         run: |
           curl -o Imaging.h https://raw.githubusercontent.com/python-pillow/Pillow/10.3.0/src/libImaging/Imaging.h
           curl -o ImagingUtils.h https://raw.githubusercontent.com/python-pillow/Pillow/10.3.0/src/libImaging/ImagingUtils.h
           curl -o ImPlatform.h https://raw.githubusercontent.com/python-pillow/Pillow/10.3.0/src/libImaging/ImPlatform.h
-  
+
       - name: Build project for Linux
         run: |
           python setup.py build
@@ -228,11 +227,11 @@ jobs:
       - name: Move Overviewer build to AppImage directory
         run: |
           sudo mv ./dist/overviewer ./Overviewer.AppDir
-  
+
       - name: Build AppImage for Linux
         run: |
           ARCH=x86_64 appimagetool Overviewer.AppDir overviewer-${{ env.VERSION }}-x86_64-linux.AppImage
-        
+
       - name: Upload AppImage release asset
         id: upload_appimage_asset
         uses: actions/upload-release-asset@v1
@@ -243,4 +242,3 @@ jobs:
           asset_path: ./overviewer-${{ env.VERSION }}-x86_64-linux.AppImage
           asset_name: overviewer-${{ env.VERSION }}-x86_64-linux.AppImage
           asset_content_type: application/x-appimage
-  
