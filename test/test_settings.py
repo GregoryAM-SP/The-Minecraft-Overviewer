@@ -36,6 +36,10 @@ class SettingsTest(unittest.TestCase):
 
         self.assertRaises(ValidationException,self.s.get_validated_config)
 
+    def test_dimension_validation(self):
+        self.s.parse("test/data/settings/settings_test_dimension.py")
+        self.assertRaises(ValidationException,self.s.get_validated_config)
+
     def test_manual(self):
         """Tests that manually setting the config parser works, you don't have
         to do it from a file
@@ -52,6 +56,7 @@ class SettingsTest(unittest.TestCase):
                     "title": "myworld title",
                     "world": "test",
                     "rendermode": rendermodes.normal,
+                    "dimension": "overworld",
                     "northdirection": "upper-left",
                 }),
 
@@ -59,6 +64,7 @@ class SettingsTest(unittest.TestCase):
                     "title": "otherworld title",
                     "world": "test",
                     "rendermode": rendermodes.normal,
+                    "dimension": "overworld",
                     "bgcolor": "#ffffff"
                 }),
             ]))
@@ -79,6 +85,7 @@ class SettingsTest(unittest.TestCase):
                     "title": "myworld title",
                     "world": "test",
                     "rendermode": "normal",
+                    "dimension": "overworld",
                     "northdirection": "upper-left",
                 },
                 })

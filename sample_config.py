@@ -18,6 +18,7 @@ rendermode = "lighting"
 renders["render1"] = {
         'world': 'My World',
         'title': 'A regular render',
+        'dimension': 'overworld',
 }
 
 # This example is the same as above, but rotated
@@ -25,6 +26,7 @@ renders["render2"] = {
         'world': 'My World',
         'northdirection': 'upper-right',
         'title': 'Upper-right north direction',
+        'dimension': 'overworld',
 }
 
 # Here's how to do a nighttime render. Also try "smooth_night" instead of "night"
@@ -33,5 +35,6 @@ renders["render3"] = {
         'title': 'Nighttime',
         # Notice how this overrides the rendermode default specified above
         'rendermode': 'night',
+        'dimension': 'overworld',
 }
 

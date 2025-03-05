@@ -230,18 +230,24 @@ def validateStr(s):
 
 
 def validateDimension(d):
-    # returns (original, argument to get_type)
-    # these are provided as arguments to RegionSet.get_type()
-    pretty_names = {
-        "nether": "DIM-1",
-        "overworld": "DIM0",
-        "end": "DIM1",
-        "default": 0,
+    """Validates the dimension setting"""
+    valid_dimensions = {
+        'overworld': 'DIM-1',
+        'nether': 'DIM0',
+        'end': 'DIM1',
+        'default': 0
     }
-    try:
-        return (d, pretty_names[d])
-    except KeyError:
-        return (d, d)
+    
+    # Convert to lowercase for case-insensitive comparison
+    if isinstance(d, str):
+        d = d.lower()
+    
+    if d not in valid_dimensions:
+        raise ValidationException(
+            "The dimension value must be one of: 'overworld', 'nether', or 'end'. "
+            f"Got '{d}' instead."
+        )
+    return d
 
 
 def validateOutputDir(d):
