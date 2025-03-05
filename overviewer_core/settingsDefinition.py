@@ -69,7 +69,6 @@ def get_default_config():
                 "world": Setting(required=True, validator=validateStr, default=None),
                 "dimension": Setting(required=True, validator=validateDimension, default="default"),
                 "title": Setting(required=True, validator=validateStr, default=None),
-                "dimension": Setting(required=True, validator=validateDimension, default='overworld'),
                 "rendermode": Setting(required=True, validator=validateRenderMode, default='normal'),
                 "northdirection": Setting(required=True, validator=validateNorthDirection, default=0),
                 "forcerender": Setting(required=False, validator=validateBool, default=None),
