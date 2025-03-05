@@ -1,0 +1,39 @@
+# Example docker-compose for running The-Minecraft-Overviewer
+# Make sure to read it and modify to meet your needs.
+
+version: "3.8"
+services:
+  # This container changes permissions for output directory and downloads 1.20.4 jar
+  # Make sure to include custom texturepath in your overviewer config, eq. texturepath = "/mnt/minecraft/.minecraft/versions/1.20.4/1.20.4.jar"
+  prepare-files:
+    image: alpine:3.18
+    restart: "no"
+    entrypoint: |
+      /bin/sh -c "
+      mkdir -p /mnt/minecraft/.minecraft/versions/1.20.4 && 
+      chown 1000:1000 -R /usr/overviewer/output &&
+      wget https://piston-data.mojang.com/v1/objects/fd19469fed4a4b4c15b2d5133985f0e3e7816a8a/client.jar -O /mnt/minecraft/.minecraft/versions/1.20.4/1.20.4.jar && 
+      chown 1000:1000 -R /mnt/minecraft
+      "
+    volumes:
+      - overviewer-output:/usr/overviewer/output:rw
+      - minecraft-jars:/mnt/minecraft:rw
+
+  overviewer:
+    # image: artur9010/overviewer:latest
+    build: .
+    depends_on:
+      - prepare-files
+    command:
+      - "-c"
+      - "config.py"
+    # Make a copy of sample_config.py and rename it to config.py. Make sure to modify paths inside of it.
+    volumes:
+      - overviewer-output:/usr/overviewer/output:rw
+      - /home/minecraft/minecraft:/usr/overviewer/server:ro
+      - minecraft-jars:/mnt/minecraft:rw
+      - ./config.py:/usr/overviewer/config.py:ro
+
+volumes:
+  minecraft-jars:
+  overviewer-output:
