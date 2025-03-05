@@ -224,7 +224,6 @@ def validateFloat(f):
 def validateInt(i):
     return int(i)
 
-
 def validateStr(s):
     return str(s)
 
@@ -232,11 +231,15 @@ def validateStr(s):
 def validateDimension(d):
     """Validates the dimension setting"""
     valid_dimensions = {
-        'overworld': 'DIM-1',
-        'nether': 'DIM0',
-        'end': 'DIM1',
-        'default': 0
+        'overworld': 0,
+        'nether': -1,
+        'end': 1
     }
+    
+    if d is None:
+        raise ValidationException(
+            "Required key 'dimension' was not specified. Must be one of: 'overworld', 'nether', or 'end'"
+        )
     
     # Convert to lowercase for case-insensitive comparison
     if isinstance(d, str):
@@ -247,8 +250,8 @@ def validateDimension(d):
             "The dimension value must be one of: 'overworld', 'nether', or 'end'. "
             f"Got '{d}' instead."
         )
-    return d
-
+    
+    return (d, valid_dimensions[d])
 
 def validateOutputDir(d):
     checkBadEscape(d)

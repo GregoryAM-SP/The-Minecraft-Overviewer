@@ -67,7 +67,7 @@ def get_default_config():
             validator=make_dictValidator(validateStr, make_configDictValidator(
             {
                 "world": Setting(required=True, validator=validateStr, default=None),
-                "dimension": Setting(required=True, validator=validateDimension, default="default"),
+                "dimension": Setting(required=True, validator=validateDimension, default=None),
                 "title": Setting(required=True, validator=validateStr, default=None),
                 "rendermode": Setting(required=True, validator=validateRenderMode, default='normal'),
                 "northdirection": Setting(required=True, validator=validateNorthDirection, default=0),
