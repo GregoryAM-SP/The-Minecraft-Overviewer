@@ -231,10 +231,12 @@ def validateStr(s):
 def validateDimension(d):
     """Validates the dimension setting"""
     valid_dimensions = {
-        'overworld': 0,
-        'nether': -1,
-        'end': 1
+        'overworld': 'DIM0',
+        'nether': 'DIM-1',
+        'end': 'DIM1'
     }
+
+
     
     if d is None:
         raise ValidationException(
