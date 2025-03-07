@@ -183,3 +183,57 @@ jobs:
           asset_path: ../the-minecraft-overviewer_${{ env.VERSION }}-0_amd64.deb
           asset_name: overviewer-${{ env.VERSION }}-x86_64-${{ matrix.os }}.deb
           asset_content_type: application/x-deb
+
+  build_and_release_appimage:
+    runs-on: ubuntu-latest
+    needs: build_and_release_windows
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.START_BUILD == 'True'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Build AppImage
+        run: |
+          docker run --rm -v ${{ github.workspace }}:/workspace centos:7 bash -c "
+          sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-* && \
+          sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-* && \
+          yum install -y git make automake gcc gcc-c++ patch zlib-devel bzip2-devel libffi-devel ncurses-devel readline-devel openssl-devel curl file && \
+          git clone https://github.com/pyenv/pyenv.git /workspace/.pyenv && \
+          echo 'export PYENV_ROOT=\"/workspace/.pyenv\"' >> /root/.bashrc && \
+          echo 'export PATH=\"\$PYENV_ROOT/bin:\$PATH\"' >> /root/.bashrc && \
+          echo 'eval \"\$(pyenv init --path)\"' >> /root/.bashrc && \
+          source /root/.bashrc && \
+          /workspace/.pyenv/bin/pyenv install 3.8.10 && \
+          /workspace/.pyenv/bin/pyenv global 3.8.10 && \
+          curl -o /workspace/Imaging.h https://raw.githubusercontent.com/python-pillow/Pillow/10.3.0/src/libImaging/Imaging.h && \
+          curl -o /workspace/ImagingUtils.h https://raw.githubusercontent.com/python-pillow/Pillow/10.3.0/src/libImaging/ImagingUtils.h && \
+          curl -o /workspace/ImPlatform.h https://raw.githubusercontent.com/python-pillow/Pillow/10.3.0/src/libImaging/ImPlatform.h && \
+          pip install -r /workspace/requirements.txt && \
+          cd /workspace && \
+          python setup.py build && \
+          pyinstaller overviewer.spec && \
+          mv /workspace/dist/overviewer /workspace/Overviewer.AppDir && \
+          curl -L -o /workspace/appimagetool-x86_64.AppImage \"https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage\" && \
+          if [ -f /workspace/appimagetool-x86_64.AppImage ]; then \
+            chmod +x /workspace/appimagetool-x86_64.AppImage; \
+          else \
+            echo 'Error: appimagetool-x86_64.AppImage not downloaded.'; exit 1; \
+          fi && \
+          /workspace/appimagetool-x86_64.AppImage --appimage-extract
+          mv /workspace/squashfs-root /workspace/appimagetool
+          ARCH=x86_64 /workspace/appimagetool/AppRun ./Overviewer.AppDir overviewer-${{ env.VERSION }}-x86_64.AppImage
+          "
+
+      - name: Create AppImage release asset
+        id: upload_centos_asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.build_and_release_windows.outputs.upload_url }}
+          asset_path: ./overviewer-${{ env.VERSION }}-x86_64.AppImage
+          asset_name: overviewer-${{ env.VERSION }}-x86_64.AppImage
+          asset_content_type: application/octet-stream
