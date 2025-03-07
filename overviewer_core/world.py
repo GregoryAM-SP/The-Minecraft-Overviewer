@@ -2258,76 +2258,12 @@ class RegionSet(object):
         modified, lest it affect the return values of future calls for the same
         chunk.
         """
-        regionfile = self._get_region_path(x, z)
-        if regionfile is None:
-            raise ChunkDoesntExist("Chunk %s,%s doesn't exist (and neither does its region)" % (x,z))
-
-        # Try a few times to load and parse this chunk before giving up and
-        # raising an error
-        tries = 5
-        while True:
-            try:
-                region = self._get_regionobj(regionfile)
-                data = region.load_chunk(x, z)
-            except nbt.CorruptionError as e:
-                tries -= 1
-                if tries > 0:
-                    # Flush the region cache to possibly read a new region file header
-                    logging.debug("Encountered a corrupt chunk or read error at %s,%s. "
-                                  "Flushing cache and retrying", x, z)
-                    del self.regioncache[regionfile]
-                    time.sleep(0.25)
-                    continue
-                else:
-                    logging.warning("The following was encountered while reading from %s:", self.regiondir)
-                    if isinstance(e, nbt.CorruptRegionError):
-                        logging.warning("Tried several times to read chunk %d,%d. Its region (%d,%d) may be corrupt. Giving up.",
-                                x, z,x//32,z//32)
-                    elif isinstance(e, nbt.CorruptChunkError):
-                        logging.warning("Tried several times to read chunk %d,%d. It may be corrupt. Giving up.",
-                                x, z)
-                    else:
-                        logging.warning("Tried several times to read chunk %d,%d. Unknown error. Giving up.",
-                                x, z)
-                    logging.debug("Full traceback:", exc_info=1)
-                    # Let this exception propagate out through the C code into
-                    # tileset.py, where it is caught and gracefully continues
-                    # with the next chunk
-                    raise
-            else:
-                # no exception raised: break out of the loop
-                break
-
-        if data is None:
-            raise ChunkDoesntExist("Chunk %s,%s doesn't exist" % (x,z))
-
-        chunk_data = data[1]
-
-        if chunk_data.get('DataVersion', 0) <= 2840 and 'Level' in chunk_data:
-            # This world was generated pre 21w43a and thus most chunk data is contained
-            # in the "Level" key
-            chunk_data = chunk_data['Level']
-        else:
-            # This world was (probably) generated post 21w43a
-            chunk_data['Sections'] = chunk_data.get('sections', [])
+        chunk_data = self.__get_chunk(x, z, False)
 
         longarray_unpacker = self._packed_longarray_to_shorts
-        if data[1].get('DataVersion', 0) >= 2529:
+        if chunk_data.get('DataVersion', 0) >= 2529:
             # starting with 1.16 snapshot 20w17a, block states are packed differently
             longarray_unpacker = self._packed_longarray_to_shorts_v116
-
-        # From the interior of a map to the edge, a chunk's status may be one of:
-        # - postprocessed (interior, or next to fullchunk)
-        # - fullchunk (next to decorated)
-        # - decorated (next to liquid_carved)
-        # - liquid_carved (next to carved)
-        # - carved (edge of world)
-        # - empty
-        # Empty is self-explanatory, and liquid_carved and carved seem to correspond
-        # to SkyLight not being calculated, which results in mostly-black chunks,
-        # so we'll just pretend they aren't there.
-        if chunk_data.get("Status", "") not in ("minecraft:full", "postprocessed", "fullchunk", "mobs_spawned", "spawn", "full", ""):
-            raise ChunkDoesntExist("Chunk %s,%s doesn't exist" % (x,z))
 
         unrecognized_block_types = {}
         for section in chunk_data['Sections']:
@@ -2410,6 +2346,9 @@ class RegionSet(object):
         modified, lest it affect the return values of future calls for the same
         chunk.
         """
+        return self.__get_chunk(x, z, True)
+
+    def __get_chunk(self, x, z, lite: bool):
         regionfile = self._get_region_path(x, z)
         if regionfile is None:
             raise ChunkDoesntExist("Chunk %s,%s doesn't exist (and neither does its region)" % (x,z))
@@ -2455,13 +2394,22 @@ class RegionSet(object):
 
         chunk_data = data[1]
 
-        if chunk_data.get('DataVersion', 0) <= 2840 and 'Level' in chunk_data:
+        data_version = chunk_data.get('DataVersion', 0)
+        if data_version <= 2840 and 'Level' in chunk_data:
             # This world was generated pre 21w43a and thus most chunk data is contained
             # in the "Level" key
             chunk_data = chunk_data['Level']
+        else:
+            if not lite:
+                # This world was (probably) generated post 21w43a
+                chunk_data['Sections'] = chunk_data.get('sections', [])
 
         if chunk_data.get("Status", "") not in ("minecraft:full", "postprocessed", "fullchunk", "mobs_spawned", "spawn", "full", ""):
             raise ChunkDoesntExist("Chunk %s,%s doesn't exist" % (x,z))
+
+        # Stitch the data version back into the chunk data if it was lost
+        if 'DataVersion' not in chunk_data:
+            chunk_data['DataVersion'] = data_version
 
         return chunk_data
 
