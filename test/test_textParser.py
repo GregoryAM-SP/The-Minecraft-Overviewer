@@ -160,6 +160,32 @@ def test_1215_string(mocker):
 
     assert result == "test"
 
+def test_1215_xss(mocker):
+    logger = mocker.Mock()
+    parser = TextParser(logger)
+    data = "<script>alert('')/*"
+
+    result = parser.parse_text_component(data, TextParser.SIGN_FORMAT_1215, True)
+
+    assert result == "&lt;script&gt;alert(&#x27;&#x27;)/*"
+
+def test_1215_xss_nonrendered(mocker):
+    """
+    I'm purposefully *not* escaping non-HTML rendered things here. The documentation states that you
+    need to escape it already, and changing this to escape all text could break existing filter functions
+    that rely on searching for < and >.
+
+    Really, non-HTML messages should never be written to the client and only used within filter functions
+    themselves. Rely on messagesHtml for things you want to write to the client.
+    """
+    logger = mocker.Mock()
+    parser = TextParser(logger)
+    data = "<script>alert('')/*"
+
+    result = parser.parse_text_component(data, TextParser.SIGN_FORMAT_1215, False)
+
+    assert result == "<script>alert('')/*"
+
 def test_1215_basic_component(mocker):
     logger = mocker.Mock()
     parser = TextParser(logger)

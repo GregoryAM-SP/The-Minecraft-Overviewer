@@ -1,3 +1,4 @@
+import html
 import json
 from logging import Logger
 
@@ -125,7 +126,7 @@ class TextParser(object):
                 return self.__parse_text_component_1080(data, html_output)
 
             # Unlikely to be 1.8 format, so assume 1.7 format.
-            return data
+            return html.escape(data) if html_output else data
 
         self.logger.error("Unknown text component format %d", chunk_data_version)
         return ''
@@ -135,7 +136,7 @@ class TextParser(object):
             js = json.loads(data)
         except ValueError as ex:
             self.logger.warning("Failed parsing JSON text `%s`", data, exc_info=ex)
-            return data
+            return html.escape(data) if html_output else data
 
         # This format is essentially the same as the new format
         return self.__parse_text_component_1215(js, html_output)
@@ -145,7 +146,7 @@ class TextParser(object):
 
         if isinstance(data, str):
             # If there's a string here, it's a real string
-            return data
+            return html.escape(data) if html_output else data
 
         style = TextStyleState(html_output)
         all_components = []
@@ -226,7 +227,7 @@ class TextParser(object):
 
         parse_recursive(data, style)
 
-        return ''.join([y.open_tag() + x + y.close_tag() for (x, y) in all_components])
+        return ''.join([y.open_tag() + y.escape(x) + y.close_tag() for (x, y) in all_components])
 
 
 class TextStyleState(object):
@@ -299,3 +300,9 @@ class TextStyleState(object):
         self.closing_tag = '</span>'
         combined_classes = ' '.join(classes)
         return f'<span class="{combined_classes}"{style_attr}>'
+
+    def escape(self, data) -> str:
+        if self.html_output:
+            return html.escape(data)
+
+        return data

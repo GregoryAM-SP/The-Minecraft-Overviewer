@@ -25,15 +25,19 @@ The function should accept one argument (a dictionary, also know as an associati
 array), and return a string representing the text to be displayed.  For example::
 
     def signFilter(poi):
-        if poi['id'] == 'Sign' or poi['id'] == 'minecraft:sign':
-            return "\n".join([poi['Text1'], poi['Text2'], poi['Text3'], poi['Text4']])
+        if poi['id'] in ['minecraft:sign', 'minecraft:hanging_sign']:
+            return "<br />".join(poi['front_text']['messagesHtml'])
 
 .. note::
-    This example is intended as a teaching aid and does not escape HTML,
-    so if you are concerned that your Minecraft players will put HTML/JS into
-    their signs, see below for a version that does do escaping.
+    `messagesHtml` is a parsed and escaped version of the text on a sign. If you need
+    the raw sign text for filtering, use `messages` instead. Be aware that `messages`
+    is not safe for displaying directly as players could inject HTML/JS into your map
+    through signs. Prefer to use messagesHtml (or `CustomNameHtml` for entity names)
+    whenever displaying user-provided data.
 
-If a POI doesn't match, the filter can return None (which is the default if a python 
+Rendering formatted text in HTML is supported for sign text and entity names only.
+
+If a POI doesn't match, the filter can return None (which is the default if a python
 functions runs off the end without an explicit 'return').
 
 The single argument will either a TileEntity, or an Entity taken directly from 
