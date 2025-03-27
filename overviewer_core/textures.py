@@ -1709,23 +1709,30 @@ def piston_extension(self, blockid, data):
 
     return img
 
-@material(blockid=31, data=list(range(4)), transparent=True)
-def tall_grass(self, blockid, data):
-    if data == 0: # dead shrub
-        texture = self.load_image_texture(BLOCKTEXTURE + "dead_bush.png")
-    elif data == 1: # tall grass
-        try:
-            texture = self.load_image_texture(BLOCKTEXTURE + "short_grass.png")
-        except (TextureException, IOError):
-            # Attempt loading from the old name of this texture pre-1.20.3
-            texture = self.load_image_texture(BLOCKTEXTURE + "grass.png")
-    elif data == 2: # fern
-        texture = self.load_image_texture(BLOCKTEXTURE + "fern.png")
-    elif data == 3: # Nether Sprouts
-        texture = self.load_image_texture(BLOCKTEXTURE + "nether_sprouts.png")
+@material(blockid=[31], data=list(range(6)), transparent=True)
+def tall_grass(self, _, data):
+    grass_map = [
+        "dead_bush",
+        ["short_grass", "grass"],
+        "fern",
+        "nether_sprouts",
+        "short_dry_grass",
+        "tall_dry_grass",
+    ]
 
-    
+    if isinstance(grass_map[data], list):
+        texture = None
+        for tex in grass_map[data]:
+            try:
+                texture = self.load_image_texture(BLOCKTEXTURE + tex + ".png")
+                break
+            except (TextureException, IOError):
+                continue
+    else:
+        texture = self.load_image_texture(BLOCKTEXTURE + grass_map[data] + ".png")
+
     return self.build_billboard(texture)
+
 
 # dead bush
 billboard(blockid=32, imagename=BLOCKTEXTURE + "dead_bush.png")
@@ -1737,11 +1744,11 @@ def wool(self, blockid, data):
     return self.build_block(texture, texture)
 
 # flowers
-@material(blockid=38, data=list(range(15)), transparent=True)
+@material(blockid=38, data=list(range(16)), transparent=True)
 def flower(self, blockid, data):
     flower_map = ["poppy", "blue_orchid", "allium", "azure_bluet", "red_tulip", "orange_tulip",
                   "white_tulip", "pink_tulip", "oxeye_daisy", "dandelion", "wither_rose",
-                  "cornflower", "lily_of_the_valley", "closed_eyeblossom", "open_eyeblossom"]
+                  "cornflower", "lily_of_the_valley", "closed_eyeblossom", "open_eyeblossom", "cactus_flower"]
     texture = self.load_image_texture(BLOCKTEXTURE + "%s.png" % flower_map[data])
     return self.build_billboard(texture)
 
@@ -4672,7 +4679,7 @@ def comparator(self, blockid, data):
     
 # trapdoor
 # the trapdoor is looks like a sprite when opened, that's not good
-@material(blockid=[96,167,11332,11333,11334,11335,11336,12501,12502, 1198, 1207, 1218, 1230, 1231, 12658, 12659, 12660, 12661, 1137],
+@material(blockid=[96,167,11332,11333,11334,11335,11336,12501,12502, 1198, 1207, 1218, 1231, 12658, 12659, 12660, 12661, 1137],
           data=list(range(16)), transparent=True, nospawn=True)
 def trapdoor(self, blockid, data):
 
@@ -4709,7 +4716,6 @@ def trapdoor(self, blockid, data):
                    1207:BLOCKTEXTURE + "cherry_trapdoor.png",
                    1218:BLOCKTEXTURE + "bamboo_trapdoor.png",
                    1137:BLOCKTEXTURE + "pale_oak_trapdoor.png",
-                   1230:BLOCKTEXTURE + "pink_petals.png",
                    1231:BLOCKTEXTURE + "frogspawn.png",
 
                    12658: BLOCKTEXTURE + "copper_trapdoor.png",
@@ -7477,13 +7483,13 @@ def difficult_heads(self, blockid, data):
     return None
 
 
-@material(blockid=[1142], data=[0,1,2,4,5,6])
+@material(blockid=[1142], data=[0, 1, 2, 4, 5, 6, 8, 9, 10])
 def creaking_heart(self, blockid, data):
     # bits
-    #   active
-    #   | axis
-    #   | |
-    # 0b000
+    #    state (0, 1, 2)
+    #    | axis (0, 1, 2)
+    #    | |
+    # 0b0000
 
     orientation = data & 3
 
@@ -7493,10 +7499,11 @@ def creaking_heart(self, blockid, data):
         elif orientation == 2:
             orientation = 1
 
-    active = "_active" if data & 4 else ""
+    state_key = data >> 2
+    state = {0: '', 1: '_dormant', 2: '_awake'}[state_key]
 
-    top = self.load_image_texture(BLOCKTEXTURE + "creaking_heart_top" + active + ".png")
-    side = self.load_image_texture(BLOCKTEXTURE + "creaking_heart" + active + ".png")
+    top = self.load_image_texture(BLOCKTEXTURE + "creaking_heart_top" + state + ".png")
+    side = self.load_image_texture(BLOCKTEXTURE + "creaking_heart" + state + ".png")
 
     # choose orientation and paste textures
     if orientation == 0:
@@ -7549,6 +7556,46 @@ def pale_moss_carpet(self, blockid, data):
 
     return self.build_full_block(None, side_select(0), side_select(1), side_select(3), side_select(2), bottom=bottomTex)
 
+
+@material(blockid=[1230, 1149, 1221], data=list(range(0b1111 + 1)), transparent=True)
+def ground_cover(self, blockid, data):
+    # bits!
+    # LS 2 bits = direction
+    # MS 2 bits = segment count
+
+    texture = self.load_image_texture(BLOCKTEXTURE + {
+        1230: "pink_petals.png",
+        1149: "wildflowers.png",
+        1221: "leaf_litter.png",
+    }[blockid])
+
+    segment_count = (data & 0b1100) >> 2
+
+    target = Image.new("RGBA", (16, 16), self.bgcolor)
+    alpha_over(target, texture.crop((0, 0, 8, 8)), (0, 0))
+
+    if segment_count >= 1:
+        alpha_over(target, texture.crop((0, 8, 8, 16)), (0, 8))
+    if segment_count >= 2:
+        alpha_over(target, texture.crop((8, 8, 16, 16)), (8, 8))
+    if segment_count >= 3:
+        alpha_over(target, texture.crop((8, 0, 16, 8)), (8, 0))
+
+    direction = data & 0b0011
+    direction += self.rotation
+
+    for i in range(direction):
+        target = target.rotate(270)
+
+    return self.build_full_block(None, None, None, None, None, target)
+
+
+@material(blockid=[36], data=list(range(4)))
+def test_block(self, _, data):
+    tex = self.load_image_texture(BLOCKTEXTURE + 'test_block_' + ['start','accept','fail','log'][data] + '.png')
+    return self.build_block(tex, tex)
+
+
 sprite(blockid=11385, imagename=BLOCKTEXTURE + "oak_sapling.png")
 sprite(blockid=11386, imagename=BLOCKTEXTURE + "spruce_sapling.png")
 sprite(blockid=11387, imagename=BLOCKTEXTURE + "birch_sapling.png")
@@ -7567,6 +7614,8 @@ sprite(blockid=1016, imagename=BLOCKTEXTURE + "warped_fungus.png")
 sprite(blockid=1017, imagename=BLOCKTEXTURE + "crimson_fungus.png")
 sprite(blockid=1018, imagename=BLOCKTEXTURE + "warped_roots.png")
 sprite(blockid=1019, imagename=BLOCKTEXTURE + "crimson_roots.png")
+sprite(blockid=258, imagename=BLOCKTEXTURE + "bush.png")
+sprite(blockid=259, imagename=BLOCKTEXTURE + "firefly_bush.png")
 
 block(blockid=4, top_image=BLOCKTEXTURE + "cobblestone.png")
 block(blockid=7, top_image=BLOCKTEXTURE + "bedrock.png")
@@ -7584,6 +7633,7 @@ block(blockid=1248, top_image=BLOCKTEXTURE + "suspicious_gravel_0.png")
 block(blockid=1229, top_image=BLOCKTEXTURE + "target_top.png", side_image=BLOCKTEXTURE + "target_side.png")
 block(blockid=1244, top_image=BLOCKTEXTURE + "sculk_catalyst_top.png", side_image=BLOCKTEXTURE + "sculk_catalyst_side.png")
 block(blockid=25, top_image=BLOCKTEXTURE + "note_block.png")
+block(blockid=37, top_image=BLOCKTEXTURE + "test_instance_block.png")
 block(blockid=41, top_image=BLOCKTEXTURE + "gold_block.png")
 block(blockid=42, top_image=BLOCKTEXTURE + "iron_block.png")
 block(blockid=45, top_image=BLOCKTEXTURE + "bricks.png")

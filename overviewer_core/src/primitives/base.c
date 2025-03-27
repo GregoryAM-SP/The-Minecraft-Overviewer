@@ -106,8 +106,8 @@ base_draw(void* data, RenderState* state, PyObject* src, PyObject* mask, PyObjec
         (state->block == block_grass && get_data(state, BLOCKS, state->x, state->y + 1, state->z) != 78) ||
         block_class_is_subset(state->block, (mc_block_t[]){block_vine, block_waterlily, block_flowing_water, block_water, block_leaves},
                               5) ||
-        /* tallgrass, but not dead shrubs */
-        (state->block == block_tallgrass && state->block_data != 0) ||
+        /* tallgrass, but not dead shrubs or dry grass */
+        (state->block == block_tallgrass && state->block_data != 0 && state->block_data != 4 && state->block_data != 5) ||
         /* pumpkin/melon stem, not fully grown. Fully grown stems
          * get constant brown color (see textures.py) */
         (((state->block == block_pumpkin_stem) || (state->block == block_melon_stem)) && (state->block_data != 7)) ||
