@@ -30,6 +30,9 @@ overviewer_core/c_overviewer*.dylib
 overviewer_core/overviewer_version.py
 overviewer_core/src/primitives.h
 
+overviewer_core/data/stylesheet_src/*.css
+overviewer_core/data/stylesheet_src/*.css.map
+
 # Mac OS X noise
 .DS_Store
 

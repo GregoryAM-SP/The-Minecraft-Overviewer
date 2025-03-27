@@ -32,6 +32,7 @@ from multiprocessing import Pool
 from argparse import ArgumentParser
 
 from overviewer_core import config_parser, logger, nbt, world
+from overviewer_core.textParser import TextParser
 from overviewer_core.files import FileReplacer, get_fs_caps
 
 UUID_LOOKUP_URL = 'https://sessionserver.mojang.com/session/minecraft/profile/'
@@ -51,48 +52,6 @@ def replaceBads(s):
     for bad in bads:
         x = x.replace(bad, "_")
     return x
-
-
-# If you want to keep your stomach contents do not, under any circumstance,
-# read the body of the following function. You have been warned.
-# All of this could be replaced by a simple json.loads if Mojang had
-# introduced a TAG_JSON, but they didn't.
-#
-# So here are a few curiosities how 1.7 signs get seen in 1.8 in Minecraft:
-# - null        ->
-# - "null"      -> null
-# - ["Hello"]   -> Hello
-# - [Hello]     -> Hello
-# - [1,2,3]     -> 123
-# Mojang just broke signs for everyone who ever used [, { and ". GG.
-def jsonText(s):
-    if s is None or s == "null":
-        return ""
-    if ((s.startswith('"') and s.endswith('"')) or
-            (s.startswith('{') and s.endswith('}'))):
-        try:
-            js = json.loads(s)
-        except ValueError:
-            return s
-
-        def parseLevel(foo):
-            bar = ""
-            if isinstance(foo, list):
-                for extra in foo:
-                    bar += parseLevel(extra)
-            elif isinstance(foo, dict):
-                if "text" in foo:
-                    bar += foo["text"]
-                if "extra" in foo:
-                    bar += parseLevel(foo["extra"])
-            elif isinstance(foo, str):
-                bar = foo
-            return bar
-
-        return parseLevel(js)
-
-    else:
-        return s
 
 
 # Since functions are not pickleable, we send their names instead.
@@ -125,18 +84,21 @@ def parseBucketChunks(task_tuple):
     pid = multiprocessing.current_process().pid
     markers = defaultdict(list)
 
+    parser = TextParser(logging.getLogger("textParser"))
+
     i = 0
     cnt = 0
     for b in bucket:
         try:
             data = rset.get_chunk_lite(b[0], b[1])
+            data_version = data.get('DataVersion', 0)
             for poi in itertools.chain(data.get('TileEntities', []), data.get('Entities', []), data.get('block_entities', [])):
                 if poi['id'] in ['Sign', 'minecraft:sign', 'minecraft:hanging_sign']:
-                    poi = signWrangler(poi)
+                    parser.parse_sign(poi, data_version)
 
                 if 'CustomName' in poi:
-                    poi['CustomNameRaw'] = poi['CustomName']
-                    poi['CustomName'] = jsonText(poi['CustomName'])
+                    poi['CustomNameHtml'] = parser.parse_text_component(poi['CustomName'], data_version, True)
+                    poi['CustomName'] = parser.parse_text_component(poi['CustomName'], data_version, False)
 
                 for name, filter_function in filters:
                     ff = bucketChunkFuncs[filter_function]
@@ -158,42 +120,6 @@ def parseBucketChunks(task_tuple):
                           sum(len(v) for v in markers.values()), pid, cnt)
 
     return markers
-
-
-def signWrangler(poi):
-    """
-    Just does the JSON things for signs
-    """
-    if "Text1" in poi:
-        for field in ["Text1", "Text2", "Text3", "Text4"]:
-            poi[field + "Raw"] = poi[field]
-            poi[field] = jsonText(poi[field])
-
-        poi.update({
-            "back_text": {
-                "has_glowing_text": 0,
-                "color": "black",
-                "messages": ["", "", "", ""],
-                "messagesRaw": ['""', '""', '""', '""']
-            },
-            "front_text": {
-                "has_glowing_text": poi.get('GlowingText', 0),
-                "color": poi.get('Color', 'black'),
-                "messages": [poi["Text1"], poi["Text2"], poi["Text3"], poi["Text4"]],
-                "messagesRaw": [poi["Text1Raw"], poi["Text2Raw"], poi["Text3Raw"], poi["Text4Raw"]]
-            },
-            "keepPacked": 0,
-            "is_waxed": 0,
-        })
-    else:
-        for field in ["front_text", "back_text"]:
-            if field in poi:
-                messages = poi[field].get("messages", [])
-                poi[field]["messagesRaw"] = messages.copy()
-
-                for i in range(len(messages)):
-                    messages[i] = jsonText(messages[i])
-    return poi
 
 
 def handleEntities(rset, config, config_path, filters, markers):

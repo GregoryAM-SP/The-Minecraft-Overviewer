@@ -1,0 +1,55 @@
+/* Custom JSON text data */
+$json-colours: (
+        "black": #000000,
+        "dark_blue": #0000AA,
+        "dark_green": #00AA00,
+        "dark_aqua": #00AAAA,
+        "dark_red": #AA0000,
+        "dark_purple": #AA00AA,
+        "gold": #FFAA00,
+        "gray": #AAAAAA,
+        "dark_gray": #555555,
+        "blue": #5555FF,
+        "green": #55FF55,
+        "aqua": #55FFFF,
+        "red": #FF5555,
+        "light_purple": #FF55FF,
+        "yellow": #FFFF55,
+        "white": #FFFFFF,
+);
+
+.mctext-obfuscated {
+  text-shadow: 0 0 6px black, 0 0 6px black, 0 0 6px black, 0 0 6px black, 0 0 8px black, 0 0 8px black;
+  color: transparent;
+}
+
+@each $colourName, $colourHex in $json-colours {
+  .mctext-#{$colourName} {
+    color: #{$colourHex};
+  }
+
+  .mctext-#{$colourName}.mctext-obfuscated {
+    text-shadow: 0 0 6px #{$colourHex}, 0 0 6px #{$colourHex}, 0 0 6px #{$colourHex}, 0 0 6px #{$colourHex}, 0 0 8px #{$colourHex}, 0 0 8px #{$colourHex};
+    color: transparent;
+  }
+}
+
+.mctext-bold {
+  font-weight: bolder;
+}
+
+.mctext-italic {
+  font-style: italic;
+}
+
+.mctext-underlined {
+  text-decoration: underline;
+}
+
+.mctext-strikethrough {
+  text-decoration: line-through;
+}
+
+.mctext-strikethrough.mctext-underlined {
+  text-decoration: line-through underline;
+}

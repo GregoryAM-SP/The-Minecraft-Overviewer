@@ -36,7 +36,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install networkx pytest
+          pip install pytest pytest-mock
           echo "PIL_INCLUDE_DIR=pillow/src/libImaging" >> "$GITHUB_ENV"
 
       - name: Build Overviewer
