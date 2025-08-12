@@ -15,10 +15,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Overviewer
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Checkout Pillow
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: python-pillow/Pillow
           ref: refs/tags/10.3.0
