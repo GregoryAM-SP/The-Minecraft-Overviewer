@@ -6774,7 +6774,12 @@ def froglight(self, blockid, data):
 # Chain
 @material(blockid=11419, data=list(range(3)), solid=True, transparent=True, nospawn=True)
 def chain(self, blockid, data):
-    tex = self.load_image_texture(BLOCKTEXTURE + "chain.png")
+    # In versions prior to 1.21.10 chain was adequate, versions after 1.21.10 chain may be iron
+    try:
+        tex = self.load_image_texture(BLOCKTEXTURE + "chain.png")
+    except:
+        tex = self.load_image_texture(BLOCKTEXTURE + "iron_chain.png")
+    
     sidetex = Image.new(tex.mode, tex.size, self.bgcolor)
     mask = tex.crop((0, 0, 6, 16))
     alpha_over(sidetex, mask, (5, 0), mask)
