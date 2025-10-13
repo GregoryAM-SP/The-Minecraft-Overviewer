@@ -1602,6 +1602,9 @@ class RegionSet(object):
                 data |= {'left': 0x8, 'right': 0x10, 'single': 0x0}[chest_type]
             elif key in ['minecraft:furnace', 'minecraft:blast_furnace', 'minecraft:smoker']:
                 data |= 8 if palette_entry['Properties'].get('lit', 'false') == 'true' else 0
+            elif key in ['minecraft:ladder']:
+                if palette_entry['Properties'].get('waterlogged', 'false') == 'true':
+                    block = 8
         elif key in ['minecraft:beehive', 'minecraft:bee_nest']:
             facing = palette_entry['Properties']['facing']
             honey_level = int(palette_entry['Properties']['honey_level'])
@@ -1822,6 +1825,9 @@ class RegionSet(object):
                 data = 1
         elif key == 'minecraft:glow_lichen':
             p = palette_entry['Properties']
+            if p['waterlogged'] == 'true':
+                block = 8
+
             if p['down'] == 'true':
                 data |= 1 << 0
             if p['up'] == 'true':
