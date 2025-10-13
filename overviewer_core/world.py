@@ -1111,6 +1111,15 @@ class RegionSet(object):
             "minecraft:composter": (11417, 0),
             "minecraft:barrel": (11418, 0),
             "minecraft:chain": (11419, 0),
+            "minecraft:iron_chain": (11420, 0), # Renamed from minecraft:chain in 1.21.9
+            "minecraft:copper_chain": (11421, 0),
+            "minecraft:exposed_copper_chain": (11422, 0),
+            "minecraft:weathered_copper_chain": (11423, 0),
+            "minecraft:oxidized_copper_chain": (11424, 0),
+            "minecraft:waxed_copper_chain": (11421, 0),
+            "minecraft:waxed_exposed_copper_chain": (11422, 0),
+            "minecraft:waxed_weathered_copper_chain": (11423, 0),
+            "minecraft:waxed_oxidized_copper_chain": (11424, 0),
             # 1.15 blocks below
             'minecraft:beehive': (11501, 0),
             'minecraft:bee_nest': (11502, 0),
@@ -1668,7 +1677,8 @@ class RegionSet(object):
             if axis == 'z':
                 data = 4
         elif key in ['minecraft:basalt', 'minecraft:polished_basalt', 'minecraft:chain', 'minecraft:purpur_pillar',
-                     'minecraft:deepslate'] or key.endswith('_froglight'):
+                     'minecraft:deepslate', 'minecraft:iron_chain'] or \
+                key.endswith('_froglight') or key in generate_copper('copper_chain'):
             axis = palette_entry['Properties']['axis']
             data = {'y': 0, 'x': 1, 'z': 2}[axis]
         elif key == 'minecraft:creaking_heart':

@@ -6772,14 +6772,26 @@ def froglight(self, blockid, data):
     return self.build_axis_block(top, side, data)
 
 # Chain
-@material(blockid=11419, data=list(range(3)), solid=True, transparent=True, nospawn=True)
+@material(blockid=[11419,11420,11421,11422,11423,11424], data=list(range(3)), solid=True, transparent=True, nospawn=True)
 def chain(self, blockid, data):
-    # In versions prior to 1.21.10 chain was adequate, versions after 1.21.10 chain may be iron
+    # Updated in 1.21.9:  chain -> iron_chain
+    # Most people are probably going to have newer versions, so let's try new first.
+
+    texture_dict = {
+        11419: "chain",
+        11420: "iron_chain",
+        11421: "copper_chain",
+        11422: "exposed_copper_chain",
+        11423: "weathered_copper_chain",
+        11424: "oxidized_copper_chain",
+    }
+
     try:
-        tex = self.load_image_texture(BLOCKTEXTURE + "chain.png")
-    except:
-        tex = self.load_image_texture(BLOCKTEXTURE + "iron_chain.png")
-    
+        tex = self.load_image_texture(BLOCKTEXTURE + texture_dict[blockid] + ".png")
+    except (TextureException, IOError):
+        # Texture load failed, assume texture doesn't exist.
+        return None
+
     sidetex = Image.new(tex.mode, tex.size, self.bgcolor)
     mask = tex.crop((0, 0, 6, 16))
     alpha_over(sidetex, mask, (5, 0), mask)
