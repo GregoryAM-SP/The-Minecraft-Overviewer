@@ -7764,4 +7764,3 @@ block(blockid=12649, top_image=BLOCKTEXTURE + "oxidized_copper_grate.png", trans
 block(blockid=12663, top_image=BLOCKTEXTURE + "chiseled_tuff.png")
 block(blockid=12666, top_image=BLOCKTEXTURE + "polished_tuff.png")
 block(blockid=12669, top_image=BLOCKTEXTURE + "tuff_bricks.png")
-block(blockid=12670, top_image=BLOCKTEXTURE + "chiseled_tuff_bricks.png")
