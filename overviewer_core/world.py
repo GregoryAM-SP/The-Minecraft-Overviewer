@@ -825,6 +825,15 @@ class RegionSet(object):
             'minecraft:bush': (258, 0),
             'minecraft:firefly_bush': (259, 0),
 
+            'minecraft:copper_bars': (260, 0),
+            'minecraft:waxed_copper_bars': (260, 0),
+            'minecraft:exposed_copper_bars': (261, 0),
+            'minecraft:waxed_exposed_copper_bars': (261, 0),
+            'minecraft:weathered_copper_bars': (262, 0),
+            'minecraft:waxed_weathered_copper_bars': (262, 0),
+            'minecraft:oxidized_copper_bars': (263, 0),
+            'minecraft:waxed_oxidized_copper_bars': (263, 0),
+
             'minecraft:armor_stand': (416, 0),  # not rendering
 
             # Underwater things that we currently render as water
@@ -1828,6 +1837,7 @@ class RegionSet(object):
                 data |= {'floor': 0, 'ceiling': 4, 'single_wall': 8,
                          'double_wall': 12}[p['attachment']]
         elif key in ['minecraft:iron_bars', 'minecraft:glass_pane'] or \
+                key in generate_copper('copper_bars') or \
                 key in ['minecraft:%s_stained_glass_pane' % item for item in colors]:
             p = palette_entry['Properties']
             if p['north'] == 'true':

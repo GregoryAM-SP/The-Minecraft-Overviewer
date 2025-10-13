@@ -4852,12 +4852,20 @@ def huge_mushroom(self, blockid, data):
 # iron bars and glass pane
 # TODO glass pane is not a sprite, it has a texture for the side,
 # at the moment is not used
-@material(blockid=[101,102, 160], data=list(range(256)), transparent=True, nospawn=True)
+@material(blockid=[101,102, 160,260,261,262,263], data=list(range(256)), transparent=True, nospawn=True)
 def panes(self, blockid, data):
     # no rotation, uses pseudo data
     if blockid == 101:
         # iron bars
         t = self.load_image_texture(BLOCKTEXTURE + "iron_bars.png")
+    elif blockid == 260:
+        t = self.load_image_texture(BLOCKTEXTURE + "copper_bars.png")
+    elif blockid == 261:
+        t = self.load_image_texture(BLOCKTEXTURE + "exposed_copper_bars.png")
+    elif blockid == 262:
+        t = self.load_image_texture(BLOCKTEXTURE + "weathered_copper_bars.png")
+    elif blockid == 263:
+        t = self.load_image_texture(BLOCKTEXTURE + "oxidized_copper_bars.png")
     elif blockid == 160:
         t = self.load_image_texture(BLOCKTEXTURE + "%s_stained_glass.png" % color_map[data & 0xf])
     else:
