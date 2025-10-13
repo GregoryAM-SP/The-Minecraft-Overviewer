@@ -25,6 +25,30 @@ from itertools import cycle, islice, product
 from string import hexdigits
 from subprocess import PIPE, Popen
 
+DIMENSION_INFO = {
+    "minecraft:overworld": ("DIM0", 0, "minecraft:overworld"),
+    "minecraft:the_end": ("DIM1", 1, "minecraft:the_end"),
+    "minecraft:the_nether": ("DIM-1", -1, "minecraft:the_nether"),
+}
+
+
+def get_dimension_data(dimension):
+    if isinstance(dimension, int):
+        for dim_name, (folder, dim_id, _) in DIMENSION_INFO.items():
+            if dim_id == dimension:
+                return DIMENSION_INFO[dim_name]
+    elif isinstance(dimension, str):
+        if dimension in DIMENSION_INFO:
+            return DIMENSION_INFO[dimension]
+        elif dimension in ("overworld"):
+            return DIMENSION_INFO["minecraft:overworld"]
+        elif dimension in ("the_end", "end"):
+            return DIMENSION_INFO["minecraft:the_end"]
+        elif dimension in ("the_nether", "nether"):
+            return DIMENSION_INFO["minecraft:the_nether"]
+
+    return None
+
 
 def get_program_path():
     # Check if running as a frozen executable (e.g., created with PyInstaller)

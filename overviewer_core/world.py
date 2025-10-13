@@ -179,7 +179,7 @@ class World(object):
         # Return a copy
         return dict(self.data)
 
-    def find_true_spawn(self):
+    def find_true_spawn(self, dimension):
         """Returns the spawn point for this world. Since there is one spawn
         point for a world across all dimensions (RegionSets), this method makes
         sense as a member of the World class.
@@ -199,11 +199,20 @@ class World(object):
             spawnX = data['spawn']['pos'][0]
             spawnY = data['spawn']['pos'][1]
             spawnZ = data['spawn']['pos'][2]
+
+            dim = data['spawn']['dimension']
+            if dim != dimension[3]:
+                return None
         except KeyError:
             ## Versions prior to 1.21.10 can read directly from the level.dat
             spawnX = data['SpawnX']
             spawnY = data['SpawnY']
             spawnZ = data['SpawnZ']
+
+            # Pre-1.21.9 versions forced the spawn to be in the overworld
+            if dimension[3] != "minecraft:overworld":
+                return None
+
 
 
         ## clamp spawnY to a sane value, in-chunk value

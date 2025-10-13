@@ -610,7 +610,7 @@ def main():
             "imgquality", "imglossless", "optimizeimg", "rendermode", "worldname_orig", "title",
             "dimension", "changelist", "showspawn", "overlay", "base", "poititle", "maxzoom",
             "showlocationmarker", "minzoom", "center"])
-        tileSetOpts.update({"spawn": w.find_true_spawn()})  # TODO find a better way to do this
+        tileSetOpts.update({"spawn": w.find_true_spawn(render['dimension'])})
         for rset in rsets:
             tset = tileset.TileSet(w, rset, assetMrg, tex, tileSetOpts, tileset_dir)
             tilesets.append(tset)
