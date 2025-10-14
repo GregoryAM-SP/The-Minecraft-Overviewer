@@ -1152,6 +1152,15 @@ class RegionSet(object):
             "minecraft:waxed_exposed_copper_chain": (11422, 0),
             "minecraft:waxed_weathered_copper_chain": (11423, 0),
             "minecraft:waxed_oxidized_copper_chain": (11424, 0),
+
+            "minecraft:copper_chest": (11425, 0),
+            "minecraft:exposed_copper_chest": (11426, 0),
+            "minecraft:weathered_copper_chest": (11427, 0),
+            "minecraft:oxidized_copper_chest": (11428, 0),
+            "minecraft:waxed_copper_chest": (11425, 0),
+            "minecraft:waxed_exposed_copper_chest": (11426, 0),
+            "minecraft:waxed_weathered_copper_chest": (11427, 0),
+            "minecraft:waxed_oxidized_copper_chest": (11428, 0),
             # 1.15 blocks below
             'minecraft:beehive': (11501, 0),
             'minecraft:bee_nest': (11502, 0),
@@ -1651,10 +1660,12 @@ class RegionSet(object):
 
         elif key in ['minecraft:ladder', 'minecraft:chest', 'minecraft:ender_chest',
                      'minecraft:trapped_chest', 'minecraft:furnace',
-                     'minecraft:blast_furnace', 'minecraft:smoker']:
+                     'minecraft:blast_furnace', 'minecraft:smoker'] or \
+                key in generate_copper('copper_chest'):
             facing = palette_entry['Properties']['facing']
             data = {'north': 2, 'south': 3, 'west': 4, 'east': 5}[facing]
-            if key in ['minecraft:chest', 'minecraft:trapped_chest']:
+            if key in ['minecraft:chest', 'minecraft:trapped_chest'] or \
+                    key in generate_copper('copper_chest'):
                 # type property should exist, but default to 'single' just in case
                 chest_type = palette_entry['Properties'].get('type', 'single')
                 data |= {'left': 0x8, 'right': 0x10, 'single': 0x0}[chest_type]

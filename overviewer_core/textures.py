@@ -2358,7 +2358,7 @@ def stairs(self, blockid, data):
 
 # normal, locked (used in april's fool day), ender and trapped chest
 # NOTE:  locked chest used to be id95 (which is now stained glass)
-@material(blockid=[54, 130, 146], data=list(range(30)), transparent = True)
+@material(blockid=[54, 130, 146, 11425, 11426, 11427, 11428], data=list(range(30)), transparent = True)
 def chests(self, blockid, data):
     # the first 3 bits are the orientation as stored in minecraft, 
     # bits 0x8 and 0x10 indicate which half of the double chest is it.
@@ -2385,12 +2385,20 @@ def chests(self, blockid, data):
         # iterate.c will only return the ancil data (without pseudo 
         # ancil data) for locked and ender chests, so only 
         # ancilData = 2,3,4,5 are used for this blockids
-    
+
+    texture_base_name = {
+        11425: "copper",
+        11426: "copper_exposed",
+        11427: "copper_weathered",
+        11428: "copper_oxidized",
+    }.get(blockid, "normal")
+
     if data & 24 == 0:
-        if blockid == 130: t = self.load_image("assets/minecraft/textures/entity/chest/ender.png")
+        if blockid == 130:
+            t = self.load_image("assets/minecraft/textures/entity/chest/ender.png")
         else:
             try:
-                t = self.load_image("assets/minecraft/textures/entity/chest/normal.png")
+                t = self.load_image(f"assets/minecraft/textures/entity/chest/{texture_base_name}.png")
             except (TextureException, IOError):
                 t = self.load_image("assets/minecraft/textures/entity/chest/chest.png")
 
@@ -2449,8 +2457,8 @@ def chests(self, blockid, data):
         # large chest
         # the textures is no longer in terrain.png, get it from 
         # item/chest.png and get all the needed stuff
-        t_left = self.load_image("assets/minecraft/textures/entity/chest/normal_left.png")
-        t_right = self.load_image("assets/minecraft/textures/entity/chest/normal_right.png")
+        t_left = self.load_image(f"assets/minecraft/textures/entity/chest/{texture_base_name}_left.png")
+        t_right = self.load_image(f"assets/minecraft/textures/entity/chest/{texture_base_name}_right.png")
         # for some reason the 1.15 images are upside down
         t_left = ImageOps.flip(t_left)
         t_right = ImageOps.flip(t_right)
