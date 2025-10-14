@@ -1316,7 +1316,7 @@ class RegionSet(object):
             'minecraft:chiseled_tuff_bricks': (12670, 0),
             'minecraft:tuff_brick_stairs': (12671, 0),
             'minecraft:tuff_brick_slab': (12672, 0),
-            
+
             'minecraft:conduit': (1255, 0),
             'minecraft:sniffer_egg': (1256, 0),
             'minecraft:turtle_egg': (1257, 0),
@@ -1371,9 +1371,9 @@ class RegionSet(object):
             'minecraft:light': (99999, 1),
             'minecraft:moving_piston': (99999, 2),
             'minecraft:structure_void': (99999, 4),
-            
+
         }
-        
+
 
         colors = [   'white', 'orange', 'magenta', 'light_blue',
                     'yellow',   'lime',    'pink',       'gray',
@@ -1509,7 +1509,7 @@ class RegionSet(object):
 
         colors = ['white', 'orange', 'magenta', 'light_blue', 'yellow', 'lime', 'pink', 'gray', 'light_gray', 'cyan',
                   'purple', 'blue', 'brown', 'green', 'red', 'black']
-        
+
         coral_list = [ 'tube', 'brain', 'bubble', 'fire', 'horn']
 
         key = palette_entry['Name']
@@ -2665,15 +2665,12 @@ class RotatedRegionSet(RegionSetWrapper):
             yield x,z,mtime
 
 class CroppedRegionSet(RegionSetWrapper):
-
-    MARGIN = 5
-
     def __init__(self, rsetobj, xmin, zmin, xmax, zmax):
         super(CroppedRegionSet, self).__init__(rsetobj)
-        self.xmin = (xmin // 16) + self.MARGIN
-        self.xmax = (xmax // 16) - self.MARGIN
-        self.zmin = (zmin // 16) + self.MARGIN
-        self.zmax = (zmax // 16) - self.MARGIN
+        self.xmin = xmin//16
+        self.xmax = xmax//16
+        self.zmin = zmin//16
+        self.zmax = zmax//16
 
     def __repr__(self):
         return "<CroppedRegionSet regiondir=%r>" % self.regiondir

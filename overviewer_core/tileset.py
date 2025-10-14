@@ -671,11 +671,11 @@ class TileSet(object):
             # Y has 4 times as many chunks as tiles, then halved since this is
             # a radius
             yradius = 2 * 2**p
-            # The +32 on the y bounds is because chunks are very tall, and in
+            # The +64 on the y bounds is because chunks are very tall, and in
             # rare cases when the bottom of the map is close to a border, it
             # could get cut off
             if xradius >= bounds.maxcol and -xradius <= bounds.mincol and \
-                    yradius >= bounds.maxrow + 32 and -yradius <= bounds.minrow:
+                    yradius >= bounds.maxrow + 64 and -yradius <= bounds.minrow:
                 break
         self.treedepth = p
         self.xradius = xradius
