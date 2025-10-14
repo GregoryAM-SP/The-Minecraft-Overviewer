@@ -194,16 +194,16 @@ class World(object):
         ## read spawn info from level.dat
         data = self.leveldat
 
-        ## Versions prior to 1.21.10 can read directly from the level.dat
         try:
-           disp_spawnX = spawnX = data['SpawnX']
-           spawnY = data['SpawnY']
-           disp_spawnZ = spawnZ = data['SpawnZ']
-        except KeyError:
             ## Versions after 1.21.10 pull from a spawn pos array
-            disp_spawnX = spawnX = data['spawn']['pos'][0]
+            spawnX = data['spawn']['pos'][0]
             spawnY = data['spawn']['pos'][1]
-            disp_spawnZ = spawnZ = data['spawn']['pos'][2]
+            spawnZ = data['spawn']['pos'][2]
+        except KeyError:
+            ## Versions prior to 1.21.10 can read directly from the level.dat
+            spawnX = data['SpawnX']
+            spawnY = data['SpawnY']
+            spawnZ = data['SpawnZ']
 
 
         ## clamp spawnY to a sane value, in-chunk value
