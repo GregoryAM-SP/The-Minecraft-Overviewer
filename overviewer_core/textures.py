@@ -1999,13 +1999,19 @@ def torches(self, blockid, data):
     return img
 
 # lantern
-@material(blockid=[11373, 1038], data=[0, 1], transparent=True)
+@material(blockid=[11373, 1038, 1156,1157,1158,1159], data=[0, 1], transparent=True)
 def lantern(self, blockid, data):
     # get the  multipart texture of the lantern
-    if blockid == 11373:
-        inputtexture = self.load_image_texture(BLOCKTEXTURE + "lantern.png")
-    if blockid == 1038:
-        inputtexture = self.load_image_texture(BLOCKTEXTURE + "soul_lantern.png")
+    texmap = {
+        11373: "lantern.png",
+        1038: "soul_lantern.png",
+        1156: "copper_lantern.png",
+        1157: "exposed_copper_lantern.png",
+        1158: "weathered_copper_lantern.png",
+        1159: "oxidized_copper_lantern.png",
+    }
+
+    inputtexture = self.load_image_texture(BLOCKTEXTURE + texmap[blockid])
 
 
     # # now create a textures, using the parts defined in lantern.json

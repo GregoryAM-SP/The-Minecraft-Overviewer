@@ -996,6 +996,15 @@ class RegionSet(object):
             'minecraft:oxidized_lightning_rod': (1155, 0),
             'minecraft:waxed_oxidized_lightning_rod': (1155, 0),
 
+            'minecraft:copper_lantern': (1156, 0),
+            'minecraft:waxed_copper_lantern': (1156, 0),
+            'minecraft:exposed_copper_lantern': (1157, 0),
+            'minecraft:waxed_exposed_copper_lantern': (1157, 0),
+            'minecraft:weathered_copper_lantern': (1158, 0),
+            'minecraft:waxed_weathered_copper_lantern': (1158, 0),
+            'minecraft:oxidized_copper_lantern': (1159, 0),
+            'minecraft:waxed_oxidized_copper_lantern': (1159, 0),
+
             'minecraft:glow_lichen': (1119, 0),
             'minecraft:spore_blossom': (1120, 0),
 
@@ -1793,8 +1802,10 @@ class RegionSet(object):
                      'minecraft:pumpkin_stem', 'minecraft:potatoes', 'minecraft:carrots',
                      'minecraft:sweet_berry_bush', 'minecraft:chorus_flower']:
             data = palette_entry['Properties']['age']
-        elif key in ['minecraft:lantern', 'minecraft:soul_lantern']:
-            if palette_entry['Properties']['hanging'] == 'true':
+        elif key in (['minecraft:lantern', 'minecraft:soul_lantern'] + generate_copper('copper_lantern')):
+            if palette_entry['Properties']['waterlogged'] == 'true':
+                block = 8
+            elif palette_entry['Properties']['hanging'] == 'true':
                 data = 1
             else:
                 data = 0
