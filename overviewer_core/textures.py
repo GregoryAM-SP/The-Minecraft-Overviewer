@@ -6956,9 +6956,17 @@ def cave_vines(self, blockid, data):
             tex = self.load_image_texture(BLOCKTEXTURE + "cave_vines.png")
     return self.build_sprite(tex)
 
-@material(blockid=1118, data=list(range(6)), transparent=True, solid=True)
+@material(blockid=[1118,1153,1154,1155], data=list(range(6)), transparent=True, solid=True)
 def lightning_rod(self, blockid, data):
-    tex = self.load_image_texture(BLOCKTEXTURE + "lightning_rod.png")
+    texmap = {
+        1118: "lightning_rod",
+        1153: "exposed_lightning_rod",
+        1154: "weathered_lightning_rod",
+        1155: "oxidized_lightning_rod",
+    }
+
+
+    tex = self.load_image_texture(BLOCKTEXTURE + texmap[blockid] + '.png')
     img = Image.new("RGBA", (24, 24), self.bgcolor)
 
     mask = tex.crop((0, 4, 2, 16))

@@ -988,6 +988,14 @@ class RegionSet(object):
             'minecraft:cave_vines_plant': (1116, 0),
             'minecraft:cave_vines': (1117, 0),
             'minecraft:lightning_rod': (1118, 0),
+            'minecraft:waxed_lightning_rod': (1118, 0),
+            'minecraft:exposed_lightning_rod': (1153, 0),
+            'minecraft:waxed_exposed_lightning_rod': (1153, 0),
+            'minecraft:weathered_lightning_rod': (1154, 0),
+            'minecraft:waxed_weathered_lightning_rod': (1154, 0),
+            'minecraft:oxidized_lightning_rod': (1155, 0),
+            'minecraft:waxed_oxidized_lightning_rod': (1155, 0),
+
             'minecraft:glow_lichen': (1119, 0),
             'minecraft:spore_blossom': (1120, 0),
 
@@ -1852,10 +1860,15 @@ class RegionSet(object):
             p = palette_entry['Properties']
             data = {'tip': 0, 'tip_merge': 1, 'middle': 2, 'frustum': 3, 'base': 4}[p['thickness']]
             data |= {'up': 0, 'down': 0b1000}[p['vertical_direction']]
-        elif key in ['minecraft:small_amethyst_bud', 'minecraft:medium_amethyst_bud', 'minecraft:large_amethyst_bud',
-                     'minecraft:lightning_rod']:
+        elif key in ['minecraft:small_amethyst_bud', 'minecraft:medium_amethyst_bud', 'minecraft:large_amethyst_bud']:
             p = palette_entry['Properties']
             data = {'down': 0, 'up': 1, 'east': 2, 'south': 3, 'west': 4, 'north': 5}[p['facing']]
+        elif key == 'minecraft:lightning_rod' or key in generate_copper('lightning_rod'):
+            p = palette_entry['Properties']
+            if p['waterlogged'] == 'true':
+                block = 8
+            else:
+                data = {'down': 0, 'up': 1, 'east': 2, 'south': 3, 'west': 4, 'north': 5}[p['facing']]
         elif key in ['minecraft:cave_vines_plant', 'minecraft:cave_vines']:
             p = palette_entry['Properties']
             if p['berries'] == 'true':
