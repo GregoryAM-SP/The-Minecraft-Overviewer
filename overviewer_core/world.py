@@ -1421,6 +1421,14 @@ class RegionSet(object):
         return "<RegionSet regiondir=%r>" % self.regiondir
 
     def _get_block(self, palette_entry):
+        def generate_copper(base_id, base_ns="minecraft"):
+            variants = []
+            states = ['','exposed_','weathered_','oxidized_']
+            for i in range(len(states)):
+                variants.append(f'{base_ns}:{states[i]}{base_id}')
+                variants.append(f'{base_ns}:waxed_{states[i]}{base_id}')
+            return variants
+
         wood_slabs = ('minecraft:oak_slab', 'minecraft:spruce_slab', 'minecraft:birch_slab', 'minecraft:jungle_slab',
                       'minecraft:acacia_slab', 'minecraft:dark_oak_slab', 'minecraft:petrified_oak_slab',
                       'minecraft:crimson_slab', 'minecraft:warped_slab', 'minecraft:mangrove_slab',
