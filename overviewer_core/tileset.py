@@ -620,8 +620,7 @@ class TileSet(object):
         if isOverlay:
             d.update({"tilesets": self.options.get("overlay")})
 
-        # DIM0 means overworld
-        if self.regionset.get_type() == "DIM0" and self.options.get("showspawn", True):
+        if self.options.get("showspawn", True):
             d.update({"spawn": self.options.get("spawn")})
         else:
             d.update({"spawn": False})

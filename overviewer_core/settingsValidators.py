@@ -230,30 +230,15 @@ def validateStr(s):
 
 def validateDimension(d):
     """Validates the dimension setting"""
-    valid_dimensions = {
-        'overworld': 'DIM0',
-        'nether': 'DIM-1',
-        'end': 'DIM1'
-    }
 
+    dimension_data = util.get_dimension_data(d)
 
-    
-    if d is None:
+    if dimension_data is None:
         raise ValidationException(
             "Required key 'dimension' was not specified. Must be one of: 'overworld', 'nether', or 'end'"
         )
-    
-    # Convert to lowercase for case-insensitive comparison
-    if isinstance(d, str):
-        d = d.lower()
-    
-    if d not in valid_dimensions:
-        raise ValidationException(
-            "The dimension value must be one of: 'overworld', 'nether', or 'end'. "
-            f"Got '{d}' instead."
-        )
-    
-    return (d, valid_dimensions[d])
+
+    return d, dimension_data[0], dimension_data[1], dimension_data[2]
 
 def validateOutputDir(d):
     checkBadEscape(d)

@@ -1927,8 +1927,8 @@ def slabs(self, blockid, data):
     
     return self.build_slab_block(top, side, data & 8 == 8);
 
-# torch, redstone torch (off), redstone torch(on), soul_torch
-@material(blockid=[50, 75, 76, 1039], data=[1, 2, 3, 4, 5], transparent=True)
+# torch, redstone torch (off), redstone torch(on), soul_torch, copper_torch
+@material(blockid=[50, 75, 76, 1039, 264], data=[1, 2, 3, 4, 5], transparent=True)
 def torches(self, blockid, data):
     # first, rotations
     if self.rotation == 1:
@@ -1956,6 +1956,9 @@ def torches(self, blockid, data):
         small = self.load_image_texture(BLOCKTEXTURE + "redstone_torch.png")
     elif blockid == 1039: # soul torch
         small= self.load_image_texture(BLOCKTEXTURE + "soul_torch.png")
+    elif blockid == 264: # soul torch
+        small= self.load_image_texture(BLOCKTEXTURE + "copper_torch.png")
+
     # compose a torch bigger than the normal
     # (better for doing transformations)
     torch = Image.new("RGBA", (16,16), self.bgcolor)
@@ -1999,13 +2002,19 @@ def torches(self, blockid, data):
     return img
 
 # lantern
-@material(blockid=[11373, 1038], data=[0, 1], transparent=True)
+@material(blockid=[11373, 1038, 1156,1157,1158,1159], data=[0, 1], transparent=True)
 def lantern(self, blockid, data):
     # get the  multipart texture of the lantern
-    if blockid == 11373:
-        inputtexture = self.load_image_texture(BLOCKTEXTURE + "lantern.png")
-    if blockid == 1038:
-        inputtexture = self.load_image_texture(BLOCKTEXTURE + "soul_lantern.png")
+    texmap = {
+        11373: "lantern.png",
+        1038: "soul_lantern.png",
+        1156: "copper_lantern.png",
+        1157: "exposed_copper_lantern.png",
+        1158: "weathered_copper_lantern.png",
+        1159: "oxidized_copper_lantern.png",
+    }
+
+    inputtexture = self.load_image_texture(BLOCKTEXTURE + texmap[blockid])
 
 
     # # now create a textures, using the parts defined in lantern.json
@@ -2349,7 +2358,7 @@ def stairs(self, blockid, data):
 
 # normal, locked (used in april's fool day), ender and trapped chest
 # NOTE:  locked chest used to be id95 (which is now stained glass)
-@material(blockid=[54, 130, 146], data=list(range(30)), transparent = True)
+@material(blockid=[54, 130, 146, 11425, 11426, 11427, 11428], data=list(range(30)), transparent = True)
 def chests(self, blockid, data):
     # the first 3 bits are the orientation as stored in minecraft, 
     # bits 0x8 and 0x10 indicate which half of the double chest is it.
@@ -2376,12 +2385,20 @@ def chests(self, blockid, data):
         # iterate.c will only return the ancil data (without pseudo 
         # ancil data) for locked and ender chests, so only 
         # ancilData = 2,3,4,5 are used for this blockids
-    
+
+    texture_base_name = {
+        11425: "copper",
+        11426: "copper_exposed",
+        11427: "copper_weathered",
+        11428: "copper_oxidized",
+    }.get(blockid, "normal")
+
     if data & 24 == 0:
-        if blockid == 130: t = self.load_image("assets/minecraft/textures/entity/chest/ender.png")
+        if blockid == 130:
+            t = self.load_image("assets/minecraft/textures/entity/chest/ender.png")
         else:
             try:
-                t = self.load_image("assets/minecraft/textures/entity/chest/normal.png")
+                t = self.load_image(f"assets/minecraft/textures/entity/chest/{texture_base_name}.png")
             except (TextureException, IOError):
                 t = self.load_image("assets/minecraft/textures/entity/chest/chest.png")
 
@@ -2440,8 +2457,8 @@ def chests(self, blockid, data):
         # large chest
         # the textures is no longer in terrain.png, get it from 
         # item/chest.png and get all the needed stuff
-        t_left = self.load_image("assets/minecraft/textures/entity/chest/normal_left.png")
-        t_right = self.load_image("assets/minecraft/textures/entity/chest/normal_right.png")
+        t_left = self.load_image(f"assets/minecraft/textures/entity/chest/{texture_base_name}_left.png")
+        t_right = self.load_image(f"assets/minecraft/textures/entity/chest/{texture_base_name}_right.png")
         # for some reason the 1.15 images are upside down
         t_left = ImageOps.flip(t_left)
         t_right = ImageOps.flip(t_right)
@@ -4852,12 +4869,20 @@ def huge_mushroom(self, blockid, data):
 # iron bars and glass pane
 # TODO glass pane is not a sprite, it has a texture for the side,
 # at the moment is not used
-@material(blockid=[101,102, 160], data=list(range(256)), transparent=True, nospawn=True)
+@material(blockid=[101,102, 160,260,261,262,263], data=list(range(256)), transparent=True, nospawn=True)
 def panes(self, blockid, data):
     # no rotation, uses pseudo data
     if blockid == 101:
         # iron bars
         t = self.load_image_texture(BLOCKTEXTURE + "iron_bars.png")
+    elif blockid == 260:
+        t = self.load_image_texture(BLOCKTEXTURE + "copper_bars.png")
+    elif blockid == 261:
+        t = self.load_image_texture(BLOCKTEXTURE + "exposed_copper_bars.png")
+    elif blockid == 262:
+        t = self.load_image_texture(BLOCKTEXTURE + "weathered_copper_bars.png")
+    elif blockid == 263:
+        t = self.load_image_texture(BLOCKTEXTURE + "oxidized_copper_bars.png")
     elif blockid == 160:
         t = self.load_image_texture(BLOCKTEXTURE + "%s_stained_glass.png" % color_map[data & 0xf])
     else:
@@ -6772,14 +6797,26 @@ def froglight(self, blockid, data):
     return self.build_axis_block(top, side, data)
 
 # Chain
-@material(blockid=11419, data=list(range(3)), solid=True, transparent=True, nospawn=True)
+@material(blockid=[11419,11420,11421,11422,11423,11424], data=list(range(3)), solid=True, transparent=True, nospawn=True)
 def chain(self, blockid, data):
-    # In versions prior to 1.21.10 chain was adequate, versions after 1.21.10 chain may be iron
+    # Updated in 1.21.9:  chain -> iron_chain
+    # Most people are probably going to have newer versions, so let's try new first.
+
+    texture_dict = {
+        11419: "chain",
+        11420: "iron_chain",
+        11421: "copper_chain",
+        11422: "exposed_copper_chain",
+        11423: "weathered_copper_chain",
+        11424: "oxidized_copper_chain",
+    }
+
     try:
-        tex = self.load_image_texture(BLOCKTEXTURE + "chain.png")
-    except:
-        tex = self.load_image_texture(BLOCKTEXTURE + "iron_chain.png")
-    
+        tex = self.load_image_texture(BLOCKTEXTURE + texture_dict[blockid] + ".png")
+    except (TextureException, IOError):
+        # Texture load failed, assume texture doesn't exist.
+        return None
+
     sidetex = Image.new(tex.mode, tex.size, self.bgcolor)
     mask = tex.crop((0, 0, 6, 16))
     alpha_over(sidetex, mask, (5, 0), mask)
@@ -6936,9 +6973,17 @@ def cave_vines(self, blockid, data):
             tex = self.load_image_texture(BLOCKTEXTURE + "cave_vines.png")
     return self.build_sprite(tex)
 
-@material(blockid=1118, data=list(range(6)), transparent=True, solid=True)
+@material(blockid=[1118,1153,1154,1155], data=list(range(6)), transparent=True, solid=True)
 def lightning_rod(self, blockid, data):
-    tex = self.load_image_texture(BLOCKTEXTURE + "lightning_rod.png")
+    texmap = {
+        1118: "lightning_rod",
+        1153: "exposed_lightning_rod",
+        1154: "weathered_lightning_rod",
+        1155: "oxidized_lightning_rod",
+    }
+
+
+    tex = self.load_image_texture(BLOCKTEXTURE + texmap[blockid] + '.png')
     img = Image.new("RGBA", (24, 24), self.bgcolor)
 
     mask = tex.crop((0, 4, 2, 16))
@@ -7599,6 +7644,91 @@ def ground_cover(self, blockid, data):
 def test_block(self, _, data):
     tex = self.load_image_texture(BLOCKTEXTURE + 'test_block_' + ['start','accept','fail','log'][data] + '.png')
     return self.build_block(tex, tex)
+
+@material(blockid=list(range(12700, 12712)), data=list(range(0b111)), transparent=True)
+def shelf(self, block_id, data):
+    texmap = {
+        12700: 'oak_shelf',
+        12701: 'spruce_shelf',
+        12702: 'birch_shelf',
+        12703: 'jungle_shelf',
+        12704: 'acacia_shelf',
+        12705: 'dark_oak_shelf',
+        12706: 'crimson_shelf',
+        12707: 'warped_shelf',
+        12708: 'mangrove_shelf',
+        12709: 'cherry_shelf',
+        12710: 'bamboo_shelf',
+        12711: 'pale_oak_shelf',
+    }
+
+    tex = self.load_image(BLOCKTEXTURE + texmap[block_id] + '.png')
+
+    powered = (data & 0b100) == 0b100
+    direction = data & 0b011
+
+    direction = (direction + self.rotation) % 4
+
+    front = Image.new("RGBA", (16, 16), self.bgcolor)
+    alpha_over(front, tex.crop((0, 0, 16, 16)), (0, 0))
+
+    if powered:
+        # fake this for now
+        chain = 'center'
+
+        if chain == 'left':
+            alpha_over(front, tex.crop((0, 16, 16, 23)), (0, 4))
+            pass
+        elif chain == 'right':
+            alpha_over(front, tex.crop((16, 16, 32, 24)), (0, 4))
+            pass
+        elif chain == 'center':
+            alpha_over(front, tex.crop((0, 24, 16, 34)), (0, 4))
+            pass
+        elif chain == 'none':
+            alpha_over(front, tex.crop((16, 24, 32, 32)), (0, 4))
+            pass
+
+    rear = Image.new("RGBA", (16, 16), self.bgcolor)
+    alpha_over(rear, tex.crop((16, 0, 32, 16)), (0, 0))
+
+    right = Image.new("RGBA", (16, 16), self.bgcolor)
+    alpha_over(right, tex.crop((28, 0, 32, 16)), (0, 0))
+
+    left = Image.new("RGBA", (16, 16), self.bgcolor)
+    alpha_over(left, tex.crop((16, 0, 20, 16)), (0, 0))
+
+    top = Image.new("RGBA", (16, 16), self.bgcolor)
+    alpha_over(top, tex.crop((16, 7, 32, 12)), (0, 0))
+
+    # None == front; we handle this later
+    sides = [left, None, right, rear]
+
+    for i in range(direction):
+        sides = sides[1:] + sides[:1]
+        top = top.rotate(270)
+
+    # Make the sides line up properly
+    if sides[2] is None:
+        sides[1] = sides[1].transpose(Image.FLIP_LEFT_RIGHT)
+        sides[3] = sides[3].transpose(Image.FLIP_LEFT_RIGHT)
+
+    if sides[3] is None:
+        sides[0] = sides[0].transpose(Image.FLIP_LEFT_RIGHT)
+        sides[2] = sides[2].transpose(Image.FLIP_LEFT_RIGHT)
+
+    block = self.build_full_block(top, sides[3], sides[2], sides[0], sides[1])
+
+    # stitch on the front in the correct place
+    if sides[0] is None:
+        front = self.transform_image_side(front)
+        alpha_over(block, front, (9, 2), front)
+
+    if sides[1] is None:
+        front = self.transform_image_side(front.transpose(Image.FLIP_LEFT_RIGHT)).transpose(Image.FLIP_LEFT_RIGHT)
+        alpha_over(block, front, (3, 2), front)
+
+    return block
 
 
 sprite(blockid=11385, imagename=BLOCKTEXTURE + "oak_sapling.png")
