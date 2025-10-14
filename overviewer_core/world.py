@@ -575,6 +575,7 @@ class RegionSet(object):
             'minecraft:iron_door': (71, 0),
             'minecraft:oak_pressure_plate': (72, 0),
             'minecraft:redstone_ore': (73, 0),
+            # lit redstone ore = 74
             'minecraft:redstone_wall_torch': (75, 0),
             'minecraft:redstone_torch': (75, 5),
             'minecraft:stone_button': (77, 0),
@@ -636,6 +637,8 @@ class RegionSet(object):
             'minecraft:end_stone': (121, 0),
             'minecraft:dragon_egg': (122, 0),
             'minecraft:redstone_lamp': (123, 0),
+            # lit redstone lamp = 124
+            # double slab = 125
             'minecraft:oak_slab': (126, 0),
             'minecraft:spruce_slab': (126, 1),
             'minecraft:birch_slab': (126, 2),
@@ -833,6 +836,9 @@ class RegionSet(object):
             'minecraft:waxed_weathered_copper_bars': (262, 0),
             'minecraft:oxidized_copper_bars': (263, 0),
             'minecraft:waxed_oxidized_copper_bars': (263, 0),
+
+            'minecraft:copper_torch': (264, 0),
+            'minecraft:copper_wall_torch': (264, 5),
 
             'minecraft:armor_stand': (416, 0),  # not rendering
 
@@ -1716,7 +1722,8 @@ class RegionSet(object):
             data |= {'y': 0, 'x': 1, 'z': 2}[axis]
 
         elif key in ['minecraft:redstone_torch','minecraft:redstone_wall_torch','minecraft:wall_torch',
-                    'minecraft:soul_torch', 'minecraft:soul_wall_torch']:
+                     'minecraft:soul_torch', 'minecraft:soul_wall_torch',
+                     'minecraft:copper_torch', 'minecraft:copper_wall_torch']:
             if key.startswith('minecraft:redstone_') and palette_entry['Properties']['lit'] == 'true':
                 block += 1
             if key.endswith('wall_torch'):

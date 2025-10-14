@@ -1927,8 +1927,8 @@ def slabs(self, blockid, data):
     
     return self.build_slab_block(top, side, data & 8 == 8);
 
-# torch, redstone torch (off), redstone torch(on), soul_torch
-@material(blockid=[50, 75, 76, 1039], data=[1, 2, 3, 4, 5], transparent=True)
+# torch, redstone torch (off), redstone torch(on), soul_torch, copper_torch
+@material(blockid=[50, 75, 76, 1039, 264], data=[1, 2, 3, 4, 5], transparent=True)
 def torches(self, blockid, data):
     # first, rotations
     if self.rotation == 1:
@@ -1956,6 +1956,9 @@ def torches(self, blockid, data):
         small = self.load_image_texture(BLOCKTEXTURE + "redstone_torch.png")
     elif blockid == 1039: # soul torch
         small= self.load_image_texture(BLOCKTEXTURE + "soul_torch.png")
+    elif blockid == 264: # soul torch
+        small= self.load_image_texture(BLOCKTEXTURE + "copper_torch.png")
+
     # compose a torch bigger than the normal
     # (better for doing transformations)
     torch = Image.new("RGBA", (16,16), self.bgcolor)
