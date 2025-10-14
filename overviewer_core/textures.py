@@ -7645,6 +7645,91 @@ def test_block(self, _, data):
     tex = self.load_image_texture(BLOCKTEXTURE + 'test_block_' + ['start','accept','fail','log'][data] + '.png')
     return self.build_block(tex, tex)
 
+@material(blockid=list(range(12700, 12712)), data=list(range(0b111)), transparent=True)
+def shelf(self, block_id, data):
+    texmap = {
+        12700: 'oak_shelf',
+        12701: 'spruce_shelf',
+        12702: 'birch_shelf',
+        12703: 'jungle_shelf',
+        12704: 'acacia_shelf',
+        12705: 'dark_oak_shelf',
+        12706: 'crimson_shelf',
+        12707: 'warped_shelf',
+        12708: 'mangrove_shelf',
+        12709: 'cherry_shelf',
+        12710: 'bamboo_shelf',
+        12711: 'pale_oak_shelf',
+    }
+
+    tex = self.load_image(BLOCKTEXTURE + texmap[block_id] + '.png')
+
+    powered = (data & 0b100) == 0b100
+    direction = data & 0b011
+
+    direction = (direction + self.rotation) % 4
+
+    front = Image.new("RGBA", (16, 16), self.bgcolor)
+    alpha_over(front, tex.crop((0, 0, 16, 16)), (0, 0))
+
+    if powered:
+        # fake this for now
+        chain = 'center'
+
+        if chain == 'left':
+            alpha_over(front, tex.crop((0, 16, 16, 23)), (0, 4))
+            pass
+        elif chain == 'right':
+            alpha_over(front, tex.crop((16, 16, 32, 24)), (0, 4))
+            pass
+        elif chain == 'center':
+            alpha_over(front, tex.crop((0, 24, 16, 34)), (0, 4))
+            pass
+        elif chain == 'none':
+            alpha_over(front, tex.crop((16, 24, 32, 32)), (0, 4))
+            pass
+
+    rear = Image.new("RGBA", (16, 16), self.bgcolor)
+    alpha_over(rear, tex.crop((16, 0, 32, 16)), (0, 0))
+
+    right = Image.new("RGBA", (16, 16), self.bgcolor)
+    alpha_over(right, tex.crop((28, 0, 32, 16)), (0, 0))
+
+    left = Image.new("RGBA", (16, 16), self.bgcolor)
+    alpha_over(left, tex.crop((16, 0, 20, 16)), (0, 0))
+
+    top = Image.new("RGBA", (16, 16), self.bgcolor)
+    alpha_over(top, tex.crop((16, 7, 32, 12)), (0, 0))
+
+    # None == front; we handle this later
+    sides = [left, None, right, rear]
+
+    for i in range(direction):
+        sides = sides[1:] + sides[:1]
+        top = top.rotate(270)
+
+    # Make the sides line up properly
+    if sides[2] is None:
+        sides[1] = sides[1].transpose(Image.FLIP_LEFT_RIGHT)
+        sides[3] = sides[3].transpose(Image.FLIP_LEFT_RIGHT)
+
+    if sides[3] is None:
+        sides[0] = sides[0].transpose(Image.FLIP_LEFT_RIGHT)
+        sides[2] = sides[2].transpose(Image.FLIP_LEFT_RIGHT)
+
+    block = self.build_full_block(top, sides[3], sides[2], sides[0], sides[1])
+
+    # stitch on the front in the correct place
+    if sides[0] is None:
+        front = self.transform_image_side(front)
+        alpha_over(block, front, (9, 2), front)
+
+    if sides[1] is None:
+        front = self.transform_image_side(front.transpose(Image.FLIP_LEFT_RIGHT)).transpose(Image.FLIP_LEFT_RIGHT)
+        alpha_over(block, front, (3, 2), front)
+
+    return block
+
 
 sprite(blockid=11385, imagename=BLOCKTEXTURE + "oak_sapling.png")
 sprite(blockid=11386, imagename=BLOCKTEXTURE + "spruce_sapling.png")

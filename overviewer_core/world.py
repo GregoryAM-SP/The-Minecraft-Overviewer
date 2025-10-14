@@ -1375,7 +1375,20 @@ class RegionSet(object):
             'minecraft:chiseled_tuff_bricks': (12670, 0),
             'minecraft:tuff_brick_stairs': (12671, 0),
             'minecraft:tuff_brick_slab': (12672, 0),
-            
+
+            'minecraft:oak_shelf': (12700, 0),
+            'minecraft:spruce_shelf': (12701, 0),
+            'minecraft:birch_shelf': (12702, 0),
+            'minecraft:jungle_shelf': (12703, 0),
+            'minecraft:acacia_shelf': (12704, 0),
+            'minecraft:dark_oak_shelf': (12705, 0),
+            'minecraft:crimson_shelf': (12706, 0),
+            'minecraft:warped_shelf': (12707, 0),
+            'minecraft:mangrove_shelf': (12708, 0),
+            'minecraft:cherry_shelf': (12709, 0),
+            'minecraft:bamboo_shelf': (12710, 0),
+            'minecraft:pale_oak_shelf': (12711, 0),
+
             'minecraft:conduit': (1255, 0),
             'minecraft:sniffer_egg': (1256, 0),
             'minecraft:turtle_egg': (1257, 0),
@@ -2105,6 +2118,20 @@ class RegionSet(object):
         elif key == 'minecraft:test_block':
             p = palette_entry['Properties']
             data = ['start','accept','fail','log'].index(p['mode'])
+
+        elif key in ['minecraft:oak_shelf', 'minecraft:spruce_shelf', 'minecraft:birch_shelf',
+                     'minecraft:jungle_shelf', 'minecraft:acacia_shelf', 'minecraft:dark_oak_shelf',
+                     'minecraft:mangrove_shelf', 'minecraft:bamboo_shelf', 'minecraft:cherry_shelf',
+                     'minecraft:pale_oak_shelf', 'minecraft:crimson_shelf', 'minecraft:warped_shelf']:
+            p = palette_entry['Properties']
+            facing = p['facing']
+            data = ['south', 'west', 'north', 'east'].index(facing)
+
+            if p['powered'] == 'true':
+                data |= 0b100
+
+            if p['waterlogged'] == 'true':
+                block = 8
 
         return (block, data)
 
