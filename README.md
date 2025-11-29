@@ -1,4 +1,4 @@
-![Overviewer](https://gregoryam.com/assets/img/github/overviewer-img.webp?h=0347c3bd38ae284637ade776034fd281)
+![Overviewer](https://gregoryam.com/assets/img/github/overviewer-img.webp)
 [![Unit tests](https://github.com/GregoryAM-SP/The-Minecraft-Overviewer/actions/workflows/ci.yml/badge.svg)](https://github.com/GregoryAM-SP/The-Minecraft-Overviewer/actions/workflows/ci.yml)
 <br><strong>Works with Minecraft Java Edition v1.2.1 - v1.21.x</strong>
 <hr>
