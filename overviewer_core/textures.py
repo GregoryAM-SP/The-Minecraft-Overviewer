@@ -2804,7 +2804,11 @@ def lectern(self, blockid, data):
     stand_top_t = create_tile(top_raw_t, (0, 1, 16, 14), (0, 1), 0)
     if data & 0b100:
         # Lectern has a book, modify the stand top texture
-        book_raw_t = self.load_image("assets/minecraft/textures/entity/enchanting_table_book.png")
+        try:
+            # Minecraft 26.1+ moved this texture into an enchantment/ subdirectory
+            book_raw_t = self.load_image("assets/minecraft/textures/entity/enchantment/enchanting_table_book.png")
+        except TextureException:
+            book_raw_t = self.load_image("assets/minecraft/textures/entity/enchanting_table_book.png")
         book_t = Image.new("RGBA", (14, 10), self.bgcolor)
         book_part_t = book_raw_t.crop((0, 0, 7, 10))  # Left cover
         alpha_over(stand_top_t, book_part_t, (1, 3), book_part_t)
