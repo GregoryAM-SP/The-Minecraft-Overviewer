@@ -250,6 +250,9 @@ def handlePlayers(worldpath, filters, markers):
     playerdir = os.path.join(worldpath, "playerdata")
     useUUIDs = True
     if not os.path.isdir(playerdir):
+        # Minecraft 26.1+ moved playerdata to players/data/
+        playerdir = os.path.join(worldpath, "players", "data")
+    if not os.path.isdir(playerdir):
         playerdir = os.path.join(worldpath, "players")
         useUUIDs = False
 
