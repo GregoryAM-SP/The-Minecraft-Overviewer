@@ -269,7 +269,7 @@ overviewer.util = {
             if (overviewer.collections.spawnMarker) {
                 overviewer.collections.spawnMarker.remove();
             }
-            if (typeof(ovconf.spawn) == "object") {
+            if (ovconf.spawn !== null && typeof(ovconf.spawn) == "object") {
                 var spawnIcon = L.icon({
                     iconUrl: overviewerConfig.CONST.image.spawnMarker,
                     iconRetinaUrl: overviewerConfig.CONST.image.spawnMarker2x,
