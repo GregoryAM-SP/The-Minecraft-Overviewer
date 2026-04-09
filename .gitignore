@@ -51,3 +51,8 @@ ImagingUtils.h
 
 # Python Virtual Environment
 .venv
+
+# Temporary files used for env configs
+tmp/
+temp/
+.tmp/
