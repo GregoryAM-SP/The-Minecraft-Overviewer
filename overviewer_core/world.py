@@ -1612,8 +1612,31 @@ class RegionSet(object):
         
         coral_list = [ 'tube', 'brain', 'bubble', 'fire', 'horn']
 
-        key = palette_entry['Name']
-        block_properties = palette_entry['Properties']
+        if isinstance(palette_entry, str):
+            palette_entry = {
+                'id' : palette_entry,
+                'properties': {}
+            }
+
+        if not isinstance(palette_entry, dict):
+            logging.error(f"Invalid palette entry: {palette_entry} is not a dict")
+            raise ValueError(f"Invalid palette entry: {palette_entry} is not a dict")
+
+        if '' in palette_entry:
+            # 26.3+ shorthand for blocks with no state, but where other state-holding blocks exist in the section
+            key = palette_entry['']
+            block_properties = dict()
+        elif 'id' in palette_entry:
+            # 26.3+ block with state
+            key = palette_entry['id']
+            block_properties = palette_entry['properties']
+        elif 'Name' in palette_entry:
+            # <= 26.2
+            key = palette_entry['Name']
+            block_properties = palette_entry['Properties']
+        else:
+            logging.error(f"Invalid palette entry: {palette_entry} is a dict with no key 'id' or 'Name'")
+            raise ValueError(f"Invalid palette entry: {palette_entry} is a dict with no key 'id' or 'Name'")
 
         (block, data) = self._blockmap[key]
         if key in ['minecraft:redstone_ore', 'minecraft:redstone_lamp']:
