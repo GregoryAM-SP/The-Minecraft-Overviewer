@@ -25,10 +25,12 @@ from itertools import cycle, islice, product
 from string import hexdigits
 from subprocess import PIPE, Popen
 
+DEFAULT_VERSION = "26.2"
+
 DIMENSION_INFO = {
-    "minecraft:overworld": ("DIM0", 0, "minecraft:overworld"),
-    "minecraft:the_end": ("DIM1", 1, "minecraft:the_end"),
-    "minecraft:the_nether": ("DIM-1", -1, "minecraft:the_nether"),
+    "minecraft:overworld": ("minecraft:overworld", 0, "minecraft:overworld"),
+    "minecraft:the_end": ("minecraft:the_end", 1, "minecraft:the_end"),
+    "minecraft:the_nether": ("minecraft:the_nether", -1, "minecraft:the_nether"),
 }
 
 
@@ -81,17 +83,28 @@ def findGitHash():
 
 def findGitTag():
     try:
-        p = Popen('git describe --tags --abbrev=0', stdout=PIPE, stderr=PIPE, shell=True)
-        p.stderr.close()
-        line = p.stdout.readlines()[0].decode('utf-8').strip()
-        return line
+        p = Popen('git describe --tags --exact-match', stdout=PIPE, stderr=PIPE, shell=True)
+        stdout, _ = p.communicate()
+        line = stdout.decode('utf-8').strip()
+        if p.returncode == 0 and line:
+            return line
     except Exception:
-        try:
-            from . import overviewer_version
-            return overviewer_version.VERSION
-        except Exception:
-            pass
-    return "unknown"
+        pass
+
+    try:
+        p = Popen('git rev-parse --is-inside-work-tree', stdout=PIPE, stderr=PIPE, shell=True)
+        stdout, _ = p.communicate()
+        if p.returncode == 0 and stdout.decode('utf-8').strip() == 'true':
+            return DEFAULT_VERSION
+    except Exception:
+        pass
+
+    try:
+        from . import overviewer_version
+        return overviewer_version.VERSION
+    except Exception:
+        pass
+    return DEFAULT_VERSION
 
 
 def is_bare_console():

@@ -332,7 +332,7 @@ class Textures(object):
             if verbose: logging.info("Did not find file {0} in jar {1}".format(filename, jarpath))
             
 
-        raise TextureException("Could not find the textures while searching for '{0}'. Try specifying the 'texturepath' option in your config file.\nSet it to the path to a Minecraft Resource pack.\nAlternately, install the Minecraft client (which includes textures)\nAlso see <http://docs.overviewer.org/en/latest/running/#installing-the-textures>\n(Remember, this version of Overviewer requires a 1.21-compatible resource pack)\n(Also note that I won't automatically use snapshots; you'll have to use the texturepath option to use a snapshot jar)".format(filename))
+        raise TextureException("Could not find the textures while searching for '{0}'. Try specifying the 'texturepath' option in your config file.\nSet it to the path to a Minecraft Resource pack.\nAlternately, install the Minecraft client (which includes textures)\nAlso see <http://docs.overviewer.org/en/latest/running/#installing-the-textures>\n(Remember, this version of Overviewer requires a 26.2-compatible resource pack)\n(Also note that I won't automatically use snapshots; you'll have to use the texturepath option to use a snapshot jar)".format(filename))
 
     def load_image_texture(self, filename):
         # Textures may be animated or in a different resolution than 16x16.  
@@ -377,7 +377,85 @@ class Textures(object):
         self.texture_cache[filename] = img
         return img
 
+    def _bed_atlas_from_faces(self, color):
+        """Reconstruct the legacy 64x64 bed entity atlas from the per-face block
+        textures used since Minecraft 26.2.
 
+        In 26.2 the single ``entity/bed/<color>.png`` atlas was replaced by
+        per-face block textures (``block/<color>_bed_{head,foot}_{up,west,...}.png``
+        plus the shared ``block/bed_head_north.png``). Only the regions that
+        ``bed()`` crops are populated here; the per-region transforms below were
+        derived to be pixel-identical to the legacy atlas, so the existing bed
+        rendering math keeps working unchanged."""
+        bt = BLOCKTEXTURE
+        head_up = self.load_image_texture(bt + "%s_bed_head_up.png" % color)
+        head_west = self.load_image_texture(bt + "%s_bed_head_west.png" % color)
+        head_north = self.load_image_texture(bt + "bed_head_north.png")
+        foot_up = self.load_image_texture(bt + "%s_bed_foot_up.png" % color)
+        foot_west = self.load_image_texture(bt + "%s_bed_foot_west.png" % color)
+        foot_south = self.load_image_texture(bt + "%s_bed_foot_south.png" % color)
+
+        atlas = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
+        # head: top, long side, headboard end
+        atlas.paste(head_up, (6, 6))
+        atlas.paste(head_west.crop((0, 7, 16, 13)).rotate(270, expand=True), (0, 6))
+        atlas.paste(head_north.crop((0, 7, 16, 13)).rotate(180, expand=True), (6, 0))
+        # foot: top, long side, footboard end
+        atlas.paste(foot_up, (6, 28))
+        atlas.paste(foot_west.crop((0, 7, 16, 13)).rotate(270, expand=True), (0, 28))
+        atlas.paste(foot_south.crop((0, 7, 16, 13)).transpose(Image.FLIP_LEFT_RIGHT)
+                    .rotate(180, expand=True), (22, 22))
+        # leg post (shared by head and foot rendering)
+        atlas.paste(head_west.crop((0, 13, 3, 16)), (53, 3))
+        return atlas
+
+    def _hanging_sign_atlas_from_block(self, wood):
+        """Reconstruct the legacy 64x32 hanging-sign entity atlas from the
+        per-wood block texture used since Minecraft 26.2.
+
+        In 26.2 ``entity/signs/hanging/<wood>.png`` was removed and the same
+        artwork re-packed into ``block/<wood>_hanging_sign.png`` (32x32). The
+        placements below were derived to be pixel-identical to the legacy atlas
+        for every region the sign code reads, so the existing crop logic keeps
+        working unchanged."""
+        src = self.load_image(BLOCKTEXTURE + "%s_hanging_sign.png" % wood)
+        atlas = Image.new("RGBA", (64, 32), (0, 0, 0, 0))
+        # (legacy dest box) <- (source top-left in the re-packed texture)
+        placements = [
+            ((4, 0, 20, 4), (0, 0)),     # bar top
+            ((4, 4, 20, 6), (4, 4)),     # bar side
+            ((0, 4, 4, 6), (0, 4)),      # bar end
+            ((2, 12, 16, 14), (2, 11)),  # sign top
+            ((2, 14, 16, 24), (2, 14)),  # sign side (board front)
+            ((0, 14, 2, 24), (2, 14)),   # sign end
+            ((6, 6, 9, 12), (28, 7)),    # chain, main link
+            ((0, 6, 3, 12), (22, 7)),    # chain, outer link
+        ]
+        for (dx0, dy0, dx1, dy1), (sx, sy) in placements:
+            w, h = dx1 - dx0, dy1 - dy0
+            atlas.paste(src.crop((sx, sy, sx + w, sy + h)), (dx0, dy0))
+        # The "attached" chain bar (legacy 12,6..28,12) has no contiguous
+        # equivalent in the re-packed texture; approximate it by tiling the
+        # main chain link across the bar (only used for flush-mounted signs).
+        link = src.crop((28, 7, 31, 13))
+        for i in range(0, 16, 3):
+            atlas.paste(link, (12 + i, 6))
+        return atlas
+
+    def _load_image_texture_compat(self, *filenames):
+        """Return the first existing texture from several candidate paths.
+
+        Used for textures Minecraft has renamed across versions (e.g. 26.2
+        renamed block/quartz_pillar.png -> block/quartz_pillar_side.png). List
+        the modern name first so current packs win, with older names as
+        fallbacks."""
+        last = None
+        for filename in filenames:
+            try:
+                return self.load_image_texture(filename)
+            except TextureException as e:
+                last = e
+        raise last
 
     def load_water(self):
         """Special-case function for loading water."""
@@ -1381,7 +1459,14 @@ def bed(self, blockid, data):
     # Masked to not clobber block head/foot & color info
     data = data & 0b11111100 | ((self.rotation + (data & 0b11)) % 4)
 
-    bed_texture = self.load_image("assets/minecraft/textures/entity/bed/%s.png" % color_map[data >> 4])
+    color = color_map[data >> 4]
+    try:
+        bed_texture = self.load_image("assets/minecraft/textures/entity/bed/%s.png" % color)
+    except TextureException:
+        # Minecraft 26.2+ dropped the monolithic bed atlas in favour of per-face
+        # block textures; rebuild a legacy-layout atlas so the crop logic below
+        # works unchanged.
+        bed_texture = self._bed_atlas_from_faces(color)
     increment = 8
     left_face = None
     right_face = None
@@ -2804,7 +2889,11 @@ def lectern(self, blockid, data):
     stand_top_t = create_tile(top_raw_t, (0, 1, 16, 14), (0, 1), 0)
     if data & 0b100:
         # Lectern has a book, modify the stand top texture
-        book_raw_t = self.load_image("assets/minecraft/textures/entity/enchanting_table_book.png")
+        try:
+            # Minecraft 26.1+ moved this texture into an enchantment/ subdirectory
+            book_raw_t = self.load_image("assets/minecraft/textures/entity/enchantment/enchanting_table_book.png")
+        except TextureException:
+            book_raw_t = self.load_image("assets/minecraft/textures/entity/enchanting_table_book.png")
         book_t = Image.new("RGBA", (14, 10), self.bgcolor)
         book_part_t = book_raw_t.crop((0, 0, 7, 10))  # Left cover
         alpha_over(stand_top_t, book_part_t, (1, 3), book_part_t)
@@ -3163,7 +3252,13 @@ def signpost(self, blockid, data):
 
     if blockid == 12514:
         # override for bamboo, this is a different texture so load it from the sign texture directly.
-        texture = self.load_image("assets/minecraft/textures/entity/signs/bamboo.png").copy().crop((2, 2, 26, 14))
+        try:
+            bamboo_sign = self.load_image("assets/minecraft/textures/entity/signs/bamboo.png")
+        except TextureException:
+            # Minecraft 26.2+ moved this to block/bamboo_sign.png; the (2,2,26,14)
+            # board crop lines up with the re-packed texture unchanged.
+            bamboo_sign = self.load_image(BLOCKTEXTURE + "bamboo_sign.png")
+        texture = bamboo_sign.copy().crop((2, 2, 26, 14))
         texture.resize((16,12), Image.LANCZOS)
         teximg = Image.new("RGBA", (16,16), self.bgcolor)
         alpha_over(teximg, texture)
@@ -3485,7 +3580,13 @@ def wall_sign(self, blockid, data): # wall sign
 
     if blockid == 12511:
         # override for bamboo, this is a different texture so load it from the sign texture directly.
-        texture = self.load_image("assets/minecraft/textures/entity/signs/bamboo.png").copy().crop((2, 2, 26, 14))
+        try:
+            bamboo_sign = self.load_image("assets/minecraft/textures/entity/signs/bamboo.png")
+        except TextureException:
+            # Minecraft 26.2+ moved this to block/bamboo_sign.png; the (2,2,26,14)
+            # board crop lines up with the re-packed texture unchanged.
+            bamboo_sign = self.load_image(BLOCKTEXTURE + "bamboo_sign.png")
+        texture = bamboo_sign.copy().crop((2, 2, 26, 14))
         texture.resize((16,12), Image.LANCZOS)
         teximg = Image.new("RGBA", (16,16), self.bgcolor)
         alpha_over(teximg, texture)
@@ -3551,8 +3652,12 @@ def hanging_wall_sign(self, blockid, data):
         12611: "pale_oak.png",
     }
 
-    texture_path = "assets/minecraft/textures/entity/signs/hanging/" + sign_texture[blockid]
-    texture = self.load_image(texture_path).copy()
+    wood = sign_texture[blockid][:-len(".png")]
+    try:
+        texture = self.load_image("assets/minecraft/textures/entity/signs/hanging/%s.png" % wood).copy()
+    except TextureException:
+        # Minecraft 26.2+ moved/re-packed this into block/<wood>_hanging_sign.png
+        texture = self._hanging_sign_atlas_from_block(wood).copy()
 
     # texture is the full multi-face sign texture. It's not a 16x16 face texture, so
     # we need to load the underlying image with load_image() rather than load_image_texture()
@@ -3653,8 +3758,12 @@ def hanging_sign(self, blockid, data):
         12631: "pale_oak.png",
     }
 
-    texture_path = "assets/minecraft/textures/entity/signs/hanging/" + sign_texture[blockid]
-    full_texture = self.load_image(texture_path).copy()
+    wood = sign_texture[blockid][:-len(".png")]
+    try:
+        full_texture = self.load_image("assets/minecraft/textures/entity/signs/hanging/%s.png" % wood).copy()
+    except TextureException:
+        # Minecraft 26.2+ moved/re-packed this into block/<wood>_hanging_sign.png
+        full_texture = self._hanging_sign_atlas_from_block(wood).copy()
 
     sign_side_tex = full_texture.crop((2, 14, 16, 24))
 
@@ -5751,7 +5860,8 @@ def quartz_block(self, blockid, data):
     
     # pillar quartz block with orientation
     top = self.load_image_texture(BLOCKTEXTURE + "quartz_pillar_top.png")
-    side = self.load_image_texture(BLOCKTEXTURE + "quartz_pillar.png").copy()
+    side = self._load_image_texture_compat(BLOCKTEXTURE + "quartz_pillar_side.png",
+                                           BLOCKTEXTURE + "quartz_pillar.png").copy()
     if data == 2: # vertical
         return self.build_block(top, side)
     elif data == 3: # north-south oriented
@@ -6202,7 +6312,8 @@ def chorus_flower(self, blockid, data):
 @material(blockid=202, data=list(range(3)), solid=True)
 def purpur_pillar(self, blockid, data):
     top=self.load_image_texture(BLOCKTEXTURE + "purpur_pillar_top.png")
-    side=self.load_image_texture(BLOCKTEXTURE + "purpur_pillar.png")
+    side=self._load_image_texture_compat(BLOCKTEXTURE + "purpur_pillar_side.png",
+                                         BLOCKTEXTURE + "purpur_pillar.png")
     return self.build_axis_block(top, side, data)
 
 # frosted ice

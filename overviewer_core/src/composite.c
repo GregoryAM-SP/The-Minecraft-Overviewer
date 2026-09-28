@@ -132,19 +132,19 @@ alpha_over_full(PyObject* dest, PyObject* src, PyObject* mask, float overall_alp
         return NULL;
 
     /* check the various image modes, make sure they make sense */
-    if (strcmp(imDest->mode, "RGBA") != 0) {
+    if (!OV_MODE_IS(imDest, RGBA)) {
         PyErr_SetString(PyExc_ValueError,
                         "given destination image does not have mode \"RGBA\"");
         return NULL;
     }
 
-    if (strcmp(imSrc->mode, "RGBA") != 0 && strcmp(imSrc->mode, "RGB") != 0) {
+    if (!OV_MODE_IS(imSrc, RGBA) && !OV_MODE_IS(imSrc, RGB)) {
         PyErr_SetString(PyExc_ValueError,
                         "given source image does not have mode \"RGBA\" or \"RGB\"");
         return NULL;
     }
 
-    if (strcmp(imMask->mode, "RGBA") != 0 && strcmp(imMask->mode, "L") != 0) {
+    if (!OV_MODE_IS(imMask, RGBA) && !OV_MODE_IS(imMask, L)) {
         PyErr_SetString(PyExc_ValueError,
                         "given mask image does not have mode \"RGBA\" or \"L\"");
         return NULL;
@@ -301,13 +301,13 @@ tint_with_mask(PyObject* dest,
         return NULL;
 
     /* check the various image modes, make sure they make sense */
-    if (strcmp(imDest->mode, "RGBA") != 0) {
+    if (!OV_MODE_IS(imDest, RGBA)) {
         PyErr_SetString(PyExc_ValueError,
                         "given destination image does not have mode \"RGBA\"");
         return NULL;
     }
 
-    if (strcmp(imMask->mode, "RGBA") != 0 && strcmp(imMask->mode, "L") != 0) {
+    if (!OV_MODE_IS(imMask, RGBA) && !OV_MODE_IS(imMask, L)) {
         PyErr_SetString(PyExc_ValueError,
                         "given mask image does not have mode \"RGBA\" or \"L\"");
         return NULL;
@@ -406,7 +406,7 @@ draw_triangle(PyObject* dest, int32_t inclusive,
         return NULL;
 
     /* check the various image modes, make sure they make sense */
-    if (strcmp(imDest->mode, "RGBA") != 0) {
+    if (!OV_MODE_IS(imDest, RGBA)) {
         PyErr_SetString(PyExc_ValueError,
                         "given destination image does not have mode \"RGBA\"");
         return NULL;
@@ -527,13 +527,13 @@ resize_half(PyObject* dest, PyObject* src) {
         return NULL;
 
     /* check the various image modes, make sure they make sense */
-    if (strcmp(imDest->mode, "RGBA") != 0) {
+    if (!OV_MODE_IS(imDest, RGBA)) {
         PyErr_SetString(PyExc_ValueError,
                         "given destination image does not have mode \"RGBA\"");
         return NULL;
     }
 
-    if (strcmp(imSrc->mode, "RGBA") != 0 && strcmp(imSrc->mode, "RGB") != 0) {
+    if (!OV_MODE_IS(imSrc, RGBA) && !OV_MODE_IS(imSrc, RGB)) {
         PyErr_SetString(PyExc_ValueError,
                         "given source image does not have mode \"RGBA\" or \"RGB\"");
         return NULL;

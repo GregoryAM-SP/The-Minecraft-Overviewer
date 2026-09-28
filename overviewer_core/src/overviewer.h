@@ -42,6 +42,17 @@
 #include <numpy/arrayobject.h>
 /* Fix Pillow on mingw-w64 which includes windows.h in Imaging.h */
 #undef TRANSPARENT
+
+/* Pillow 12 changed Imaging->mode from a char* string ("RGBA", "RGB", "L") to
+   a ModeID enum (IMAGING_MODE_*). OV_MODE_IS lets the same source compile
+   against both: OV_PILLOW_VERSION_MAJOR is supplied by setup.py from the
+   installed Pillow version. Usage: OV_MODE_IS(im, RGBA). */
+#if defined(OV_PILLOW_VERSION_MAJOR) && OV_PILLOW_VERSION_MAJOR >= 12
+#define OV_MODE_IS(im, m) ((im)->mode == IMAGING_MODE_##m)
+#else
+#define OV_MODE_IS(im, m) (strcmp((im)->mode, #m) == 0)
+#endif
+
 /* Utility macros */
 #include "mc_id.h"
 #include "utils.h"
@@ -73,6 +84,12 @@ PyObject* draw_triangle(PyObject* dest, int32_t inclusive,
                         int32_t tux, int32_t tuy, int32_t* touchups, uint32_t num_touchups);
 PyObject* resize_half(PyObject* dest, PyObject* src);
 PyObject* resize_half_wrap(PyObject* self, PyObject* args);
+
+/* in Draw.c -- Overviewer's own copy of Pillow's line drawing. Named with an
+   ov_ prefix so it does not collide with the ImagingDrawLine prototype that
+   Pillow's Imaging.h declares (the signatures differ as of Pillow 12). */
+int32_t ov_DrawLine(Imaging im, int32_t x0, int32_t y0, int32_t x1, int32_t y1,
+                    const void* ink_, int32_t op);
 
 /* forward declaration of RenderMode object */
 typedef struct _RenderMode RenderMode;

@@ -204,15 +204,20 @@ bool render_mode_parse_option(PyObject* support, const char* name, const char* f
     Py_DECREF(dict);
 
     if (!ret) {
-        PyObject *errtype, *errvalue, *errtraceback, *errstring;
+        PyObject *errtype, *errvalue, *errtraceback;
 
         PyErr_Fetch(&errtype, &errvalue, &errtraceback);
-        errstring = PyUnicode_AsUTF8String(errvalue);
+        PyErr_NormalizeException(&errtype, &errvalue, &errtraceback);
 
-        PyErr_Format(PyExc_TypeError, "rendermode option \"%s\" has incorrect type (%s)", name, errstring);
+        if (errvalue) {
+            PyErr_Format(PyExc_TypeError, "rendermode option \"%s\" has incorrect type (%S)",
+                         name, errvalue);
+        } else {
+            PyErr_Format(PyExc_TypeError, "rendermode option \"%s\" has incorrect type", name);
+        }
 
-        Py_DECREF(errtype);
-        Py_DECREF(errvalue);
+        Py_XDECREF(errtype);
+        Py_XDECREF(errvalue);
         Py_XDECREF(errtraceback);
     }
 

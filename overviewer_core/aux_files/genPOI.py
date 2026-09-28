@@ -21,7 +21,6 @@ import json
 import logging
 import multiprocessing
 import os
-import re
 import sys
 import time
 import urllib.request
@@ -250,6 +249,9 @@ def handlePlayers(worldpath, filters, markers):
     playerdir = os.path.join(worldpath, "playerdata")
     useUUIDs = True
     if not os.path.isdir(playerdir):
+        # Minecraft 26.1+ moved playerdata to players/data/
+        playerdir = os.path.join(worldpath, "players", "data")
+    if not os.path.isdir(playerdir):
         playerdir = os.path.join(worldpath, "players")
         useUUIDs = False
 
@@ -305,8 +307,7 @@ def handlePlayers(worldpath, filters, markers):
             if rset.get_type().endswith("/entities"):
                 continue
 
-            dimension = int(re.match(r"^DIM(_MYST)?(-?\d+)$", rset.get_type()).group(2))
-            dimension = DIMENSION_INT_TO_STR.get(dimension, "minecraft:overworld")
+            dimension = rset.get_type()
 
             read_dim = data.get("Dimension", "minecraft:overworld")
             if type(read_dim) == int:

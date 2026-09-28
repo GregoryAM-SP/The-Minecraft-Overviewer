@@ -1,5 +1,6 @@
 import unittest
 from unittest.mock import patch
+import posixpath
 import overviewer
 
 class OverviewerTest(unittest.TestCase):
@@ -32,6 +33,7 @@ class OverviewerTest(unittest.TestCase):
 
 
     @patch('os.path.sep', new='/')
+    @patch('os.path.join', side_effect=posixpath.join)
     @patch('os.path.expanduser', return_value='/home/user')
     @patch('platform.system', return_value='Linux')
     @patch('os.path.exists')
@@ -69,6 +71,7 @@ class OverviewerTest(unittest.TestCase):
 
 
     @patch('os.path.sep', new='/')
+    @patch('os.path.join', side_effect=posixpath.join)
     @patch('os.path.expanduser', return_value='/home/user')
     @patch('platform.system', return_value='Linux')
     @patch('os.path.exists')

@@ -6,7 +6,7 @@ on:
       - main
 
 env:
-  VERSION: 1.21.3-rc.1
+  VERSION: 26.2
 
 jobs:
   build_and_release_windows:
@@ -22,7 +22,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v6
         with:
-          python-version: 3.8
+          python-version: "3.10"
 
       - name: Create Release Tag
         run: |
@@ -34,11 +34,13 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Fetch Pillow files
+      - name: Checkout matching Pillow headers
+        shell: pwsh
         run: |
-          Invoke-WebRequest -Uri "https://raw.githubusercontent.com/python-pillow/Pillow/10.3.0/src/libImaging/Imaging.h" -OutFile "Imaging.h"
-          Invoke-WebRequest -Uri "https://raw.githubusercontent.com/python-pillow/Pillow/10.3.0/src/libImaging/ImagingUtils.h" -OutFile "ImagingUtils.h"
-          Invoke-WebRequest -Uri "https://raw.githubusercontent.com/python-pillow/Pillow/10.3.0/src/libImaging/ImPlatform.h" -OutFile "ImPlatform.h"
+          $pillowVersion = python -c "import PIL; print(PIL.__version__)"
+          $pillowPath = Join-Path $env:RUNNER_TEMP "pillow"
+          git clone --branch="$pillowVersion" --depth=1 https://github.com/python-pillow/Pillow.git $pillowPath
+          "PIL_INCLUDE_DIR=$pillowPath\src\libImaging" >> $env:GITHUB_ENV
 
       - name: Build Overviewer for Windows
         run: |
@@ -81,7 +83,7 @@ jobs:
       upload_url: ${{ steps.create_release_windows.outputs.upload_url }}
 
   build_and_release_linux:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-26.04
     needs: build_and_release_windows
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'  && vars.START_BUILD == 'True'
 
@@ -91,25 +93,29 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: 3.8
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update -y
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y python3-dev python3-venv python3-pip build-essential git
 
       - name: Install dependencies (pip)
-        run: pip install -r requirements.txt
-
-      - name: Fetch Pillow files
         run: |
-          curl -o Imaging.h https://raw.githubusercontent.com/python-pillow/Pillow/10.3.0/src/libImaging/Imaging.h
-          curl -o ImagingUtils.h https://raw.githubusercontent.com/python-pillow/Pillow/10.3.0/src/libImaging/ImagingUtils.h
-          curl -o ImPlatform.h https://raw.githubusercontent.com/python-pillow/Pillow/10.3.0/src/libImaging/ImPlatform.h
+          python3 -VV
+          python3 -m venv .venv
+          .venv/bin/python -m pip install --upgrade pip
+          .venv/bin/python -m pip install -r requirements.txt
+
+      - name: Checkout matching Pillow headers
+        run: |
+          PILLOW_VERSION=$(.venv/bin/python -c "import PIL; print(PIL.__version__)")
+          git clone --branch="$PILLOW_VERSION" --depth=1 https://github.com/python-pillow/Pillow.git "$RUNNER_TEMP/pillow"
+          echo "PIL_INCLUDE_DIR=$RUNNER_TEMP/pillow/src/libImaging" >> "$GITHUB_ENV"
 
       - name: Build Overviewer for Linux
         run: |
           uname -m
-          python setup.py build
-          pyinstaller overviewer.spec
+          .venv/bin/python setup.py build
+          .venv/bin/pyinstaller overviewer.spec
 
       - name: Create tar.xz archive for Linux
         run: |
@@ -145,24 +151,19 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: 3.8
-
       - name: Install Dependencies (apt)
         run: |
           sudo apt-get update -y
-          sudo DEBIAN_FRONTEND=noninteractive apt-get -y install zlib1g-dev libjpeg-dev devscripts python3-all-dev debhelper python3-pil python3-numpy dh-python build-essential
+          sudo DEBIAN_FRONTEND=noninteractive apt-get -y install zlib1g-dev libjpeg-dev devscripts python3-all-dev python3-setuptools debhelper python3-pil python3-numpy dh-python build-essential git gettext-base
 
-      - name: Install Dependencies (pip)
-        run: pip install -r requirements.txt
-
-      - name: Clone Pillow 10.3.0
-        run: git clone --branch=10.3.0 --depth=1 https://github.com/python-pillow/Pillow.git /tmp/pillow_checkout
+      - name: Checkout matching Pillow headers
+        run: |
+          python3 -VV
+          PILLOW_VERSION=$(python3 -c "import PIL; print(PIL.__version__)")
+          git clone --branch="$PILLOW_VERSION" --depth=1 https://github.com/python-pillow/Pillow.git /tmp/pillow_checkout
 
       - name: Build Extension
-        run: env PIL_INCLUDE_DIR=/tmp/pillow_checkout/src/libImaging/ python setup.py build
+        run: env PIL_INCLUDE_DIR=/tmp/pillow_checkout/src/libImaging/ python3 setup.py build
 
       - name: Create .deb changelog
         run: |
@@ -171,7 +172,7 @@ jobs:
           envsubst < debian/changelog.in > debian/changelog
 
       - name: Build .deb package
-        run: env DEB_BUILD_OPTIONS=nocheck debuild -i -us -uc -b -Zxz
+        run: env DEB_BUILD_OPTIONS=nocheck PIL_INCLUDE_DIR=/tmp/pillow_checkout/src/libImaging/ debuild -i -us -uc -b -Zxz
 
       - name: Upload Debian Package release asset
         id: upload_debian_package
@@ -206,14 +207,13 @@ jobs:
           echo 'export PATH=\"\$PYENV_ROOT/bin:\$PATH\"' >> /root/.bashrc && \
           echo 'eval \"\$(pyenv init --path)\"' >> /root/.bashrc && \
           source /root/.bashrc && \
-          /workspace/.pyenv/bin/pyenv install 3.8.10 && \
-          /workspace/.pyenv/bin/pyenv global 3.8.10 && \
-          curl -o /workspace/Imaging.h https://raw.githubusercontent.com/python-pillow/Pillow/10.3.0/src/libImaging/Imaging.h && \
-          curl -o /workspace/ImagingUtils.h https://raw.githubusercontent.com/python-pillow/Pillow/10.3.0/src/libImaging/ImagingUtils.h && \
-          curl -o /workspace/ImPlatform.h https://raw.githubusercontent.com/python-pillow/Pillow/10.3.0/src/libImaging/ImPlatform.h && \
+          /workspace/.pyenv/bin/pyenv install 3.10.12 && \
+          /workspace/.pyenv/bin/pyenv global 3.10.12 && \
           pip install -r /workspace/requirements.txt && \
+          PILLOW_VERSION=\$(python -c \"import PIL; print(PIL.__version__)\") && \
+          git clone --branch=\"\$PILLOW_VERSION\" --depth=1 https://github.com/python-pillow/Pillow.git /tmp/pillow_checkout && \
           cd /workspace && \
-          python setup.py build && \
+          PIL_INCLUDE_DIR=/tmp/pillow_checkout/src/libImaging python setup.py build && \
           pyinstaller overviewer.spec && \
           mv /workspace/dist/overviewer /workspace/Overviewer.AppDir && \
           curl -L -o /workspace/appimagetool-x86_64.AppImage \"https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage\" && \

@@ -5,24 +5,21 @@ import traceback
 
 
 # quick version check
-if sys.version_info[0] == 2 or (sys.version_info[0] == 3 and sys.version_info[1] < 4):
-    print("Sorry, the Overviewer requires at least Python 3.4 to run.")
+if sys.version_info < (3, 10):
+    print("Sorry, the Overviewer requires at least Python 3.10 to run.")
     sys.exit(1)
 
 
-from distutils.core import setup
-from distutils.extension import Extension
-from distutils.command.build import build
+from setuptools import Command, Extension, setup
+from setuptools.command.build import build
+from setuptools.command.build_ext import build_ext
+from setuptools.command.sdist import sdist
 from distutils.command.clean import clean
-from distutils.command.build_ext import build_ext
-from distutils.command.sdist import sdist
-from distutils.cmd import Command
-from distutils.dir_util import remove_tree
-from distutils.sysconfig import get_python_inc
 from distutils import log
 import os, os.path
 import glob
 import platform
+import sysconfig
 import time
 import overviewer_core.util as util
 import numpy
@@ -172,9 +169,20 @@ except AttributeError:
 try:
     pil_include = os.environ['PIL_INCLUDE_DIR'].split(os.pathsep)
 except Exception:
-    pil_include = [ os.path.join(get_python_inc(plat_specific=1), 'Imaging') ]
-    if not os.path.exists(pil_include[0]):
+    python_include = sysconfig.get_path('platinclude') or sysconfig.get_path('include')
+    pil_include = [ os.path.join(python_include, 'Imaging') ] if python_include else []
+    if pil_include and not os.path.exists(pil_include[0]):
         pil_include = [ ]
+
+# Pillow 12 changed its C API (Imaging->mode became a ModeID enum and the
+# ImagingDraw* prototypes moved into Imaging.h). Pass the installed Pillow's
+# major version through to the C sources so they can compile against both the
+# pre-12 and 12+ headers (see OV_MODE_IS / ov_Draw* in overviewer.h).
+try:
+    import PIL
+    pillow_version_major = int(PIL.__version__.split('.')[0])
+except Exception:
+    pillow_version_major = 0
 
 
 # used to figure out what files to compile
@@ -197,7 +205,7 @@ c_overviewer_includes = ['overviewer_core/src/' + s for s in c_overviewer_includ
 # really ugly hack for our scuffed CI, remove this once we move
 # to something else. The problem is that virtualenv somehow
 # now overrides the base_prefix (which it shouldn't do) which
-# makes distutils unable to find our Python library
+# makes the build tooling unable to find our Python library
 python_lib_dirs = None
 if platform.system() == 'Windows':
     ci_python_dir = os.path.split(find_system_module_path())[0]
@@ -209,6 +217,7 @@ setup_kwargs['ext_modules'].append(Extension(
     include_dirs=['.', numpy_include] + pil_include,
     library_dirs=python_lib_dirs,
     depends=c_overviewer_includes,
+    define_macros=[('OV_PILLOW_VERSION_MAJOR', str(pillow_version_major))],
     extra_link_args=[]
 ))
 
@@ -322,8 +331,11 @@ class CustomBuildExt(build_ext):
             for e in self.extensions:
                 e.extra_compile_args.append("-Wno-unused-variable") # quell some annoying warnings
                 e.extra_compile_args.append("-Wno-unused-function") # quell some annoying warnings
-                e.extra_compile_args.append("-Wdeclaration-after-statement")
-                e.extra_compile_args.append("-Werror=declaration-after-statement")
+                # NOTE: we intentionally do NOT add -Werror=declaration-after-statement
+                # here. numpy 2.x's generated __multiarray_api.h (_import_array) contains
+                # a declaration after a statement, which that flag would turn into a hard
+                # compile error under gcc. -std=gnu99 already permits mixed declarations,
+                # so the flag was only ever a stylistic check on our own C.
                 e.extra_compile_args.append("-O3")
                 e.extra_compile_args.append("-std=gnu99")
 
@@ -342,4 +354,3 @@ setup_kwargs['cmdclass']['build_ext'] = CustomBuildExt
 ###
 
 setup(**setup_kwargs)
-

@@ -636,7 +636,7 @@ DRAW draw32rgba = {point32rgba, hline32rgba, line32rgba, polygon32rgba};
         ink = INK32(ink_);                   \
     }
 
-int32_t ImagingDrawPoint(Imaging im, int32_t x0, int32_t y0, const void* ink_, int32_t op) {
+int32_t ov_DrawPoint(Imaging im, int32_t x0, int32_t y0, const void* ink_, int32_t op) {
     DRAW* draw;
     INT32 ink;
 
@@ -647,7 +647,7 @@ int32_t ImagingDrawPoint(Imaging im, int32_t x0, int32_t y0, const void* ink_, i
     return 0;
 }
 
-int32_t ImagingDrawLine(Imaging im, int32_t x0, int32_t y0, int32_t x1, int32_t y1, const void* ink_,
+int32_t ov_DrawLine(Imaging im, int32_t x0, int32_t y0, int32_t x1, int32_t y1, const void* ink_,
                         int32_t op) {
     DRAW* draw;
     INT32 ink;
@@ -659,7 +659,7 @@ int32_t ImagingDrawLine(Imaging im, int32_t x0, int32_t y0, int32_t x1, int32_t 
     return 0;
 }
 
-int32_t ImagingDrawWideLine(Imaging im, int32_t x0, int32_t y0, int32_t x1, int32_t y1,
+int32_t ov_DrawWideLine(Imaging im, int32_t x0, int32_t y0, int32_t x1, int32_t y1,
                             const void* ink_, int32_t width, int32_t op) {
     DRAW* draw;
     INT32 ink;
@@ -727,7 +727,7 @@ struct ImagingOutlineInstance {
     int32_t size;
 };
 
-void ImagingOutlineDelete(ImagingOutline outline) {
+void ov_OutlineDelete(ImagingOutline outline) {
     if (!outline)
         return;
 
@@ -760,14 +760,14 @@ allocate(ImagingOutline outline, int32_t extra) {
     return e;
 }
 
-int32_t ImagingOutlineMove(ImagingOutline outline, float x0, float y0) {
+int32_t ov_OutlineMove(ImagingOutline outline, float x0, float y0) {
     outline->x = outline->x0 = x0;
     outline->y = outline->y0 = y0;
 
     return 0;
 }
 
-int32_t ImagingOutlineLine(ImagingOutline outline, float x1, float y1) {
+int32_t ov_OutlineLine(ImagingOutline outline, float x1, float y1) {
     Edge* e;
 
     e = allocate(outline, 1);
@@ -782,7 +782,7 @@ int32_t ImagingOutlineLine(ImagingOutline outline, float x1, float y1) {
     return 0;
 }
 
-int32_t ImagingOutlineCurve(ImagingOutline outline, float x1, float y1,
+int32_t ov_OutlineCurve(ImagingOutline outline, float x1, float y1,
                             float x2, float y2, float x3, float y3) {
     Edge* e;
     int32_t i;
@@ -823,25 +823,25 @@ int32_t ImagingOutlineCurve(ImagingOutline outline, float x1, float y1,
     return 0;
 }
 
-int32_t ImagingOutlineCurve2(ImagingOutline outline, float cx, float cy,
+int32_t ov_OutlineCurve2(ImagingOutline outline, float cx, float cy,
                              float x3, float y3) {
     /* add bezier curve based on three control points (as
        in the Flash file format) */
 
-    return ImagingOutlineCurve(
+    return ov_OutlineCurve(
         outline,
         (outline->x + cx + cx) / 3, (outline->y + cy + cy) / 3,
         (cx + cx + x3) / 3, (cy + cy + y3) / 3,
         x3, y3);
 }
 
-int32_t ImagingOutlineClose(ImagingOutline outline) {
+int32_t ov_OutlineClose(ImagingOutline outline) {
     if (outline->x == outline->x0 && outline->y == outline->y0)
         return 0;
-    return ImagingOutlineLine(outline, outline->x0, outline->y0);
+    return ov_OutlineLine(outline, outline->x0, outline->y0);
 }
 
-int32_t ImagingDrawOutline(Imaging im, ImagingOutline outline, const void* ink_,
+int32_t ov_DrawOutline(Imaging im, ImagingOutline outline, const void* ink_,
                            int32_t fill, int32_t op) {
     DRAW* draw;
     INT32 ink;

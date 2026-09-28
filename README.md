@@ -1,9 +1,9 @@
 ![Overviewer](https://gregoryam.com/assets/img/assets/overviewer-thumbnail.webp)
 [![Unit tests](https://github.com/GregoryAM-SP/The-Minecraft-Overviewer/actions/workflows/ci.yml/badge.svg)](https://github.com/GregoryAM-SP/The-Minecraft-Overviewer/actions/workflows/ci.yml)
-<br><strong>Works with Minecraft Java Edition v1.2.1 - v1.21.x</strong>
+<br><strong>Works with Minecraft Java Edition v1.2.1 - v26.2</strong>
 <hr>
 
-### [Python 3.8.10](https://www.python.org/downloads/release/python-3810/) Required
+### [Python 3.10+](https://www.python.org/downloads/) Required
 
 <hr>
 

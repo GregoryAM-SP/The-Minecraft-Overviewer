@@ -118,17 +118,19 @@ Requirements
 This is a quick list of what's required to run The Overviewer. It runs on
 Windows, Mac, and Linux as long as you have these software packages installed:
 
-* Python 3.4 or above (we are no longer compatible with Python 2.x)
+* Python 3.10 or above (we are no longer compatible with Python 2.x)
 
-* PIL (Python Imaging Library) or Pillow
+* Pillow
 
 * Numpy
 
 * Either a Minecraft Client installed or a textures/ folder for the textures (possibly from a texturepack)
 
-The first three are included in the Windows download. Also, there are additional
-requirements for compiling it (like a compiler). More details are available in
-either the :doc:`Building <building>` or :doc:`Installing <installing>` pages.
+The Python dependencies are installed from ``requirements.txt`` when building
+from source. The Windows download includes the required runtime dependencies.
+There are additional requirements for compiling it, such as a compiler and the
+matching Pillow source headers. More details are available in either the
+:doc:`Building <building>` or :doc:`Installing <installing>` pages.
 
 Getting Started
 ===============
@@ -177,4 +179,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
