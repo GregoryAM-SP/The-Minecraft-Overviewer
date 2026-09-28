@@ -1625,7 +1625,7 @@ class RegionSet(object):
         if '' in palette_entry:
             # 26.3+ shorthand for blocks with no state, but where other state-holding blocks exist in the section
             key = palette_entry['']
-            block_properties = dict()
+            block_properties = {}
         elif 'id' in palette_entry:
             # 26.3+ block with state
             key = palette_entry['id']
