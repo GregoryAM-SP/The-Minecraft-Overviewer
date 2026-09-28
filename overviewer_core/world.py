@@ -1612,17 +1612,17 @@ class RegionSet(object):
         
         coral_list = [ 'tube', 'brain', 'bubble', 'fire', 'horn']
 
+        # Check things are in a somewhat-sensible format before proceeding.
+        if not isinstance(palette_entry, dict) and not isinstance(palette_entry, str):
+            logging.error(f"Invalid palette entry: {palette_entry} is not a dict or string")
+            raise ValueError(f"Invalid palette entry: {palette_entry} is not a dict or string")
+
+        # Extract the block ID and properties from the palette entry so we don't have to worry about it later.
         if isinstance(palette_entry, str):
-            palette_entry = {
-                'id' : palette_entry,
-                'properties': {}
-            }
-
-        if not isinstance(palette_entry, dict):
-            logging.error(f"Invalid palette entry: {palette_entry} is not a dict")
-            raise ValueError(f"Invalid palette entry: {palette_entry} is not a dict")
-
-        if '' in palette_entry:
+            # 26.3+; no block state in this section, so the palette entry is just a string.
+            key = palette_entry
+            block_properties = {}
+        elif '' in palette_entry:
             # 26.3+ shorthand for blocks with no state, but where other state-holding blocks exist in the section
             key = palette_entry['']
             block_properties = {}
