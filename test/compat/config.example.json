@@ -1,0 +1,24 @@
+{
+  "saves_dir": "C:/Users/you/AppData/Roaming/.minecraft/saves",
+  "versions_dir": "C:/Users/you/AppData/Roaming/.minecraft/versions",
+  "work_dir": "C:/Users/you/AppData/Local/Temp/ov_compat_matrix",
+  "ubuntu": ["22.04", "24.04", "26.04"],
+  "windows": true,
+  "engine": "auto",
+  "worlds": {
+    "Legacy-1.21": {
+      "mc_version": "1.21.11",
+      "dimensions": ["overworld"]
+    },
+    "NewLayout-26.1": {
+      "mc_version": "26.1",
+      "dimensions": ["overworld", "nether", "end"]
+    },
+    "Elsewhere-26.2": {
+      "mc_version": "26.2",
+      "dimensions": ["overworld", "nether", "end"],
+      "path": "D:/mc-test-worlds/Elsewhere-26.2"
+    }
+  },
+  "selected": ["Legacy-1.21", "NewLayout-26.1"]
+}

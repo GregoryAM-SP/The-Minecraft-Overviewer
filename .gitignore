@@ -40,6 +40,11 @@ overviewer_core/data/stylesheet_src/*.css.map
 #Script files, as users may want their own scripts.
 *.sh
 *.bat
+!test/compat/entrypoint.sh
+
+# compat matrix local config (machine-specific paths and world choices)
+/config.json
+test/compat/config.json
 
 # PyCharm directory
 .idea
