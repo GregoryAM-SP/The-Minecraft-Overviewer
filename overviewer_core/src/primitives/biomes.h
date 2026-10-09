@@ -27,6 +27,7 @@ typedef struct {
 
     uint32_t r, g, b;
     uint32_t water_r, water_g, water_b;
+    uint32_t grass_color, foliage_color;
 } Biome;
 
 /* each entry in this table is yanked *directly* out of the minecraft source
@@ -122,6 +123,8 @@ static Biome biome_table[] = {
     {"Cherry Grove",                0.5,  0.8, 353, 297, 225,  93, 183, 239},
     {"Pale Garden",                 0.7,  0.8, 119, 130, 114,  63, 118, 228},
     /* 65 */
+    {"Sulfur Caves",                0.8,  0.4, 255, 255, 255,  52, 191, 137, 0xaba64f, 0},
+    {"Dappled Forest",              0.6,  0.6, 255, 255, 255,  55,  81,  84, 0xdf6827, 0xe68e30},
 };
 
 #define NUM_BIOMES (sizeof(biome_table) / sizeof(Biome))

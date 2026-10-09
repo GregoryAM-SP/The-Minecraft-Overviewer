@@ -146,6 +146,7 @@ base_draw(void* data, RenderState* state, PyObject* src, PyObject* mask, PyObjec
             uint8_t tablex, tabley;
             float temp = 0.0, rain = 0.0;
             uint32_t multr = 0, multg = 0, multb = 0;
+            uint32_t override_r = 0, override_g = 0, override_b = 0, overrides = 0;
             int32_t tmp;
             PyObject* color = NULL;
 
@@ -169,6 +170,16 @@ base_draw(void* data, RenderState* state, PyObject* src, PyObject* mask, PyObjec
                             multb += biome_table[biome].water_b;
                             //printf("%s, (%d, %d, %d) ->\n", biome_table[biome].name, biome_table[biome].water_r, biome_table[biome].water_g, biome_table[biome].water_b);
                         } else {
+                            /* New biomes can specify grass/foliage RGB overrides (0xRRGGBB).
+                             * Older biomes have zero here and use the color table as before. */
+                            uint32_t override = color_table == self->foliagecolor
+                                ? biome_table[biome].foliage_color : biome_table[biome].grass_color;
+                            if (override != 0) {
+                                override_r += (override >> 16) & 255;
+                                override_g += (override >> 8) & 255;
+                                override_b += override & 255;
+                                overrides++;
+                            }
                             multr += biome_table[biome].r;
                             multg += biome_table[biome].g;
                             multb += biome_table[biome].b;
@@ -232,6 +243,10 @@ base_draw(void* data, RenderState* state, PyObject* src, PyObject* mask, PyObjec
                 r = OV_MULDIV255(r, multr, tmp);
                 g = OV_MULDIV255(g, multg, tmp);
                 b = OV_MULDIV255(b, multb, tmp);
+                /* Average explicit RGB samples with color-table samples over the 3x3 area. */
+                r = (r * (9 - overrides) + override_r) / 9;
+                g = (g * (9 - overrides) + override_g) / 9;
+                b = (b * (9 - overrides) + override_b) / 9;
             }
         }
 
