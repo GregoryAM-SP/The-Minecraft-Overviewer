@@ -160,7 +160,12 @@ const mc_block_t block_class_stair[] = {
     block_bamboo_mosaic_stairs,
     block_mud_brick_stairs,
     block_pale_oak_stairs,
-    block_resin_brick_stairs};
+    block_resin_brick_stairs,
+    block_poplar_stairs,
+    12830, 12831, 12832, 12833, 12834, 12835, 12836, 12837,
+    12838, 12839, 12840, 12841, 12842, 12843, 12844, 12845,
+    12870, 12871, 12872, 12873, 12874, 12875, 12876, 12877,
+    12878, 12879, 12880, 12881, 12882, 12883, 12884, 12885};
 const size_t block_class_stair_len = COUNT_OF(block_class_stair);
 
 const mc_block_t block_class_door[] = {
@@ -175,7 +180,10 @@ const mc_block_t block_class_door[] = {
     block_warped_door,
     block_mangrove_door,
     block_bamboo_door,
-    block_cherry_door};
+    block_cherry_door,
+    1136,
+    12654, 12655, 12656, 12657,
+    block_poplar_door};
 const size_t block_class_door_len = COUNT_OF(block_class_door);
 
 const mc_block_t block_class_ancil[] = {
@@ -190,6 +198,9 @@ const mc_block_t block_class_ancil[] = {
     block_mangrove_door,
     block_bamboo_door,
     block_cherry_door,
+    1136,
+    12654, 12655, 12656, 12657,
+    block_poplar_door,
     block_oak_stairs,
     block_brick_stairs,
     block_stone_brick_stairs,
@@ -283,7 +294,12 @@ const mc_block_t block_class_ancil[] = {
     block_mud_brick_stairs,
     block_mud_brick_wall,
     block_resin_brick_stairs,
-    block_resin_brick_wall};
+    block_resin_brick_wall,
+    block_poplar_stairs,
+    12830, 12831, 12832, 12833, 12834, 12835, 12836, 12837,
+    12838, 12839, 12840, 12841, 12842, 12843, 12844, 12845,
+    12870, 12871, 12872, 12873, 12874, 12875, 12876, 12877,
+    12878, 12879, 12880, 12881, 12882, 12883, 12884, 12885};
 const size_t block_class_ancil_len = COUNT_OF(block_class_ancil);
 
 const mc_block_t block_class_alt_height[] = {
@@ -387,7 +403,16 @@ const mc_block_t block_class_alt_height[] = {
     block_bamboo_mosaic_stairs,
     block_mud_brick_stairs,
     block_resin_brick_stairs,
-    block_resin_brick_slab};
+    block_resin_brick_slab,
+    block_poplar_slab, block_poplar_stairs,
+    12810, 12811, 12812, 12813, 12814, 12815, 12816, 12817,
+    12818, 12819, 12820, 12821, 12822, 12823, 12824, 12825,
+    12830, 12831, 12832, 12833, 12834, 12835, 12836, 12837,
+    12838, 12839, 12840, 12841, 12842, 12843, 12844, 12845,
+    12850, 12851, 12852, 12853, 12854, 12855, 12856, 12857,
+    12858, 12859, 12860, 12861, 12862, 12863, 12864, 12865,
+    12870, 12871, 12872, 12873, 12874, 12875, 12876, 12877,
+    12878, 12879, 12880, 12881, 12882, 12883, 12884, 12885};
 const size_t block_class_alt_height_len = COUNT_OF(block_class_alt_height);
 
 const mc_block_t block_class_nether_roof[] = {

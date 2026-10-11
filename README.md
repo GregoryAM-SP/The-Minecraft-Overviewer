@@ -1,6 +1,6 @@
 ![Overviewer](https://gregoryam.com/assets/img/assets/overviewer-thumbnail.webp)
 [![Unit tests](https://github.com/GregoryAM-SP/The-Minecraft-Overviewer/actions/workflows/ci.yml/badge.svg)](https://github.com/GregoryAM-SP/The-Minecraft-Overviewer/actions/workflows/ci.yml)
-<br><strong>Works with Minecraft Java Edition v1.2.1 - v26.2</strong>
+<br><strong>Works with Minecraft Java Edition v1.2.1 - v26.3</strong>
 <hr>
 
 ### [Python 3.10+](https://www.python.org/downloads/) Required
@@ -38,6 +38,13 @@ Since Minecraft Maps can be infinite, the maximum time this could take is also i
 **Keep this in mind for large worlds.**
 
 ## Running Overviewer
+
+Minecraft 26.3 save-format support includes namespaced dimension folders and
+compact block-state palettes, while retaining legacy world support. New-block
+coverage is incremental; unsupported blocks are reported in the log. Use the
+26.3 client jar as `texturepath` for 26.3 worlds. See
+[source build instructions](docs/building.rst) and
+[26.x compatibility notes](docs/running.rst).
 
 While Overviewer can be run directly from the command line, it's generally easiest to set up a configuration file and running script once that you can then use whenever you want to update your map, so that's what we'll go over here. It's worth noting that this guide is designed for use on Windows computers.
 

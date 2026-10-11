@@ -81,8 +81,16 @@ for use in your filter function, you need to explicitly load it into the global 
     global escape
     from html import escape
     def signFilter(poi):
-        if poi['id'] == 'Sign' or poi['id'] == 'minecraft:sign':
-            return escape("\n".join([poi['Text1'], poi['Text2'], poi['Text3'], poi['Text4']]))
+        if poi['id'] in ['minecraft:sign', 'minecraft:hanging_sign']:
+            return escape("
+".join(poi['front_text']['messages']))
+
+.. note::
+    genPOI converts pre-1.20 signs (``Text1``..``Text4``, id ``Sign``) to the
+    modern layout before your filter runs. A single filter checking for
+    ``minecraft:sign``/``minecraft:hanging_sign`` and reading ``front_text`` and
+    ``back_text`` therefore matches signs from both old and new worlds. Legacy
+    signs have an empty ``back_text``.
 
 Since writing these filters can be a little tedious, a set of predefined filters
 functions are provided.  See the :ref:`predefined_filter_functions` section for

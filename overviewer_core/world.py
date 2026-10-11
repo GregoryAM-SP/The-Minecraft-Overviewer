@@ -28,6 +28,7 @@ import math
 from . import nbt
 from . import cache
 from .biome import reshape_biome_data
+from .blockstate_defaults import DEFAULT_BLOCK_PROPERTIES
 
 """
 This module has routines for extracting information about available worlds
@@ -40,6 +41,29 @@ class ChunkDoesntExist(Exception):
 
 class UnsupportedVersion(Exception):
     pass
+
+
+def normalize_blockstate(entry):
+    """Normalize block states to modern id/properties compounds."""
+    legacy = False
+    if isinstance(entry, dict) and set(entry) == {""}:
+        entry = entry[""]
+    if isinstance(entry, str):
+        name, properties = entry, {}
+    elif isinstance(entry, dict):
+        name, properties = entry.get("id"), entry.get("properties", {})
+        if "id" not in entry and "Name" in entry:
+            name, properties = entry["Name"], entry.get("Properties", {})
+            legacy = True
+    else:
+        raise nbt.CorruptChunkError("Invalid block state palette entry: %r" % (entry,))
+    if (not isinstance(name, str) or not name or not isinstance(properties, dict)
+            or any(not isinstance(k, str) or not isinstance(v, str)
+                   for k, v in properties.items())):
+        raise nbt.CorruptChunkError("Invalid block state palette entry: %r" % (entry,))
+    # Older saves must not inherit defaults introduced by a newer release.
+    defaults = {} if legacy else DEFAULT_BLOCK_PROPERTIES.get(name, {})
+    return {"id": name, "properties": dict(defaults, **properties)}
 
 
 def log_other_exceptions(func):
@@ -143,6 +167,12 @@ class World(object):
                     else:
                         self.regionsets.append(rset)
 
+        # Prefer converted vanilla dimensions over any leftover legacy folders.
+        self.regionsets.sort(key=lambda r: (
+            r.get_type() != "minecraft:overworld",
+            not r.rel.startswith(os.path.join("dimensions", "minecraft") + os.sep),
+        ))
+
         # TODO move a lot of the following code into the RegionSet
 
 
@@ -232,7 +262,7 @@ class World(object):
         inChunkY = spawnY % 16
 
         ## Open up the chunk that the spawn is in
-        regionset = self.get_regionset('minecraft:overworld')
+        regionset = self.get_regionset(dimension[1])
         if not regionset:
             return None
         try:
@@ -243,17 +273,16 @@ class World(object):
         ## Check for first air block (0) above spawn
         
         # Get only the spawn section and the ones above, ordered from low to high
-        spawnChunkSections = sorted(chunk['Sections'], key=lambda sec: sec['Y'])[chunkY:]
+        spawnChunkSections = sorted(
+            (sec for sec in chunk['Sections'] if sec['Y'] >= chunkY),
+            key=lambda sec: sec['Y'])
         for section in spawnChunkSections:
             # First section, start at registered local y
-            for y in range(inChunkY, 16):
+            startY = inChunkY if section['Y'] == chunkY else 0
+            for y in range(startY, 16):
                 # If air, return absolute coords
-                if section['Blocks'][inChunkX, inChunkZ, y] == 0:
-                    return spawnX, spawnY, spawnZ
-                # Keep track of the absolute Y
-                spawnY += 1
-            # Next section, start at local 0
-            inChunkY = 0
+                if section['Blocks'][y, inChunkZ, inChunkX] == 0:
+                    return spawnX, section['Y'] * 16 + y, spawnZ
         return spawnX, 320, spawnZ
 
 class RegionSet(object):
@@ -297,28 +326,14 @@ class RegionSet(object):
             os.path.normpath("dimensions/minecraft/the_end"): "minecraft:the_end",
         }
 
-        # we want to get rid of /regions, if it exists
-        if self.rel.endswith(os.path.normpath("/region")):
-            self.type = self.rel[0:-len(os.path.normpath("/region"))]
-        elif self.rel.endswith(os.path.normpath("/entities")):
-            self.type = self.rel
-        elif self.rel == "region":
-            # this is the main world
-            self.type = "minecraft:overworld"
-        elif self.rel == "entities":
-            self.type = "minecraft:overworld/entities"
+        dimension, kind = os.path.split(self.rel)
+        if kind in ("region", "entities"):
+            self.type = _dim_path_to_namespaced.get(dimension, dimension) or "minecraft:overworld"
+            if kind == "entities":
+                self.type += "/entities"
         else:
             logging.warning("Unknown region type in %r, rel %r", regiondir, self.rel)
             self.type = "__unknown"
-
-        # Normalize legacy DIM* and Minecraft 26.1+ dimension paths to
-        # the namespaced dimension name used throughout the code.
-        if self.type in _dim_path_to_namespaced:
-            self.type = _dim_path_to_namespaced[self.type]
-        elif self.type.endswith(os.path.normpath("/entities")):
-            base = self.type[0:-len(os.path.normpath("/entities"))]
-            if base in _dim_path_to_namespaced:
-                self.type = _dim_path_to_namespaced[base] + "/entities"
 
         logging.debug("Scanning regions.  Type is %r" % self.type)
 
@@ -336,6 +351,7 @@ class RegionSet(object):
                 logging.debug("Skipping zero-size region file {}".format(regionfile))
 
         self.empty_chunk = [None,None]
+        self._unrecognized_blocks = set()
         logging.debug("Done scanning regions")
 
         self._biomemap = [
@@ -415,7 +431,9 @@ class RegionSet(object):
             'minecraft:small_end_islands',
             'minecraft:end_barrens',
             'minecraft:cherry_grove',
-            'minecraft:pale_garden'
+            'minecraft:pale_garden',
+            'minecraft:sulfur_caves',
+            'minecraft:dappled_forest',
         ]
 
         self._blockmap = {
@@ -859,6 +877,11 @@ class RegionSet(object):
 
             'minecraft:copper_torch': (264, 0),
             'minecraft:copper_wall_torch': (264, 5),
+
+            'minecraft:sulfur': (265, 0),
+            'minecraft:cinnabar': (266, 0),
+            'minecraft:potent_sulfur': (267, 0),
+            'minecraft:sulfur_spike': (268, 0),
 
             'minecraft:armor_stand': (416, 0),  # not rendering
 
@@ -1408,6 +1431,31 @@ class RegionSet(object):
             'minecraft:cherry_shelf': (12709, 0),
             'minecraft:bamboo_shelf': (12710, 0),
             'minecraft:pale_oak_shelf': (12711, 0),
+            'minecraft:poplar_shelf': (12712, 0),
+
+            # 26.3
+            'minecraft:poplar_log': (12900, 0),
+            'minecraft:stripped_poplar_log': (12900, 1),
+            'minecraft:poplar_wood': (12900, 2),
+            'minecraft:stripped_poplar_wood': (12900, 3),
+            'minecraft:poplar_sapling': (12901, 0),
+            'minecraft:poplar_slab': (12902, 0),
+            'minecraft:poplar_stairs': (12903, 0),
+            'minecraft:poplar_pressure_plate': (12904, 0),
+            'minecraft:poplar_button': (12905, 0),
+            'minecraft:poplar_fence': (12906, 0),
+            'minecraft:poplar_fence_gate': (12907, 0),
+            'minecraft:poplar_door': (12908, 0),
+            'minecraft:poplar_trapdoor': (12909, 0),
+            'minecraft:poplar_sign': (12910, 0),
+            'minecraft:poplar_wall_sign': (12911, 0),
+            'minecraft:poplar_wall_hanging_sign': (12912, 0),
+            'minecraft:poplar_hanging_sign': (12913, 0),
+            'minecraft:potted_poplar_sapling': (12914, 0),
+            'minecraft:red_shrub': (12915, 0),
+            'minecraft:shelf_mushroom': (12916, 0),
+            'minecraft:straw_bed': (12917, 0),
+            'minecraft:dried_ghast': (12918, 0),
 
             'minecraft:conduit': (1255, 0),
             'minecraft:sniffer_egg': (1256, 0),
@@ -1434,6 +1482,7 @@ class RegionSet(object):
             'minecraft:player_wall_head': (1283, 0),
 
             'minecraft:pale_oak_planks': (5, 11),
+            'minecraft:poplar_planks': (5, 12),
             'minecraft:pale_oak_slab': (1130, 0),
             'minecraft:pale_oak_stairs': (1131, 0),
             'minecraft:pale_oak_pressure_plate': (1132, 0),
@@ -1484,6 +1533,16 @@ class RegionSet(object):
             self._blockmap['minecraft:%s_concrete_powder'    % colors[i]] = (252, i)
             self._blockmap['minecraft:%s_candle'             % colors[i]] = (1265, i)
             self._blockmap['minecraft:%s_candle_cake'        % colors[i]] = (1264, i)
+            self._blockmap['minecraft:%s_wool_slab'          % colors[i]] = (12810 + i, 0)
+            self._blockmap['minecraft:%s_wool_stairs'        % colors[i]] = (12830 + i, 0)
+            self._blockmap['minecraft:%s_concrete_slab'      % colors[i]] = (12850 + i, 0)
+            self._blockmap['minecraft:%s_concrete_stairs'    % colors[i]] = (12870 + i, 0)
+
+        self._blockmap.update({
+            'minecraft:red_poplar_leaves': (161, 11),
+            'minecraft:orange_poplar_leaves': (161, 12),
+            'minecraft:yellow_poplar_leaves': (161, 13),
+        })
 
         coral_list = [ 'tube', 'brain', 'bubble', 'fire', 'horn']
         for i in range(len(coral_list)):
@@ -1504,6 +1563,8 @@ class RegionSet(object):
         return "<RegionSet regiondir=%r>" % self.regiondir
 
     def _get_block(self, palette_entry):
+        palette_entry = normalize_blockstate(palette_entry)
+
         def generate_copper(base_id, base_ns="minecraft"):
             variants = []
             states = ['','exposed_','weathered_','oxidized_']
@@ -1516,7 +1577,7 @@ class RegionSet(object):
                       'minecraft:acacia_slab', 'minecraft:dark_oak_slab', 'minecraft:petrified_oak_slab',
                       'minecraft:crimson_slab', 'minecraft:warped_slab', 'minecraft:mangrove_slab',
                       'minecraft:cherry_slab', 'minecraft:bamboo_slab', 'minecraft:bamboo_mosaic_slab',
-                      'minecraft:pale_oak_slab')
+                      'minecraft:pale_oak_slab', 'minecraft:poplar_slab')
         stone_slabs = ('minecraft:stone_slab', 'minecraft:sandstone_slab','minecraft:red_sandstone_slab',
                         'minecraft:cobblestone_slab', 'minecraft:brick_slab','minecraft:purpur_slab',
                         'minecraft:stone_brick_slab', 'minecraft:nether_brick_slab',
@@ -1605,59 +1666,67 @@ class RegionSet(object):
             'minecraft:bamboo_slab': 'minecraft:bamboo_planks',
             'minecraft:bamboo_mosaic_slab': 'minecraft:bamboo_mosaic',
             'minecraft:pale_oak_slab': 'minecraft:pale_oak_planks',
+            'minecraft:poplar_slab': 'minecraft:poplar_planks',
         }
 
         colors = ['white', 'orange', 'magenta', 'light_blue', 'yellow', 'lime', 'pink', 'gray', 'light_gray', 'cyan',
                   'purple', 'blue', 'brown', 'green', 'red', 'black']
+
+        colored_slabs = tuple(
+            'minecraft:%s_%s_slab' % (color, material)
+            for material in ('wool', 'concrete')
+            for color in colors
+        )
         
         coral_list = [ 'tube', 'brain', 'bubble', 'fire', 'horn']
 
-        key = palette_entry['Name']
+        key = palette_entry['id']
+        properties = palette_entry['properties']
         (block, data) = self._blockmap[key]
         if key in ['minecraft:redstone_ore', 'minecraft:redstone_lamp']:
-            if palette_entry['Properties']['lit'] == 'true':
+            if properties['lit'] == 'true':
                 block += 1
         elif key.endswith('gate'):
-            facing = palette_entry['Properties']['facing']
+            facing = properties['facing']
             data = {'south': 0, 'west': 1, 'north': 2, 'east': 3}[facing]
-            if palette_entry['Properties']['open'] == 'true':
+            if properties['open'] == 'true':
                 data += 4
         elif key.endswith('rail'):
-            shape = palette_entry['Properties']['shape']
+            shape = properties['shape']
             data = {'north_south':0, 'east_west': 1, 'ascending_east': 2, 'ascending_west': 3, 'ascending_north': 4, 'ascending_south': 5, 'south_east': 6, 'south_west': 7, 'north_west': 8, 'north_east': 9}[shape]
-            if key == 'minecraft:powered_rail' and palette_entry['Properties']['powered'] == 'true':
+            if key == 'minecraft:powered_rail' and properties['powered'] == 'true':
                 data |= 8
         elif key in ['minecraft:comparator', 'minecraft:repeater']:
             # Bits 1-2 indicates facing, bits 3-4 indicates delay
-            if palette_entry['Properties']['powered'] == 'true':
+            if properties['powered'] == 'true':
                 block += 1
-            facing = palette_entry['Properties']['facing']
+            facing = properties['facing']
             data = {'south': 0, 'west': 1, 'north': 2, 'east': 3}[facing]
-            data |= (int(palette_entry['Properties'].get('delay', '1')) - 1) << 2
+            data |= (int(properties.get('delay', '1')) - 1) << 2
         elif key == 'minecraft:daylight_detector':
-            if palette_entry['Properties']['inverted'] == 'true':
+            if properties['inverted'] == 'true':
                 block = 178
         elif key == 'minecraft:redstone_wire':
-            data = palette_entry['Properties']['power']
+            data = properties['power']
         elif key in ['minecraft:grass_block', 'minecraft:mycelium', 'minecraft:podzol']:
-            if palette_entry['Properties']['snowy'] == 'true':
+            if properties['snowy'] == 'true':
                 data |= 0x10
         elif key == 'minecraft:snow':
-            data = palette_entry['Properties']['layers']
+            data = properties['layers']
         elif key in ('minecraft:sunflower', 'minecraft:lilac', 'minecraft:tall_grass', 'minecraft:large_fern', 'minecraft:rose_bush', 'minecraft:peony'):
-            if palette_entry['Properties']['half'] == 'upper':
+            if properties['half'] == 'upper':
                 data |= 0x08
         elif key in ('minecraft:pitcher_plant'):
-            if palette_entry['Properties']['half'] == 'upper':
+            if properties['half'] == 'upper':
                 data |= 0x08
         elif key == 'minecraft:pitcher_crop':
-            data = int(palette_entry['Properties']['age'])
-            if palette_entry['Properties']['half'] == 'upper':
+            data = int(properties['age'])
+            if properties['half'] == 'upper':
                     data |= 0x08
         elif (key in 'minecraft:chiseled_bookshelf'):
-            facing = palette_entry['Properties']['facing']
+            facing = properties['facing']
             data = {'south': 0, 'west': 1, 'north': 2, 'east': 3}[facing]
-            p = palette_entry['Properties']
+            p = properties
             occupancy = 0
             for i in range(6):
                 if p[f'slot_{i}_occupied'] == 'true':
@@ -1666,21 +1735,25 @@ class RegionSet(object):
             occupancy = occupancy << 1
             data |= occupancy
         elif key == 'minecraft:calibrated_sculk_sensor':
-            facing = palette_entry['Properties']['facing']
+            facing = properties['facing']
             data = {'south': 0, 'west': 1, 'north': 2, 'east': 3}[facing]
         elif key in ['minecraft:small_dripleaf', 'minecraft:big_dripleaf', 'minecraft:big_dripleaf_stem']:
-            facing = palette_entry['Properties']['facing']
+            facing = properties['facing']
             data = {'south': 0, 'west': 1, 'north': 2, 'east': 3}[facing]
-        elif key in wood_slabs + stone_slabs + prismarine_slabs + copper_slabs:
+        elif key in wood_slabs + stone_slabs + prismarine_slabs + copper_slabs + colored_slabs:
             # handle double slabs
-            if palette_entry['Properties']['type'] == 'top':
+            if properties['type'] == 'top':
                 data |= 0x08
-            elif key == 'minecraft:smooth_stone_slab' and palette_entry['Properties']['type'] == 'double':
+            elif key == 'minecraft:smooth_stone_slab' and properties['type'] == 'double':
                 # smooth stone slabs are special because they have a different texture for double slabs than the full
                 # block.
                 block = 11358
                 data |= 1
-            elif palette_entry['Properties']['type'] == 'double':
+            elif properties['type'] == 'double':
+                if key in colored_slabs:
+                    color, material = key[len('minecraft:'):-len('_slab')].rsplit('_', 1)
+                    (block, data) = self._blockmap['minecraft:%s_%s' % (color, material)]
+                    return (block, data)
                 # Not all wooden slabs are listed here. Block ID 125 has a 4 bit data field, one bit of which is used
                 # for top/bottom indication allowing only 8 distinct slab types. These are listed here. Everything else
                 # goes through the usual slab process.
@@ -1695,42 +1768,41 @@ class RegionSet(object):
                      'minecraft:trapped_chest', 'minecraft:furnace',
                      'minecraft:blast_furnace', 'minecraft:smoker'] or \
                 key in generate_copper('copper_chest'):
-            facing = palette_entry['Properties']['facing']
+            facing = properties['facing']
             data = {'north': 2, 'south': 3, 'west': 4, 'east': 5}[facing]
             if key in ['minecraft:chest', 'minecraft:trapped_chest'] or \
                     key in generate_copper('copper_chest'):
                 # type property should exist, but default to 'single' just in case
-                chest_type = palette_entry['Properties'].get('type', 'single')
+                chest_type = properties.get('type', 'single')
                 data |= {'left': 0x8, 'right': 0x10, 'single': 0x0}[chest_type]
             elif key in ['minecraft:furnace', 'minecraft:blast_furnace', 'minecraft:smoker']:
-                data |= 8 if palette_entry['Properties'].get('lit', 'false') == 'true' else 0
+                data |= 8 if properties.get('lit', 'false') == 'true' else 0
             elif key in ['minecraft:ladder']:
-                if palette_entry['Properties'].get('waterlogged', 'false') == 'true':
+                if properties.get('waterlogged', 'false') == 'true':
                     block = 8
         elif key in ['minecraft:beehive', 'minecraft:bee_nest']:
-            facing = palette_entry['Properties']['facing']
-            honey_level = int(palette_entry['Properties']['honey_level'])
+            facing = properties['facing']
+            honey_level = int(properties['honey_level'])
             data = {'south': 0, 'west': 1, 'north': 2, 'east': 3}[facing]
             if honey_level == 5:
                 data = {'south': 4, 'west': 5, 'north': 6, 'east': 7}[facing]
         elif key.endswith('_button'):
-            facing = palette_entry['Properties']['facing']
-            face   = palette_entry['Properties']['face']
+            facing = properties['facing']
+            face   = properties['face']
             if face == 'ceiling':
-                block = 0
-                data = 0
+                data = {'east': 17, 'west': 17, 'south': 16, 'north': 16}[facing]
             elif face == 'wall':
                 data = {'east': 1, 'west': 2, 'south': 3, 'north': 4}[facing]
             elif face == 'floor':
                 data = {'east': 6, 'west': 6, 'south': 5, 'north': 5}[facing]
         elif key == 'minecraft:nether_wart':
-            data = int(palette_entry['Properties']['age'])
+            data = int(properties['age'])
         elif key == 'minecraft:torchflower_crop':
-            data = int(palette_entry['Properties']['age'])
+            data = int(properties['age'])
         elif (key.endswith('shulker_box') or key.endswith('piston') or
               key in ['minecraft:observer', 'minecraft:dropper', 'minecraft:dispenser',
                       'minecraft:piston_head', 'minecraft:jigsaw', 'minecraft:end_rod']):
-            p = palette_entry['Properties']
+            p = properties
             data = {'down': 0, 'up': 1, 'north': 2, 'south': 3, 'west': 4, 'east': 5}[p['facing']]
             if ((key.endswith('piston') and p.get('extended', 'false') == 'true') or
                 (key == 'minecraft:piston_head' and p.get('type', 'normal') == 'sticky') or
@@ -1741,13 +1813,13 @@ class RegionSet(object):
                       'minecraft:warped_stem', 'minecraft:stripped_warped_stem',
                       'minecraft:crimson_stem', 'minecraft:stripped_crimson_stem',
                       'minecraft:bamboo_block', 'minecraft:stripped_bamboo_block']):
-            axis = palette_entry['Properties']['axis']
+            axis = properties['axis']
             if axis == 'x':
                 data |= 4
             elif axis == 'z':
                 data |= 8
         elif key == 'minecraft:quartz_pillar':
-            axis = palette_entry['Properties']['axis']
+            axis = properties['axis']
             if axis == 'x':
                 data = 3
             if axis == 'z':
@@ -1755,11 +1827,11 @@ class RegionSet(object):
         elif key in ['minecraft:basalt', 'minecraft:polished_basalt', 'minecraft:chain', 'minecraft:purpur_pillar',
                      'minecraft:deepslate', 'minecraft:iron_chain'] or \
                 key.endswith('_froglight') or key in generate_copper('copper_chain'):
-            axis = palette_entry['Properties']['axis']
+            axis = properties['axis']
             data = {'y': 0, 'x': 1, 'z': 2}[axis]
         elif key == 'minecraft:creaking_heart':
-            axis = palette_entry['Properties']['axis']
-            state = palette_entry['Properties']['creaking_heart_state']
+            axis = properties['axis']
+            state = properties['creaking_heart_state']
 
             data = {'uprooted': 0, 'dormant': 1, 'awake': 2}[state]
             data <<= 2
@@ -1768,21 +1840,21 @@ class RegionSet(object):
         elif key in ['minecraft:redstone_torch','minecraft:redstone_wall_torch','minecraft:wall_torch',
                      'minecraft:soul_torch', 'minecraft:soul_wall_torch',
                      'minecraft:copper_torch', 'minecraft:copper_wall_torch']:
-            if key.startswith('minecraft:redstone_') and palette_entry['Properties']['lit'] == 'true':
+            if key.startswith('minecraft:redstone_') and properties['lit'] == 'true':
                 block += 1
             if key.endswith('wall_torch'):
-                facing = palette_entry['Properties'].get('facing')
+                facing = properties.get('facing')
                 data = {'east': 1, 'west': 2, 'south': 3, 'north': 4}[facing]
             else:
                 data = 5
         elif (key in ['minecraft:carved_pumpkin', 'minecraft:jack_o_lantern',
                       'minecraft:stonecutter', 'minecraft:loom'] or
               key.endswith('glazed_terracotta')):
-            facing = palette_entry['Properties']['facing']
+            facing = properties['facing']
             data = {'south': 0, 'west': 1, 'north': 2, 'east': 3}[facing]
         elif key in ['minecraft:vine', 'minecraft:brown_mushroom_block',
                      'minecraft:red_mushroom_block', 'minecraft:mushroom_stem']:
-            p = palette_entry['Properties']
+            p = properties
             if p['south'] == 'true':
                 data |= 1
             if p['west']  == 'true':
@@ -1797,26 +1869,26 @@ class RegionSet(object):
             if p.get('down', 'false') == 'true':
                 data |= 32
         elif key.endswith('anvil'):
-            facing = palette_entry['Properties']['facing']
+            facing = properties['facing']
             if facing == 'west':  data += 1
             if facing == 'north': data += 2
             if facing == 'east':  data += 3
         elif key.endswith('sign'):
             if key.endswith('wall_sign') or key.endswith('_wall_hanging_sign'):
-                facing = palette_entry['Properties']['facing']
+                facing = properties['facing']
                 if   facing == 'north': data = 2
                 elif facing == 'west':  data = 4
                 elif facing == 'south': data = 3
                 elif facing == 'east':  data = 5
             else:
-                p = palette_entry['Properties']
+                p = properties
                 data = int(p['rotation'])
 
                 if key.endswith('_hanging_sign') and p['attached'] == 'true':
                     data |= 0x10
 
         elif key.endswith('_fence'):
-            p = palette_entry['Properties']
+            p = properties
             if p['north'] == 'true':
                 data |= 1
             if p['east'] == 'true':
@@ -1826,15 +1898,15 @@ class RegionSet(object):
             if p['west'] == 'true':
                 data |= 8
         elif key.endswith('_stairs'):
-            facing = palette_entry['Properties']['facing']
+            facing = properties['facing']
             if   facing == 'south': data = 2
             elif facing == 'east':  data = 0
             elif facing == 'north': data = 3
             elif facing == 'west':  data = 1
-            if palette_entry['Properties']['half'] == 'top':
+            if properties['half'] == 'top':
                 data |= 0x4
         elif key.endswith('_door'):
-            p = palette_entry['Properties']
+            p = properties
             if p['hinge'] == 'left': data |= 0x10
             if p['open'] == 'true': data |= 0x04
             if p['half'] == 'upper': data |= 0x08
@@ -1845,55 +1917,55 @@ class RegionSet(object):
                 'east':  0x00,
                }[p['facing']]
         elif key.endswith('_trapdoor'):
-            p = palette_entry['Properties']
+            p = properties
             data = {'south': 1, 'north': 0, 'east': 3, 'west': 2}[p['facing']]
             if p['open'] == 'true': data |= 0x04
             if p['half'] == 'top': data |= 0x08
         elif key in ['minecraft:beetroots', 'minecraft:melon_stem', 'minecraft:wheat',
                      'minecraft:pumpkin_stem', 'minecraft:potatoes', 'minecraft:carrots',
                      'minecraft:sweet_berry_bush', 'minecraft:chorus_flower']:
-            data = palette_entry['Properties']['age']
+            data = properties['age']
         elif key in (['minecraft:lantern', 'minecraft:soul_lantern'] + generate_copper('copper_lantern')):
-            if palette_entry['Properties']['waterlogged'] == 'true':
+            if properties['waterlogged'] == 'true':
                 block = 8
-            elif palette_entry['Properties']['hanging'] == 'true':
+            elif properties['hanging'] == 'true':
                 data = 1
             else:
                 data = 0
         elif key == "minecraft:composter":
-            data = palette_entry['Properties']['level']
+            data = properties['level']
         elif key == "minecraft:barrel":
             facing_data = {'up': 0, 'down': 1, 'south': 2, 'east': 3, 'north': 4, 'west': 5}
             data = (
-                (facing_data[palette_entry['Properties']['facing']] << 1) +
-                (1 if palette_entry['Properties']['open'] == 'true' else 0)
+                (facing_data[properties['facing']] << 1) +
+                (1 if properties['open'] == 'true' else 0)
             )
         elif key.endswith('_bed'):
-            facing = palette_entry['Properties']['facing']
+            facing = properties['facing']
             data |= {'south': 0, 'west': 1, 'north': 2, 'east': 3}[facing]
-            if palette_entry['Properties'].get('part', 'foot') == 'head':
+            if properties.get('part', 'foot') == 'head':
                 data |= 8
         elif key == 'minecraft:end_portal_frame':
-            facing = palette_entry['Properties']['facing']
+            facing = properties['facing']
             data |= {'south': 0, 'west': 1, 'north': 2, 'east': 3}[facing]
-            if palette_entry['Properties'].get('eye', 'false') == 'true':
+            if properties.get('eye', 'false') == 'true':
                 data |= 4
         elif key == 'minecraft:respawn_anchor':
-            data = int(palette_entry['Properties']['charges'])
+            data = int(properties['charges'])
         elif key in ['minecraft:cauldron', 'minecraft:water_cauldron',
                      'minecraft:lava_cauldron', 'minecraft:powder_snow_cauldron']:
-            data |= int(palette_entry.get('Properties', {}).get('level', '0'))
+            data |= int(properties.get('level', '0'))
         elif key == 'minecraft:structure_block':
-            block_mode = palette_entry['Properties'].get('mode', 'save')
+            block_mode = properties.get('mode', 'save')
             data = {'save': 0, 'load': 1, 'corner': 2, 'data': 3}.get(block_mode, 0)
         elif key == 'minecraft:cake':
-            data = int(palette_entry['Properties'].get('bites', '0'))
+            data = int(properties.get('bites', '0'))
         elif key == 'minecraft:farmland':
             # A moisture level of 7 has a different texture from other farmland
-            data = 1 if palette_entry['Properties'].get('moisture', '0') == '7' else 0
+            data = 1 if properties.get('moisture', '0') == '7' else 0
         elif key in ['minecraft:grindstone', 'minecraft:lectern', 'minecraft:campfire',
                      'minecraft:bell', 'minecraft:soul_campfire']:
-            p = palette_entry['Properties']
+            p = properties
             data = {'south': 0, 'west': 1, 'north': 2, 'east': 3}[p['facing']]
             if key == 'minecraft:grindstone':
                 data |= {'floor': 0, 'wall': 4, 'ceiling': 8}[p['face']]
@@ -1909,7 +1981,7 @@ class RegionSet(object):
         elif key in ['minecraft:iron_bars', 'minecraft:glass_pane'] or \
                 key in generate_copper('copper_bars') or \
                 key in ['minecraft:%s_stained_glass_pane' % item for item in colors]:
-            p = palette_entry['Properties']
+            p = properties
             if p['north'] == 'true':
                 data |= (1 << 4)
             if p['east'] == 'true':
@@ -1918,25 +1990,25 @@ class RegionSet(object):
                 data |= (4 << 4)
             if p['west'] == 'true':
                 data |= (8 << 4)
-        elif key == 'minecraft:pointed_dripstone':
-            p = palette_entry['Properties']
+        elif key in ('minecraft:pointed_dripstone', 'minecraft:sulfur_spike'):
+            p = properties
             data = {'tip': 0, 'tip_merge': 1, 'middle': 2, 'frustum': 3, 'base': 4}[p['thickness']]
             data |= {'up': 0, 'down': 0b1000}[p['vertical_direction']]
         elif key in ['minecraft:small_amethyst_bud', 'minecraft:medium_amethyst_bud', 'minecraft:large_amethyst_bud']:
-            p = palette_entry['Properties']
+            p = properties
             data = {'down': 0, 'up': 1, 'east': 2, 'south': 3, 'west': 4, 'north': 5}[p['facing']]
         elif key == 'minecraft:lightning_rod' or key in generate_copper('lightning_rod'):
-            p = palette_entry['Properties']
+            p = properties
             if p['waterlogged'] == 'true':
                 block = 8
             else:
                 data = {'down': 0, 'up': 1, 'east': 2, 'south': 3, 'west': 4, 'north': 5}[p['facing']]
         elif key in ['minecraft:cave_vines_plant', 'minecraft:cave_vines']:
-            p = palette_entry['Properties']
+            p = properties
             if p['berries'] == 'true':
                 data = 1
         elif key == 'minecraft:glow_lichen':
-            p = palette_entry['Properties']
+            p = properties
             if p['waterlogged'] == 'true':
                 block = 8
 
@@ -1953,13 +2025,13 @@ class RegionSet(object):
             if p['north'] == 'true':
                 data |= 1 << 5
         elif key.endswith('copper_bulb'):
-            p = palette_entry['Properties']
+            p = properties
             if p['lit'] == 'true':
                 data |= (1 << 0)
             if p['powered'] == 'true':
                 data |= (1 << 1)
         elif key == 'minecraft:crafter':
-            p = palette_entry['Properties']
+            p = properties
 
             if p['crafting'] == 'true':
                 data |= (1 << 4)
@@ -1987,7 +2059,7 @@ class RegionSet(object):
                 data |= 3
 
         elif key == 'minecraft:trial_spawner':
-            p = palette_entry['Properties']
+            p = properties
 
             # 3 bits of data.
             #   ┌─── ominous
@@ -2005,7 +2077,7 @@ class RegionSet(object):
             data |= (p['ominous'] == 'true') << 2
 
         elif key == 'minecraft:vault':
-            p = palette_entry['Properties']
+            p = properties
             # 5 bits of data.
             #   ┌───── ominous
             #   │┌┬─── vault_state
@@ -2026,7 +2098,7 @@ class RegionSet(object):
 
         elif key in ['minecraft:dead_%s_coral_wall_fan' % item for item in coral_list] or \
              key in ['minecraft:%s_coral_wall_fan' % item for item in coral_list]:
-            p = palette_entry['Properties']
+            p = properties
             facing = p['facing']
             if p['waterlogged'] == 'true':
                 block = 8
@@ -2044,7 +2116,7 @@ class RegionSet(object):
                 data |= 1
 
         elif (key.endswith('_coral') or key.endswith('fan')):
-            if palette_entry['Properties']['waterlogged'] == 'true':
+            if properties['waterlogged'] == 'true':
                 block = 8
 
         elif key.endswith('_candle') or key == 'minecraft:candle':
@@ -2054,7 +2126,7 @@ class RegionSet(object):
             #   next 2 bits == number of candles
             #   next 1 bit == list
 
-            p = palette_entry['Properties']
+            p = properties
             if p['waterlogged'] == 'true':
                 block = 8
             else:
@@ -2068,19 +2140,19 @@ class RegionSet(object):
             #   first 4 bits == colour
             #   next 1 bit == list
 
-            p = palette_entry['Properties']
+            p = properties
             if p['lit'] == 'true':
                 data |= 1 << 4
 
         elif key.endswith('_wall_head') or key.endswith('_wall_skull'):
-            facing = palette_entry['Properties']['facing']
+            facing = properties['facing']
             data = {'south': 0, 'west': 1, 'north': 2, 'east': 3}[facing]
 
         elif key.endswith('_head') or key.endswith('_skull'):
-            data = int(palette_entry['Properties']['rotation'])
+            data = int(properties['rotation'])
 
         elif key == "minecraft:sniffer_egg":
-            p = palette_entry['Properties']
+            p = properties
             if p['hatch'] == 0:
                 data = 0
             if p['hatch'] == 1:
@@ -2089,7 +2161,7 @@ class RegionSet(object):
                 data = 2
 
         elif key in ['minecraft:sculk_vein', 'minecraft:resin_clump']:
-            p = palette_entry['Properties']
+            p = properties
 
             if 'waterlogged' in p and p['waterlogged'] == 'true':
                 block = 8
@@ -2103,12 +2175,12 @@ class RegionSet(object):
                 data |= 0b10_0000 if p['south'] == 'true' else 0
 
         elif key == "minecraft:pale_hanging_moss":
-            p = palette_entry['Properties']
+            p = properties
             if p['tip'] == 'true':
                 data = 1
 
         elif key == 'minecraft:pale_moss_carpet':
-            p = palette_entry['Properties']
+            p = properties
             data = 0
 
             for dir in ['north', 'east', 'south', 'west']:
@@ -2125,25 +2197,26 @@ class RegionSet(object):
                 data |= 1
 
         elif key in ('minecraft:pink_petals', 'minecraft:wildflowers', 'minecraft:leaf_litter'):
-            facing = palette_entry['Properties']['facing']
+            facing = properties['facing']
             data = {'north': 0, 'east': 1, 'south': 2, 'west': 3}[facing]
 
             if key == 'minecraft:leaf_litter':
-                amount = int(palette_entry['Properties']['segment_amount'])
+                amount = int(properties['segment_amount'])
             else:
-                amount = int(palette_entry['Properties']['flower_amount'])
+                amount = int(properties['flower_amount'])
 
             data |= (amount - 1) << 2
 
         elif key == 'minecraft:test_block':
-            p = palette_entry['Properties']
+            p = properties
             data = ['start','accept','fail','log'].index(p['mode'])
 
         elif key in ['minecraft:oak_shelf', 'minecraft:spruce_shelf', 'minecraft:birch_shelf',
                      'minecraft:jungle_shelf', 'minecraft:acacia_shelf', 'minecraft:dark_oak_shelf',
                      'minecraft:mangrove_shelf', 'minecraft:bamboo_shelf', 'minecraft:cherry_shelf',
-                     'minecraft:pale_oak_shelf', 'minecraft:crimson_shelf', 'minecraft:warped_shelf']:
-            p = palette_entry['Properties']
+                     'minecraft:pale_oak_shelf', 'minecraft:crimson_shelf', 'minecraft:warped_shelf',
+                     'minecraft:poplar_shelf']:
+            p = properties
             facing = p['facing']
             data = ['south', 'west', 'north', 'east'].index(facing)
 
@@ -2152,6 +2225,14 @@ class RegionSet(object):
 
             if p['waterlogged'] == 'true':
                 block = 8
+
+        elif key == 'minecraft:shelf_mushroom':
+            data = ['south', 'west', 'north', 'east'].index(properties['facing'])
+            data |= int(properties['age']) << 2
+
+        elif key == 'minecraft:dried_ghast':
+            data = ['north', 'east', 'south', 'west'].index(properties['facing'])
+            data |= int(properties['hydration']) << 2
 
         return (block, data)
 
@@ -2194,8 +2275,8 @@ class RegionSet(object):
 
             try:
                 translated_biomes[i] = self._biomemap.index(key)
-            except KeyError:
-                raise Exception("Unknown biome `%s` wanted, investigate!" % key)
+            except ValueError as exc:
+                raise nbt.CorruptChunkError("Unsupported biome %r" % key) from exc
 
         if not biome_data:
             #no biome-dataarray, means entire biome is palette[0]
@@ -2339,8 +2420,12 @@ class RegionSet(object):
             key = palette[i]
             try:
                 translated_blocks[i], translated_data[i] = self._get_block(key)
-            except KeyError:
-                pass    # We already have initialised arrays with 0 (= air)
+            except KeyError as exc:
+                name = normalize_blockstate(key)['id']
+                if name in self._blockmap:
+                    raise nbt.CorruptChunkError("Invalid properties for block %r: %s"
+                                               % (name, exc)) from exc
+                unrecognized_block_types[name] = unrecognized_block_types.get(name, 0) + 1
 
         # Turn the BlockStates array into a 16x16x16 numpy matrix of shorts.
         blocks = numpy.empty((4096,), dtype=numpy.uint16)
@@ -2506,7 +2591,10 @@ class RegionSet(object):
                 raise nbt.CorruptChunkError()
 
         for k in unrecognized_block_types:
-            logging.debug("Found %d blocks of unknown type %s" % (unrecognized_block_types[k], k))
+            if k not in self._unrecognized_blocks:
+                logging.warning("Unsupported block %s in %s; rendering it as air.",
+                                k, self.regiondir)
+                self._unrecognized_blocks.add(k)
 
         return chunk_data
 

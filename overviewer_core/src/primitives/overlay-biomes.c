@@ -96,6 +96,8 @@ static struct BiomeColor default_biomes[] = {
     {62, 0xD3, 0xD3, 0xD3}, // End Barrens
     {63, 0xfb, 0xa7, 0xea}, // Cherry Grove
     {64, 0x8F, 0xBC, 0x8F}, // Pale Garden
+    {65, 0xAB, 0xA6, 0x4F}, // Sulfur Caves
+    {66, 0xDF, 0x68, 0x27}, // Dappled Forest
 
     /* end of list marker */
     {255, 0, 0, 0}};

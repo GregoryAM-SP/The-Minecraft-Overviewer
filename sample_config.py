@@ -15,10 +15,22 @@ outputdir = "/tmp/test_render"
 # Try "smooth_lighting" for even better looking maps!
 rendermode = "lighting"
 
+# Sign markers. genPOI (run with --genpoi) converts old (pre-1.20) signs to the
+# modern layout before calling filter functions, so this one filter matches
+# signs from both old and new worlds. Use "messagesHtml" when displaying text
+# (it is escaped); use "messages" for plain-text matching.
+def signFilter(poi):
+    if poi['id'] in ['minecraft:sign', 'minecraft:hanging_sign']:
+        lines = []
+        for side in ['front_text', 'back_text']:
+            lines += [l for l in poi.get(side, {}).get('messagesHtml', []) if l.strip()]
+        return "<br />".join(lines)
+
 renders["render1"] = {
         'world': 'My World',
         'title': 'A regular render',
         'dimension': 'overworld',
+        'markers': [dict(name="Signs", filterFunction=signFilter)],
 }
 
 # This example is the same as above, but rotated

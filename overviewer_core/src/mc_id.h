@@ -576,7 +576,19 @@ enum mc_block_id {
     block_tuff_brick_stairs = 12671,
 
     block_resin_brick_stairs = 1147,
-    block_resin_brick_slab = 1148
+    block_resin_brick_slab = 1148,
+
+    block_white_wool_slab = 12810,
+    block_black_wool_slab = 12825,
+    block_white_wool_stairs = 12830,
+    block_black_wool_stairs = 12845,
+    block_white_concrete_slab = 12850,
+    block_black_concrete_slab = 12865,
+    block_white_concrete_stairs = 12870,
+    block_black_concrete_stairs = 12885,
+    block_poplar_slab = 12902,
+    block_poplar_stairs = 12903,
+    block_poplar_door = 12908
 };
 
 typedef uint16_t mc_block_t;
